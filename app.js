@@ -655,44 +655,42 @@ function App(){
               const activeTab=rolesTab;
               const tabBtnSt=active=>({background:active?'#5514B4':'transparent',border:'none',padding:'7px 16px',fontSize:'13.5px',fontWeight:active?700:500,color:active?'#fff':'#5C5C6E',cursor:'pointer',borderRadius:'7px',fontFamily:'inherit',transition:'background 0.15s, color 0.15s',whiteSpace:'nowrap'});
               const whoHasAccessPanel=isBt
-                ?h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                  h('div',{style:{overflowX:'auto'}},
+                ?h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},
                     h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
                       h('thead',null,h('tr',null,
                         h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
                         PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
                       h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
                         h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
-                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))))
-                :h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                  h('div',{style:{overflowX:'auto'}},
+                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))))
+                :h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},
                     h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'820px'}},
                       h('thead',null,h('tr',null,
                         h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Permission area'),
                         ROLE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 8px',fontSize:'12.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'96px'}},hd)))),
                       h('tbody',null,ROLE_ROWS.map((row,ri)=>h('tr',{key:ri},
                         h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
-                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))));
-              return h('div',{style:{maxWidth:'1120px'}},
-                h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',marginBottom:'24px',alignSelf:'flex-start',width:'fit-content'}},
-                  tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label))),
+                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))));
+              return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',maxWidth:'1120px'}},
+                h('div',{style:{padding:'20px 24px 18px'}},
+                  h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',alignSelf:'flex-start',width:'fit-content'}},
+                    tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
                 activeTab==='orgProfiles'&&h('div',null,
-                  h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
+                  h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
                     ?'Four organisation types make up the BT Wholesale network. Each is built on a capability profile — this defines what they can do on the platform and what permissions they can pass down to the next tier.'
                     :'Your network includes different types of downstream organisations. This shows what each type is set up to do on the platform.'),
-                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                    h('div',{style:{overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
-                      h('thead',null,h('tr',null,
-                        h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
-                        PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
-                      h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
-                        h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
-                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))))),
+                  h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
+                    h('thead',null,h('tr',null,
+                      h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
+                      PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
+                    h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
+                      h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
+                      row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))))),
                 activeTab==='roleDirectory'&&h('div',null,
-                  h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
+                  h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
                     ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
                     :'Each role controls exactly what a user can see and do in the platform. When you assign someone a role, they get access to everything it covers — no more, no less.'),
-                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
+                  h('div',{style:{borderTop:'1px solid #E8E8E8'}},
                     h('table',{style:{borderCollapse:'collapse',width:'100%'}},
                       h('thead',null,h('tr',null,
                         h('th',{style:{textAlign:'left',padding:'13px 22px',fontSize:'11.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},'Role'),
@@ -705,8 +703,8 @@ function App(){
                           onMouseLeave:e=>{if(selRole!==r.key)e.currentTarget.style.background='transparent';}},
                           h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},r.label),
                           h('td',{style:{padding:'14px 22px',fontSize:'13.5px',color:'#434343',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},r.desc),
-                          h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,color:'#5514B4',textAlign:'right',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},String(users.filter(u=>u.roleKey===r.key).length)))))))
-                ));
+                          h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,color:'#5514B4',textAlign:'right',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},String(users.filter(u=>u.roleKey===r.key).length))))))))
+                );
             })()),
 
           screen==='orgs'&&h('div',null,
@@ -1122,44 +1120,42 @@ function App(){
                 const activeTab=rolesTab;
                 const tabBtnSt=active=>({background:active?'#5514B4':'transparent',border:'none',padding:'7px 16px',fontSize:'13.5px',fontWeight:active?700:500,color:active?'#fff':'#5C5C6E',cursor:'pointer',borderRadius:'7px',fontFamily:'inherit',transition:'background 0.15s, color 0.15s',whiteSpace:'nowrap'});
                 const whoHasAccessPanel=isBt
-                  ?h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                    h('div',{style:{overflowX:'auto'}},
+                  ?h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},
                       h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
                         h('thead',null,h('tr',null,
                           h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
                           PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
                         h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
                           h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
-                          row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))))
-                  :h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                    h('div',{style:{overflowX:'auto'}},
+                          row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))))
+                  :h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},
                       h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'820px'}},
                         h('thead',null,h('tr',null,
                           h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Permission area'),
                           ROLE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 8px',fontSize:'12.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'96px'}},hd)))),
                         h('tbody',null,ROLE_ROWS.map((row,ri)=>h('tr',{key:ri},
                           h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
-                          row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))));
-                return h('div',null,
-                  h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',marginBottom:'24px',alignSelf:'flex-start',width:'fit-content'}},
-                    tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label))),
+                          row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))));
+                return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
+                  h('div',{style:{padding:'20px 24px 18px'}},
+                    h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',alignSelf:'flex-start',width:'fit-content'}},
+                      tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
                   activeTab==='orgProfiles'&&h('div',null,
-                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
+                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
                       ?'Four organisation types make up the BT Wholesale network. Each is built on a capability profile — this defines what they can do on the platform and what permissions they can pass down to the next tier.'
                       :'Your network includes different types of downstream organisations. This shows what each type is set up to do on the platform.'),
-                    h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                      h('div',{style:{overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
-                        h('thead',null,h('tr',null,
-                          h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
-                          PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
-                        h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
-                          h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
-                          row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))))),
+                    h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'640px'}},
+                      h('thead',null,h('tr',null,
+                        h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
+                        PROFILE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 10px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'120px'}},hd)))),
+                      h('tbody',null,PROFILE_ROWS.map((row,ri)=>h('tr',{key:ri},
+                        h('td',{style:{textAlign:'left',padding:'12px 22px',fontSize:'13.5px',borderBottom:'1px solid #F0F0F0'}},row[0]),
+                        row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'12px 10px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))))),
                   activeTab==='roleDirectory'&&h('div',null,
-                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
+                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
                       ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
                       :'Each role controls exactly what a user can see and do in the platform. When you assign someone a role, they get access to everything it covers — no more, no less.'),
-                    h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
+                    h('div',{style:{borderTop:'1px solid #E8E8E8'}},
                       h('table',{style:{borderCollapse:'collapse',width:'100%'}},
                         h('thead',null,h('tr',null,
                           h('th',{style:{textAlign:'left',padding:'13px 22px',fontSize:'11.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},'Role'),
@@ -1176,8 +1172,8 @@ function App(){
                             isBt?String(r.users):String(users.filter(u=>u.roleKey===r.key).length)))))))),
                   (activeTab==='userRoles'||activeTab==='resellerAdmins')&&(isBt
                     ?h('div',null,
-                        h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},'These are the named administrators across your reseller network. Each reseller needs an active administrator before their users and downstream organisations can be managed.'),
-                        h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',marginBottom:'12px'}},
+                        h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 0 16px'}},'These are the named administrators across your reseller network. Each reseller needs an active administrator before their users and downstream organisations can be managed.'),
+                        h('div',{style:{borderTop:'1px solid #E8E8E8',marginBottom:'12px'}},
                           h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 120px',padding:'11px 20px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontSize:'11.5px',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},'Organisation','Administrator','Email','Status'),
                           orgs.filter(o=>o.typeKey==='reseller').map(o=>{
                             const admin=users.find(u=>u.orgId===o.id&&u.roleKey==='admin');
@@ -1199,13 +1195,12 @@ function App(){
                           h('span',{style:{color:'#808080',flexShrink:0,marginTop:'1px'}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:15,c:'#808080'})),
                           h('div',{style:{fontSize:'13px',color:'#808080',lineHeight:1.5}},'Day-to-day user roles within each reseller — such as Order Manager, Billing Manager and Support — are set and managed by each reseller\'s own administrator. You don\'t configure those from here.')))
                     :h('div',null,
-                        h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},'This shows what each role in your organisation can access. Use it when deciding which role to assign to a new team member, or to check what someone currently has access to.'),
+                        h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 0 16px'}},'This shows what each role in your organisation can access. Use it when deciding which role to assign to a new team member, or to check what someone currently has access to.'),
                         h('div',{style:{display:'flex',gap:'18px',alignItems:'center',marginBottom:'12px',fontSize:'12.5px',color:'#6B6B6B'}},
                           h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'y'}),'Full access'),
                           h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'p'}),'Partial access'),
                           h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'n'}),'No access')),
-                        h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-                          h('div',{style:{overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'820px'}},
+                        h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'820px'}},
                             h('thead',null,h('tr',null,
                               h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Permission area'),
                               ROLE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 8px',fontSize:'12.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'96px'}},hd)))),
@@ -1213,10 +1208,10 @@ function App(){
                               h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
                               row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))))))),
                   activeTab==='whoHasAccess'&&h('div',null,
-                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
+                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
                       ?'A complete breakdown of which platform capabilities each organisation type in your network can access.'
                       :'A complete breakdown of which permission areas each role in your organisation can access. Use this to understand what you\'re granting when you assign someone a role.'),
-                    whoHasAccessPanel));
+                    whoHasAccessPanel);
               })()))),
 
 
