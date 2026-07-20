@@ -965,7 +965,7 @@ function App(){
                 ?[{key:'orgProfiles',label:'Organisation types'},{key:'roleDirectory',label:'Available roles'},{key:'resellerAdmins',label:'Reseller admins'},{key:'whoHasAccess',label:'Who has access?'}]
                 :[{key:'orgProfiles',label:'Organisation types'},{key:'roleDirectory',label:'Available roles'},{key:'userRoles',label:"Your team's roles"},{key:'whoHasAccess',label:'Who has access?'}];
               const activeTab=rolesTab;
-              const tabBtnSt=active=>({background:'none',border:'none',padding:'10px 18px',fontSize:'14px',fontWeight:active?700:500,color:active?'#5514B4':'#808080',cursor:'pointer',borderBottom:active?'2px solid #5514B4':'2px solid transparent',marginBottom:'-1px',fontFamily:'inherit',transition:'color 0.15s'});
+              const tabBtnSt=active=>({background:active?'#5514B4':'transparent',border:'none',padding:'7px 16px',fontSize:'13.5px',fontWeight:active?700:500,color:active?'#fff':'#5C5C6E',cursor:'pointer',borderRadius:'7px',fontFamily:'inherit',transition:'background 0.15s, color 0.15s',whiteSpace:'nowrap'});
               const whoHasAccessPanel=isBt
                 ?h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
                   h('div',{style:{overflowX:'auto'}},
@@ -986,7 +986,7 @@ function App(){
                         h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
                         row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))));
               return h('div',{style:{maxWidth:'1120px'}},
-                h('div',{style:{display:'flex',borderBottom:'1px solid #E3E3E3',marginBottom:'24px'}},
+                h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',marginBottom:'24px',alignSelf:'flex-start',width:'fit-content'}},
                   tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label))),
                 activeTab==='orgProfiles'&&h('div',null,
                   h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
@@ -1432,7 +1432,7 @@ function App(){
                   ?[{key:'orgProfiles',label:'Organisation types'},{key:'roleDirectory',label:'Available roles'},{key:'resellerAdmins',label:'Reseller admins'},{key:'whoHasAccess',label:'Who has access?'}]
                   :[{key:'orgProfiles',label:'Organisation types'},{key:'roleDirectory',label:'Available roles'},{key:'userRoles',label:'Your team\'s roles'},{key:'whoHasAccess',label:'Who has access?'}];
                 const activeTab=rolesTab;
-                const tabBtnSt=active=>({background:'none',border:'none',padding:'10px 18px',fontSize:'14px',fontWeight:active?700:500,color:active?'#5514B4':'#808080',cursor:'pointer',borderBottom:active?'2px solid #5514B4':'2px solid transparent',marginBottom:'-1px',fontFamily:'inherit',transition:'color 0.15s'});
+                const tabBtnSt=active=>({background:active?'#5514B4':'transparent',border:'none',padding:'7px 16px',fontSize:'13.5px',fontWeight:active?700:500,color:active?'#fff':'#5C5C6E',cursor:'pointer',borderRadius:'7px',fontFamily:'inherit',transition:'background 0.15s, color 0.15s',whiteSpace:'nowrap'});
                 const whoHasAccessPanel=isBt
                   ?h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
                     h('div',{style:{overflowX:'auto'}},
@@ -1453,7 +1453,7 @@ function App(){
                           h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
                           row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))));
                 return h('div',null,
-                  h('div',{style:{display:'flex',borderBottom:'1px solid #E3E3E3',marginBottom:'24px'}},
+                  h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',marginBottom:'24px',alignSelf:'flex-start',width:'fit-content'}},
                     tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label))),
                   activeTab==='orgProfiles'&&h('div',null,
                     h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,marginBottom:'16px',marginTop:0}},isBt
