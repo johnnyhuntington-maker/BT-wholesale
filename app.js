@@ -320,7 +320,7 @@ function App(){
           const labels={bt:'BT Wholesale Admin',reseller:'Reseller Admin',user:'Standard User'};
           const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
           const active=persona===k;
-          return h('button',{key:k,onClick:()=>setPsn(k),title:!sidebarOpen?labels[k]:undefined,
+          return h('button',{key:k,onClick:()=>{setPsn(k);setScreen('overview');},title:!sidebarOpen?labels[k]:undefined,
             style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:!sidebarOpen?'10px 0':'10px 12px',justifyContent:!sidebarOpen?'center':'flex-start',border:0,borderRadius:'11px',cursor:'pointer',fontSize:'13.5px',fontWeight:active?700:500,marginBottom:'3px',background:active?'rgba(255,255,255,0.18)':'transparent',color:active?'#fff':'rgba(255,255,255,0.6)',fontFamily:'inherit',transition:'background 150ms'}},
             ic(icons[k],{s:17,c:active?'#fff':'rgba(255,255,255,0.6)'}),
             sidebarOpen&&h('span',{style:{flex:1,textAlign:'left'}},labels[k]));
