@@ -890,7 +890,7 @@ function App(){
             overviewTab==='create'&&orgWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',width:'100%'}},
               h('div',{style:{maxWidth:'640px',margin:'0 auto',padding:'32px 0 0'}},
               h('div',{style:{padding:'0 24px 20px',borderBottom:'1px solid #E3E3E3'}},
-                h('div',{style:{display:'flex',alignItems:'center',gap:'0'}},
+                h('div',{style:{display:'flex',alignItems:'center',gap:'0',maxWidth:'480px',margin:'0 auto'}},
                   ['Details','Contact','Entitlements','Review'].map((label,i)=>{
                     const stepNum=i+1;const done=orgWiz.step>stepNum;const active=orgWiz.step===stepNum;
                     return h('div',{key:label,style:{display:'flex',alignItems:'center',flex:i<3?1:'auto'}},
