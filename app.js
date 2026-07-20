@@ -575,14 +575,9 @@ function App(){
                   showToast('success','Invitation sent to '+user.name+' as '+roleLabel(userWiz.role)+' at '+(o?o.name:'Northgate Telecom')+'.');
                 },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue'))),
 
-            overviewTab==='create'&&orgWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',maxWidth:'760px'}},
-              h('div',{style:{padding:'22px 26px 18px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'flex-start',justifyContent:'space-between'}},
-                h('div',null,
-                  h('div',{style:{fontSize:'18px',fontWeight:700}},isBt?'Create reseller organisation':'Create organisation'),
-                  h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+orgWiz.step+' of 4 · '+['Details','Contacts','Entitlements','Review'][orgWiz.step-1])),
-                h('button',{onClick:()=>{setOrgWiz(null);setOverviewTab('network');},style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',flexShrink:0}},
-                  ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
-              h('div',{style:{padding:'16px 26px',borderBottom:'1px solid #E3E3E3'}},
+            overviewTab==='create'&&orgWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',width:'100%'}},
+              h('div',{style:{maxWidth:'640px',margin:'0 auto',padding:'32px 0 0'}},
+              h('div',{style:{padding:'0 24px 20px',borderBottom:'1px solid #E3E3E3'}},
                 h('div',{style:{display:'flex',alignItems:'center',gap:'0'}},
                   ['Details','Contact','Entitlements','Review'].map((label,i)=>{
                     const stepNum=i+1;const done=orgWiz.step>stepNum;const active=orgWiz.step===stepNum;
@@ -650,7 +645,7 @@ function App(){
                   const org={id,name:orgWiz.name.trim()||'New organisation',typeKey:orgWiz.type,parentId:p.id,contact:orgWiz.email.trim()||'—',primaryName:orgWiz.primaryName||'',primaryEmail:orgWiz.primaryEmail||'',primaryPhone:orgWiz.primaryPhone||'',billingName:orgWiz.billingName||'',billingEmail:orgWiz.billingEmail||'',billingPhone:orgWiz.billingPhone||'',address:orgWiz.address||'',website:orgWiz.website||'',entitlements:ents};
                   setOrgs(os=>[...os,org]);setSeq(n=>n+1);setOrgWiz(null);setSelOrgId(id);setScreen('orgs');
                   showToast('success',org.name+' created as a '+TYPE_LABELS[orgWiz.type]+' under '+p.name+'.');
-                },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue'))),
+                },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue')))),
 
             overviewTab==='roles'&&persona!=='user'&&(()=>{
               const tabs=isBt
