@@ -727,7 +727,7 @@ function App(){
                               :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'No admin set'),
                             h('div',{style:{fontSize:'12.5px',color:'#808080'}},admin?admin.email:'—'),
                             admin&&sc
-                              ?h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'11.5px',fontWeight:700,color:sc[0],background:sc[1]}},
+                              ?h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'11.5px',fontWeight:700,color:sc[0],background:sc[1],width:'fit-content'}},
                                   h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),admin.status)
                               :h('span',null,'—'));
                         })),
@@ -1230,7 +1230,7 @@ function App(){
                                 :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'No admin set'),
                               h('div',{style:{fontSize:'12.5px',color:'#808080'}},admin?admin.email:'—'),
                               admin&&sc
-                                ?h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'11.5px',fontWeight:700,color:sc[0],background:sc[1]}},
+                                ?h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'11.5px',fontWeight:700,color:sc[0],background:sc[1],width:'fit-content'}},
                                     h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),admin.status)
                                 :h('span',null,'—'));
                           })),
