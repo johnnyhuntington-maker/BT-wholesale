@@ -985,7 +985,7 @@ function App(){
                         row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))));
               return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',maxWidth:'1120px'}},
                 h('div',{style:{padding:'20px 24px 18px'}},
-                  h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',alignSelf:'flex-start',width:'fit-content'}},
+                  h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',width:'100%'}},
                     tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
                 activeTab==='orgProfiles'&&h('div',null,
                   h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
@@ -1450,7 +1450,7 @@ function App(){
                           row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v}))))))));
                 return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
                   h('div',{style:{padding:'20px 24px 18px'}},
-                    h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',alignSelf:'flex-start',width:'fit-content'}},
+                    h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',width:'100%'}},
                       tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
                   activeTab==='orgProfiles'&&h('div',null,
                     h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
