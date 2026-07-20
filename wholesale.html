@@ -641,7 +641,7 @@ function App(){
         // Header
         h('header',{style:{height:'74px',flexShrink:0,background:'#fff',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',gap:'24px'}},
           h('div',{style:{display:'flex',alignItems:'center',gap:'10px',minWidth:0}},
-            h('div',{style:{width:'34px',height:'34px',borderRadius:'999px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#fff',background:P.accent,fontWeight:700,fontSize:'12px',letterSpacing:'0.02em'}},
+            h('div',{style:{width:'34px',height:'34px',borderRadius:'999px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontWeight:700,fontSize:'12px',letterSpacing:'0.02em',background:isBt?'#fff':P.accent,color:isBt?'#5514B4':'#fff',border:isBt?'2px solid #5514B4':'none'}},
               P.orgInitials),
             h('span',{style:{fontSize:'14px',fontWeight:600,color:'#1A1A1A',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},
               P.org)),
