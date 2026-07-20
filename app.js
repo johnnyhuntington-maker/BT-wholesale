@@ -298,8 +298,7 @@ function App(){
           ?h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'22px',minWidth:0}},
               h('span',{style:{color:'#fff',display:'flex',flexShrink:0}},BT_LOGO),
               h('div',{style:{lineHeight:1.1,minWidth:0}},
-                h('div',{style:{fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',letterSpacing:'-0.01em',color:'#fff'}},'BT Wholesale'),
-                h('div',{style:{fontSize:'11.5px',color:'rgba(255,255,255,0.65)',fontWeight:600,letterSpacing:'0.01em'}},'Platform Administration')))
+                h('div',{style:{fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',letterSpacing:'-0.01em',color:'#fff'}},'BT Wholesale')))
           :h('div',null,
               h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'16px'}},BT_LOGO)),
 
@@ -339,7 +338,10 @@ function App(){
             avatarMenuOpen&&h('div',{style:{position:'absolute',top:'48px',right:0,background:'#fff',border:'1px solid #E3E3E3',borderRadius:'12px',boxShadow:'0 8px 24px rgba(20,10,40,0.14)',minWidth:'200px',zIndex:50,padding:'6px'}},
               h('div',{style:{padding:'12px 14px 10px',borderBottom:'1px solid #F0F0F0',marginBottom:'4px'}},
                 h('div',{style:{fontWeight:700,fontSize:'13.5px',color:'#1A1A1A'}},P.person.name),
-                h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},P.person.meta)),
+                h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},P.person.meta),
+                h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#ECFDF3',border:'1px solid #A7F3C0',color:'#16A34A',borderRadius:'999px',padding:'3px 10px',fontSize:'11.5px',fontWeight:700,marginTop:'7px'}},
+                  h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#16A34A',flexShrink:0}}),
+                  'Account active')),
               [{icon:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',label:'Profile & settings',screen:'accountSettings'},
                {icon:'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',label:'Preferences',screen:'accountSettings'},
                {icon:'M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',label:'Help & support',screen:'helpSupport'},
