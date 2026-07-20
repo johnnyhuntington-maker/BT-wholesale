@@ -610,11 +610,11 @@ function App(){
                 style:{flexShrink:0,width:'28px',height:'28px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}},
                 ic('m15 18-6-6 6-6',{s:15,c:'#fff'})))
           :h('div',null,
-              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'10px'}},BT_LOGO),
-              h('div',{style:{display:'flex',justifyContent:'center',marginBottom:'6px'}},
+              h('div',{style:{display:'flex',justifyContent:'center',marginBottom:'10px'}},
                 h('button',{onClick:()=>setSidebarOpen(o=>!o),title:'Expand menu',
                   style:{flexShrink:0,width:'28px',height:'28px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}},
-                  ic('m9 18 6-6-6-6',{s:15,c:'#fff'})))),
+                  ic('m9 18 6-6-6-6',{s:15,c:'#fff'}))),
+              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'6px'}},BT_LOGO)),
 
         h('div',{style:{height:'1px',background:'rgba(255,255,255,0.15)',margin:'0 0 16px'}}),
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.5)',padding:'0 10px 8px'}},'Manage'),
