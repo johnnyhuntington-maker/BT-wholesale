@@ -661,8 +661,8 @@ function App(){
               P.orgInitials),
             h('span',{style:{fontSize:'14px',fontWeight:600,color:'#1A1A1A',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},
               P.org)),
-          h('div',{style:{position:'relative',flexShrink:0}},
-            h('button',{onClick:()=>setAvatarMenuOpen(o=>!o),style:{width:'40px',height:'40px',borderRadius:'999px',border:'none',cursor:'pointer',padding:0,overflow:'hidden',background:'#F3EBFE',color:'#5514B4',fontWeight:700,fontSize:'14px',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},
+          h('div',{style:{position:'relative',flexShrink:0},onMouseEnter:()=>setAvatarMenuOpen(true),onMouseLeave:()=>setAvatarMenuOpen(false)},
+            h('button',{style:{width:'40px',height:'40px',borderRadius:'999px',border:'none',cursor:'pointer',padding:0,overflow:'hidden',background:'#F3EBFE',color:'#5514B4',fontWeight:700,fontSize:'14px',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},
               P.person.photo?h('img',{src:P.person.photo,alt:P.person.name,style:{width:'100%',height:'100%',objectFit:'cover',display:'block'}}):P.person.avatar),
             avatarMenuOpen&&h('div',{style:{position:'absolute',top:'48px',right:0,background:'#fff',border:'1px solid #E3E3E3',borderRadius:'12px',boxShadow:'0 8px 24px rgba(20,10,40,0.14)',minWidth:'200px',zIndex:50,padding:'6px'}},
               h('div',{style:{padding:'12px 14px 10px',borderBottom:'1px solid #F0F0F0',marginBottom:'4px'}},
@@ -1608,9 +1608,9 @@ function App(){
               h('div',{style:{display:'grid',gridTemplateColumns:'1fr',gap:'16px',marginBottom:'34px'}},
                 [persona].map(k=>{
                   const pp=PERSONAS[k];const active=k===persona;
-                  return h('div',{key:k,style:{background:'#fff',borderRadius:'16px',border:active?'2px solid #5514B4':'1px solid #E3E3E3',overflow:'hidden'}},
-                    h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'20px',cursor:'pointer'},
-                      onClick:()=>setPersonaCardOpen(o=>!o)},
+                  return h('div',{key:k,style:{background:'#fff',borderRadius:'16px',border:active?'2px solid #5514B4':'1px solid #E3E3E3',overflow:'hidden'},
+                    onMouseEnter:()=>setPersonaCardOpen(true),onMouseLeave:()=>setPersonaCardOpen(false)},
+                    h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'20px',cursor:'default'}},
                       h('span',{style:{width:'34px',height:'34px',borderRadius:'9px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'#fff',background:k==='bt'?'#5514B4':pp.accent}},k==='bt'?h('span',{style:{fontWeight:900,fontSize:'13px',letterSpacing:'-0.02em'}},'BT'):ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:17})),
                       h('div',{style:{fontWeight:700,fontSize:'15px'}},pp.name),
                       active&&h('span',{style:{marginLeft:'auto',fontSize:'10.5px',fontWeight:700,color:'#fff',background:'#5514B4',padding:'3px 8px',borderRadius:'5px'}},'ACTIVE'),
