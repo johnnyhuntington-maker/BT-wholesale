@@ -681,6 +681,12 @@ function App(){
               screen==='accountSettings'?'Profile & settings':P.title),
             screen==='orgs'&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,createOrg.label)),
             screen==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
+          screen==='knowledgeHub'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
+            h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
+              h('div',{style:{width:'56px',height:'56px',borderRadius:'16px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
+                ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:26})),
+              h('div',{style:{fontWeight:700,fontSize:'18px',color:'#1A1A1A',marginBottom:'10px'}},'Coming soon'),
+              h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The Knowledge Hub is on its way. You\'ll find guides, best practices and platform documentation here.'))),
 
           screen==='overview'&&persona==='user'&&(()=>{
             const me=users.find(u=>u.id==='u2')||users[0];
@@ -1718,13 +1724,6 @@ function App(){
                   h('div',{style:{fontSize:'13.5px',color:'#808080',lineHeight:1.6,marginBottom:'6px'}},cur.desc),
                   h('div',{style:{fontSize:'12px',color:'#AAAAAA',marginTop:'4px'}},'Content coming soon'))));
           })(),
-
-          screen==='knowledgeHub'&&h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'60vh'}},
-            h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
-              h('div',{style:{width:'56px',height:'56px',borderRadius:'16px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
-                ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:26})),
-              h('div',{style:{fontWeight:700,fontSize:'18px',color:'#1A1A1A',marginBottom:'10px'}},'Coming soon'),
-              h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The Knowledge Hub is on its way. You\'ll find guides, best practices and platform documentation here.'))),
 
           screen==='helpSupport'&&h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'60vh'}},
             h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
