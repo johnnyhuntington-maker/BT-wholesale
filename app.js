@@ -308,6 +308,7 @@ function App(){
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.5)',padding:'0 10px 8px'}},'Manage'),
         h(NavBtn,{id:'overview',screen,setScreen,label:'Dashboard',collapsed:!sidebarOpen,icon:h('svg',{width:19,height:19,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'},h('rect',{x:3,y:3,width:7,height:7,rx:'1.5'}),h('rect',{x:14,y:3,width:7,height:7,rx:'1.5'}),h('rect',{x:14,y:14,width:7,height:7,rx:'1.5'}),h('rect',{x:3,y:14,width:7,height:7,rx:'1.5'}))}),
         persona!=='user'&&h(NavBtn,{id:'orgs',screen,setScreen,label:'Organisations',collapsed:!sidebarOpen,icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4M10 14h4'],{s:19})}),
+        persona!=='user'&&h(NavBtn,{id:'billingSupport',screen,setScreen,label:'Billing Support',collapsed:!sidebarOpen,icon:ic(['M12 2v20','M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],{s:19})}),
         h(NavBtn,{id:'users',screen,setScreen,label:'Users',collapsed:!sidebarOpen,icon:ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'],{s:19})}),
         h(NavBtn,{id:'roles',screen,setScreen,label:'Roles & permissions',collapsed:!sidebarOpen,icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:19})}),
         h(NavBtn,{id:'knowledgeHub',screen,setScreen,label:'Knowledge Hub',collapsed:!sidebarOpen,icon:ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:19})}),
@@ -367,6 +368,7 @@ function App(){
               screen==='roles'&&overviewTab!=='roles'?'Roles & permissions':
               screen==='helpSupport'?'Help & support':
               screen==='knowledgeHub'?'Knowledge Hub':
+              screen==='billingSupport'?'Billing Support':
               screen==='accountSettings'?'Profile & settings':P.title),
             screen==='orgs'&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,createOrg.label)),
             screen==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
@@ -376,6 +378,12 @@ function App(){
                 ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:26})),
               h('div',{style:{fontWeight:700,fontSize:'18px',color:'#1A1A1A',marginBottom:'10px'}},'Coming soon'),
               h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The Knowledge Hub is on its way. You\'ll find guides, best practices and platform documentation here.'))),
+          screen==='billingSupport'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
+            h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
+              h('div',{style:{width:'56px',height:'56px',borderRadius:'16px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
+                ic(['M12 2v20','M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],{s:26})),
+              h('div',{style:{fontWeight:700,fontSize:'18px',color:'#1A1A1A',marginBottom:'10px'}},'Coming soon'),
+              h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'Billing Support is on its way. You\'ll be able to manage invoices, billing queries and financial support here.'))),
 
           screen==='overview'&&persona==='user'&&(()=>{
             const me=users.find(u=>u.id==='u2')||users[0];
