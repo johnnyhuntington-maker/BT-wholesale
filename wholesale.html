@@ -670,13 +670,16 @@ function App(){
         // Content
         h('div',{style:{flex:1,overflowY:'auto',padding:'30px 32px 48px'}},
 
-          h('div',{style:{fontSize:'22px',fontWeight:700,letterSpacing:'-0.01em',marginBottom:'24px'}},
-            screen==='orgDetail'?(orgById(selOrgId)||{name:'Organisation'}).name:
-            screen==='orgs'?(isBt?'Reseller organisations':'Organisations'):
-            screen==='users'?'Users':
-            screen==='roles'&&overviewTab!=='roles'?'Roles & permissions':
-            screen==='helpSupport'?'Help & support':
-            screen==='accountSettings'?'Profile & settings':P.title),
+          h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'24px'}},
+            h('div',{style:{fontSize:'22px',fontWeight:700,letterSpacing:'-0.01em'}},
+              screen==='orgDetail'?(orgById(selOrgId)||{name:'Organisation'}).name:
+              screen==='orgs'?(isBt?'Reseller organisations':'Organisations'):
+              screen==='users'?'Users':
+              screen==='roles'&&overviewTab!=='roles'?'Roles & permissions':
+              screen==='helpSupport'?'Help & support':
+              screen==='accountSettings'?'Profile & settings':P.title),
+            screen==='orgs'&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,createOrg.label)),
+            screen==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
 
           screen==='overview'&&persona==='user'&&(()=>{
             const me=users.find(u=>u.id==='u2')||users[0];
@@ -1023,8 +1026,6 @@ function App(){
             })()),
 
           screen==='orgs'&&h('div',null,
-            h('div',{style:{display:'flex',alignItems:'center',justifyContent:'flex-end',marginBottom:'20px'}},
-              h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,createOrg.label))),
             h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
               h('div',{style:{display:'grid',gridTemplateColumns:'2.4fr 1.2fr 1.8fr 0.6fr 0.8fr 0.7fr',padding:'13px 22px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontSize:'12px',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},
                 h('div',null,'Organisation'),
@@ -1255,8 +1256,6 @@ function App(){
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
-            h('div',{style:{display:'flex',alignItems:'center',justifyContent:'flex-end',marginBottom:'20px'}},
-              h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
 
             h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
               // Filter bar inside card
