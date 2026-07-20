@@ -310,8 +310,7 @@ var d=null!=c&&c.hydratedSources||null,e=!1,f="",g=aj;null!==c&&void 0!==c&&(!0=
 function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmountComponentAtNode=function(a){if(!Vd(a))throw Error(m(40));return a._reactRootContainer?(yb(function(){Wd(null,null,a,!1,function(){a._reactRootContainer=null;a[Ja]=null})}),!0):!1};Q.unstable_batchedUpdates=Tf;Q.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!Vd(c))throw Error(m(200));if(null==a||void 0===a._reactInternals)throw Error(m(38));return Wd(a,b,c,!1,d)};Q.version="18.3.1-next-f1338f8080-20240426"});
 })();
 </script><script id="app-script">
-(function(){
-'use strict';
+(function(){'use strict';
 
 (function(){
 'use strict';
@@ -438,9 +437,9 @@ const ROLE_ROWS=[
   ['Organisation management','y','n','n','n','n','n','n'],
   ['User administration','y','n','n','n','n','n','n'],
   ['Product management','y','p','p','p','p','p','p'],
-  ['Operations & orders','y','y','p','p','p','p','p'],
-  ['Fault management','y','p','n','y','n','p','n'],
-  ['Billing & invoices','y','n','y','n','p','p','n'],
+  ['Ordering','y','y','p','p','p','p','p'],
+  ['Raising faults','y','p','n','y','n','p','n'],
+  ['Billing','y','n','y','n','p','p','n'],
   ['Reporting','y','p','y','p','y','p','n'],
   ['Support tickets','y','p','n','y','n','p','n'],
   ['API access','y','n','n','n','n','n','y'],
@@ -455,7 +454,7 @@ const INIT_ORGS=[
   {id:'apex',name:'Apex Telecom',typeKey:'dealer',parentId:'northgate',contact:'sales@apextelecom.co.uk',primaryName:'Fatima Al-Rashid',primaryEmail:'fatima.alrashid@apextelecom.co.uk',primaryPhone:'+44 1908 123 456',billingName:'Accounts Dept',billingEmail:'accounts@apextelecom.co.uk',billingPhone:'+44 1908 123 457',address:'12 Apex Way, Northampton, NN1 2BP',website:'www.apextelecom.co.uk',entitlements:['broadband','branding']},
 ];
 const INIT_USERS=[
-  {id:'u1',name:'Sarah Whitfield',email:'sarah.whitfield@northgate.co.uk',roleKey:'admin',orgId:'northgate',status:'Active',roleDate:'Jan 2024',photo:'https://randomuser.me/api/portraits/women/44.jpg'},
+  {id:'u1',name:'Sarah Whitfield',email:'sarah.whitfield@northgate.co.uk',roleKey:'admin',orgId:'northgate',status:'Active',roleDate:'Jan 2024',photo:'https://randomuser.me/api/portraits/women/44.jpg',isPrimary:true},
   {id:'u2',name:'James Okafor',email:'james.okafor@northgate.co.uk',roleKey:'orderManager',orgId:'northgate',status:'Active',roleDate:'Mar 2024',photo:'https://randomuser.me/api/portraits/men/75.jpg'},
   {id:'u3',name:'Priya Nair',email:'priya.nair@northgate.co.uk',roleKey:'billingManager',orgId:'northgate',status:'Active',roleDate:'Mar 2024'},
   {id:'u4',name:'Tom Reeves',email:'tom.reeves@metroconnect.co.uk',roleKey:'support',orgId:'metro',status:'Active',roleDate:'Jun 2024',photo:'https://randomuser.me/api/portraits/men/41.jpg'},
@@ -582,7 +581,7 @@ function App(){
     const hint=isOrg?(isBt?'Set up a new reseller organisation':'Delegate access to a downstream org'):(isBt?'Add a user & assign them a role':'Add a team member & assign a role');
     const onClick=isOrg
       ?()=>{if(!canAdmin)return deny();const t=childTypes()[0];setOrgWiz({step:1,name:'',email:'',type:t,ent:defEnt(t)});}
-      :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',orgId:'northgate',role:'orderManager'});};
+      :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:'northgate',profileType:'regular',role:'orderManager'});};
     return {label,hint,onClick,
       rowStyle:{display:'flex',alignItems:'center',gap:'12px',width:'100%',borderRadius:'12px',padding:'13px 14px',marginBottom:'10px',textAlign:'left',border:'1px solid #E3E3E3',background:canAdmin?'#fff':'#F7F7F7',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
       ctaStyle:{display:'inline-flex',alignItems:'center',gap:'8px',border:0,borderRadius:'999px',padding:'11px 18px',fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',background:canAdmin?'#5514B4':'#EDEDED',color:canAdmin?'#fff':'#AAAAAA',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
@@ -893,7 +892,7 @@ function App(){
               h('div',{style:{padding:'22px 26px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
                 h('div',null,
                   h('div',{style:{fontSize:'18px',fontWeight:700}},'Invite a user'),
-                  h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+userWiz.step+' of 3 · '+['Details','Role','Review'][userWiz.step-1])),
+                  h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+userWiz.step+' of 3 · '+['Details','Access','Review'][userWiz.step-1])),
                 h('button',{onClick:()=>{setUserWiz(null);setOverviewTab('network');},style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
               h('div',{style:{height:'4px',background:'#F0F0F0'}},h('div',{style:{height:'100%',background:'#5514B4',width:Math.round(userWiz.step/3*100)+'%',transition:'width 240ms ease'}})),
               h('div',{style:{padding:'26px'}},
@@ -902,32 +901,46 @@ function App(){
                   h('input',{value:userWiz.name,onChange:e=>setUserWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Morgan Hale',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit',boxSizing:'border-box'}}),
                   h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Email address'),
                   h('input',{value:userWiz.email,onChange:e=>setUserWiz(w=>({...w,email:e.target.value})),placeholder:'morgan.hale@northgate.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit',boxSizing:'border-box'}}),
+                  h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},h('span',null,'Phone number '),h('span',{style:{fontWeight:400,color:'#808080'}},'(optional)')),
+                  h('input',{value:userWiz.phone,onChange:e=>setUserWiz(w=>({...w,phone:e.target.value})),placeholder:'+44 7700 900000',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit',boxSizing:'border-box'}}),
                   h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Organisation'),
                   h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
                     [orgById(home),...childrenOf(home)].map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey])))),
-                userWiz.step===2&&h('div',{style:{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:'20px'}},
-                  h('div',null,
-                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Assign a role'),
-                    h('div',{style:{display:'flex',flexDirection:'column',gap:'9px'}},
-                      ROLES.map(r=>{
-                        const active=userWiz.role===r.key;
-                        return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                          h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                          h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
-                      }))),
-                  h('div',null,
-                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Permissions granted'),
-                    h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px'}},
-                      h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'12px'}},(ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).label),
-                      (ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).grants.map((pm,i)=>
-                        h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'flex-start',fontSize:'12.5px',marginBottom:'7px'}},
-                          ic('M20 6 9 17l-5-5',{s:14,c:'#5514B4',w:2.4}),h('span',null,pm)))))),
+                userWiz.step===2&&h('div',null,
+                  h('div',{style:{marginBottom:'20px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Profile type'),
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}},
+                      [['admin','Administrator','Full access to all platform features'],['regular','Regular user','Assign specific permissions and tools']].map(([pt,lbl,desc])=>
+                        h('button',{key:pt,onClick:()=>setUserWiz(w=>({...w,profileType:pt,role:pt==='admin'?'admin':w.role==='admin'?'orderManager':w.role})),style:{padding:'13px',borderRadius:'10px',border:'1px solid '+(userWiz.profileType===pt?'#5514B4':'#E3E3E3'),background:userWiz.profileType===pt?'#FAF6FF':'#fff',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}},
+                          h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:userWiz.profileType===pt?'#5514B4':'#1A1A1A'}},lbl),
+                          h('span',{style:{display:'block',fontSize:'12px',color:'#808080',marginTop:'3px',lineHeight:1.35}},desc))))),
+                  h('div',{style:{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:'20px'}},
+                    h('div',null,
+                      h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},userWiz.profileType==='admin'?'Role':'Assign a role'),
+                      userWiz.profileType==='admin'
+                        ?h('div',{style:{padding:'12px 13px',borderRadius:'11px',border:'1px solid #5514B4',background:'#FAF6FF'}},
+                            h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
+                            h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
+                        :h('div',{style:{display:'flex',flexDirection:'column',gap:'9px'}},
+                            ROLES.filter(r=>r.key!=='admin').map(r=>{
+                              const active=userWiz.role===r.key;
+                              return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
+                                h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
+                                h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
+                            }))),
+                    h('div',null,
+                      h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Permissions granted'),
+                      h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px'}},
+                        h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'12px'}},(ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).label),
+                        (ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).grants.map((pm,i)=>
+                          h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'flex-start',fontSize:'12.5px',marginBottom:'7px'}},
+                            ic('M20 6 9 17l-5-5',{s:14,c:'#5514B4',w:2.4}),h('span',null,pm))))))),
                 userWiz.step===3&&h('div',null,
                   h('div',{style:{display:'flex',alignItems:'center',gap:'14px',marginBottom:'20px'}},
                     h('div',{style:{width:'52px',height:'52px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'18px',flexShrink:0}},initials(userWiz.name||'?')),
                     h('div',null,h('div',{style:{fontWeight:700,fontSize:'17px'}},userWiz.name||'(unnamed)'),h('div',{style:{fontSize:'13px',color:'#808080'}},userWiz.email))),
                   h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'12px'}},
-                    [['Role',(ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).label],['Organisation',(orgById(userWiz.orgId)||{name:'—'}).name]].map(([k,v],i)=>
+                    [['Profile type',userWiz.profileType==='admin'?'Administrator':'Regular user'],['Role',(ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).label],['Organisation',(orgById(userWiz.orgId)||{name:'—'}).name],...(userWiz.phone?[['Phone',userWiz.phone]]:[])].map(([k,v],i)=>
                       h('div',{key:k,style:{display:'flex',justifyContent:'space-between',padding:'13px 16px',borderBottom:'1px solid #F0F0F0'}},
                         h('span',{style:{color:'#808080',fontSize:'13px'}},k),h('span',{style:{fontWeight:700,fontSize:'14px'}},v))),
                     h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px'}},
@@ -939,9 +952,10 @@ function App(){
                 h('button',{onClick:()=>{
                   if(userWiz.step<3){setUserWiz(w=>({...w,step:w.step+1}));return;}
                   const o=orgById(userWiz.orgId);const id='nu'+seq;
-                  const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',roleKey:userWiz.role,orgId:userWiz.orgId,status:'Invited'};
+                  const rk=userWiz.profileType==='admin'?'admin':userWiz.role;
+                  const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
                   setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setOverviewTab('network');
-                  showToast('success','Invitation sent to '+user.name+' as '+roleLabel(userWiz.role)+' at '+(o?o.name:'Northgate Telecom')+'.');
+                  showToast('success','Invitation sent to '+user.name+' as '+roleLabel(rk)+' at '+(o?o.name:'Northgate Telecom')+'.');
                 },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue'))),
 
             overviewTab==='create'&&orgWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',width:'100%'}},
@@ -1398,7 +1412,7 @@ function App(){
                     })),
                 h('div',{style:{padding:'12px 13px',borderTop:'1px solid #E3E3E3',flexShrink:0}},
                   canAdmin
-                    ?h('button',{onClick:()=>setUserWiz({step:1,name:'',email:'',orgId:'northgate',role:'orderManager'}),
+                    ?h('button',{onClick:()=>setUserWiz({step:1,name:'',email:'',phone:'',orgId:'northgate',profileType:'regular',role:'orderManager'}),
                         style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'7px',width:'100%',padding:'9px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},
                         ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Invite user')
                     :null)),
@@ -1420,7 +1434,9 @@ function App(){
                               :ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'],{s:12,c:'#808080'}),
                             du.roleKey==='admin'?'Administrator':'Standard user'),
                           h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'4px 10px',fontSize:'12px',fontWeight:700,color:(statusMap[du.status]||statusMap.Active)[0],background:(statusMap[du.status]||statusMap.Active)[1]}},
-                            h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),du.status)))),
+                            h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),du.status),
+                          du.isPrimary&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#E8F1FB',color:'#1A4070',borderRadius:'6px',padding:'4px 10px',fontSize:'12px',fontWeight:700}},
+                            ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:12,c:'#1A4070'}),'Primary contact')))),
                     // Details strip
                     h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'22px'}},
                       [['Organisation',dOrg?dOrg.name:'—'],['Role since',du.roleDate||'—'],['Org type',dOrg?TYPE_LABELS[dOrg.typeKey]:'—']].map(([lbl,val])=>
@@ -1714,7 +1730,7 @@ function App(){
             h('div',{style:{padding:'22px 26px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
               h('div',null,
                 h('div',{style:{fontSize:'18px',fontWeight:700}},'Invite a user'),
-                h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+userWiz.step+' of 3 · '+['Details','Role','Review'][userWiz.step-1])),
+                h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+userWiz.step+' of 3 · '+['Details','Access','Review'][userWiz.step-1])),
               h('button',{onClick:()=>setUserWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
             h('div',{style:{height:'4px',background:'#F0F0F0'}},h('div',{style:{height:'100%',background:'#5514B4',width:Math.round(userWiz.step/3*100)+'%',transition:'width 240ms ease'}})),
             h('div',{style:{padding:'26px',overflowY:'auto',flex:1}},
@@ -1723,32 +1739,46 @@ function App(){
                 h('input',{value:userWiz.name,onChange:e=>setUserWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Morgan Hale',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit'}}),
                 h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Email address'),
                 h('input',{value:userWiz.email,onChange:e=>setUserWiz(w=>({...w,email:e.target.value})),placeholder:'morgan.hale@northgate.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit'}}),
+                h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},h('span',null,'Phone number '),h('span',{style:{fontWeight:400,color:'#808080'}},'(optional)')),
+                h('input',{value:userWiz.phone,onChange:e=>setUserWiz(w=>({...w,phone:e.target.value})),placeholder:'+44 7700 900000',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit'}}),
                 h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Organisation'),
                 h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
                   [orgById('northgate'),...childrenOf('northgate')].map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey])))),
-              userWiz.step===2&&h('div',{style:{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:'20px'}},
-                h('div',null,
-                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Assign a role'),
-                  h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',maxHeight:'344px',overflowY:'auto',paddingRight:'4px'}},
-                    ROLES.map(r=>{
-                      const active=userWiz.role===r.key;
-                      return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                        h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                        h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
-                    }))),
-                h('div',null,
-                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Permissions granted'),
-                  h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px',maxHeight:'344px',overflowY:'auto'}},
-                    h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'12px'}},(ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).label),
-                    (ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).grants.map((pm,i)=>
-                      h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'flex-start',fontSize:'12.5px',marginBottom:'7px'}},
-                        ic('M20 6 9 17l-5-5',{s:14,c:'#5514B4',w:2.4}),h('span',null,pm)))))),
+              userWiz.step===2&&h('div',null,
+                h('div',{style:{marginBottom:'20px'}},
+                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Profile type'),
+                  h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}},
+                    [['admin','Administrator','Full access to all platform features'],['regular','Regular user','Assign specific permissions and tools']].map(([pt,lbl,desc])=>
+                      h('button',{key:pt,onClick:()=>setUserWiz(w=>({...w,profileType:pt,role:pt==='admin'?'admin':w.role==='admin'?'orderManager':w.role})),style:{padding:'13px',borderRadius:'10px',border:'1px solid '+(userWiz.profileType===pt?'#5514B4':'#E3E3E3'),background:userWiz.profileType===pt?'#FAF6FF':'#fff',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}},
+                        h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:userWiz.profileType===pt?'#5514B4':'#1A1A1A'}},lbl),
+                        h('span',{style:{display:'block',fontSize:'12px',color:'#808080',marginTop:'3px',lineHeight:1.35}},desc))))),
+                h('div',{style:{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:'20px'}},
+                  h('div',null,
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},userWiz.profileType==='admin'?'Role':'Assign a role'),
+                    userWiz.profileType==='admin'
+                      ?h('div',{style:{padding:'12px 13px',borderRadius:'11px',border:'1px solid #5514B4',background:'#FAF6FF'}},
+                          h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
+                          h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
+                      :h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',maxHeight:'280px',overflowY:'auto',paddingRight:'4px'}},
+                          ROLES.filter(r=>r.key!=='admin').map(r=>{
+                            const active=userWiz.role===r.key;
+                            return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
+                              h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
+                              h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
+                          }))),
+                  h('div',null,
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Permissions granted'),
+                    h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px',maxHeight:'280px',overflowY:'auto'}},
+                      h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'12px'}},(ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).label),
+                      (ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).grants.map((pm,i)=>
+                        h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'flex-start',fontSize:'12.5px',marginBottom:'7px'}},
+                          ic('M20 6 9 17l-5-5',{s:14,c:'#5514B4',w:2.4}),h('span',null,pm))))))),
               userWiz.step===3&&h('div',null,
                 h('div',{style:{display:'flex',alignItems:'center',gap:'14px',marginBottom:'20px'}},
                   h('div',{style:{width:'52px',height:'52px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'18px',flexShrink:0}},initials(userWiz.name||'?')),
                   h('div',null,h('div',{style:{fontWeight:700,fontSize:'17px'}},userWiz.name||'(unnamed)'),h('div',{style:{fontSize:'13px',color:'#808080'}},userWiz.email))),
                 h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'12px'}},
-                  [['Role',(ROLES.find(r=>r.key===userWiz.role)||ROLES[0]).label],['Organisation',(orgById(userWiz.orgId)||{name:'—'}).name]].map(([k,v],i)=>
+                  [['Profile type',userWiz.profileType==='admin'?'Administrator':'Regular user'],['Role',(ROLES.find(r=>r.key===(userWiz.profileType==='admin'?'admin':userWiz.role))||ROLES[0]).label],['Organisation',(orgById(userWiz.orgId)||{name:'—'}).name],...(userWiz.phone?[['Phone',userWiz.phone]]:[])].map(([k,v],i)=>
                     h('div',{key:k,style:{display:'flex',justifyContent:'space-between',padding:'13px 16px',borderBottom:'1px solid #F0F0F0'}},
                       h('span',{style:{color:'#808080',fontSize:'13px'}},k),h('span',{style:{fontWeight:700,fontSize:'14px'}},v))),
                   h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px'}},
@@ -1760,9 +1790,10 @@ function App(){
               h('button',{onClick:()=>{
                 if(userWiz.step<3){setUserWiz(w=>({...w,step:w.step+1}));return;}
                 const o=orgById(userWiz.orgId);const id='nu'+seq;
-                const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',roleKey:userWiz.role,orgId:userWiz.orgId,status:'Invited'};
+                const rk=userWiz.profileType==='admin'?'admin':userWiz.role;
+                const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
                 setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setScreen('users');
-                showToast('success','Invitation sent to '+user.name+' as '+roleLabel(userWiz.role)+' at '+(o?o.name:'Northgate Telecom')+'.');
+                showToast('success','Invitation sent to '+user.name+' as '+roleLabel(rk)+' at '+(o?o.name:'Northgate Telecom')+'.');
               },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue')))),
 
         // User profile drawer
@@ -1777,7 +1808,9 @@ function App(){
                 h('div',{style:{width:'60px',height:'60px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'20px',flexShrink:0}},initials(drawerUser.name)),
                 h('div',null,
                   h('div',{style:{fontWeight:700,fontSize:'19px'}},drawerUser.name),
-                  h('div',{style:{fontSize:'14px',color:'#808080',marginTop:'3px'}},drawerUser.email))),
+                  h('div',{style:{fontSize:'14px',color:'#808080',marginTop:'3px'}},drawerUser.email),
+                  drawerUser.isPrimary&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#E8F1FB',color:'#1A4070',borderRadius:'6px',padding:'4px 10px',fontSize:'12px',fontWeight:700,marginTop:'8px'}},
+                    ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:12,c:'#1A4070'}),'Primary contact'))),
               h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'24px'}},
                 h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px'}},
                   h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'8px'}},'Status'),
@@ -1916,10 +1949,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 })();
 
 
-
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 })();
-
 </script>  <script>
     (function(){
       document.body.classList.add('sk-load');
