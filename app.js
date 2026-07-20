@@ -709,8 +709,49 @@ function App(){
                           onMouseLeave:e=>{if(selRole!==r.key)e.currentTarget.style.background='transparent';}},
                           h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},r.label),
                           h('td',{style:{padding:'14px 22px',fontSize:'13.5px',color:'#434343',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},r.desc),
-                          h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,color:'#5514B4',textAlign:'right',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},String(users.filter(u=>u.roleKey===r.key).length))))))))
-                );
+                          h('td',{style:{padding:'14px 22px',fontSize:'14px',fontWeight:700,color:'#5514B4',textAlign:'right',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},String(users.filter(u=>u.roleKey===r.key).length)))))))),
+                (activeTab==='userRoles'||activeTab==='resellerAdmins')&&(isBt
+                  ?h('div',null,
+                      h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},'These are the named administrators across your reseller network. Each reseller needs an active administrator before their users and downstream organisations can be managed.'),
+                      h('div',{style:{borderTop:'1px solid #E8E8E8',marginBottom:'12px'}},
+                        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 120px',padding:'11px 22px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontSize:'11.5px',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},'Organisation','Administrator','Email','Status'),
+                        orgs.filter(o=>o.typeKey==='reseller').map(o=>{
+                          const admin=users.find(u=>u.orgId===o.id&&u.roleKey==='admin');
+                          const sc=admin?statusMap[admin.status]||statusMap.Active:null;
+                          return h('div',{key:o.id,style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 120px',padding:'13px 22px',borderBottom:'1px solid #F0F0F0',alignItems:'center'}},
+                            h('div',{style:{fontWeight:700,fontSize:'13.5px'}},o.name),
+                            admin
+                              ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                                  h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',flexShrink:0}},initials(admin.name)),
+                                  h('div',{style:{fontSize:'13px',fontWeight:600}},admin.name))
+                              :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'No admin set'),
+                            h('div',{style:{fontSize:'12.5px',color:'#808080'}},admin?admin.email:'—'),
+                            admin&&sc
+                              ?h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'11.5px',fontWeight:700,color:sc[0],background:sc[1]}},
+                                  h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),admin.status)
+                              :h('span',null,'—'));
+                        })),
+                      h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 18px',margin:'0 22px 20px',display:'flex',gap:'10px',alignItems:'flex-start'}},
+                        h('span',{style:{color:'#808080',flexShrink:0,marginTop:'1px'}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:15,c:'#808080'})),
+                        h('div',{style:{fontSize:'13px',color:'#808080',lineHeight:1.5}},'Day-to-day user roles within each reseller — such as Order Manager, Billing Manager and Support — are set and managed by each reseller\'s own administrator. You don\'t configure those from here.')))
+                  :h('div',null,
+                      h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},'This shows what each role in your organisation can access. Use it when deciding which role to assign to a new team member, or to check what someone currently has access to.'),
+                      h('div',{style:{display:'flex',gap:'18px',alignItems:'center',marginBottom:'12px',fontSize:'12.5px',color:'#6B6B6B',padding:'0 24px'}},
+                        h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'y'}),'Full access'),
+                        h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'p'}),'Partial access'),
+                        h('span',{style:{display:'inline-flex',alignItems:'center',gap:'7px'}},h(CellMark,{v:'n'}),'No access')),
+                      h('div',{style:{borderTop:'1px solid #E8E8E8',overflowX:'auto'}},h('table',{style:{borderCollapse:'collapse',width:'100%',minWidth:'820px'}},
+                          h('thead',null,h('tr',null,
+                            h('th',{style:{textAlign:'left',padding:'15px 22px',fontSize:'13px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Permission area'),
+                            ROLE_HEADERS.map((hd,i)=>h('th',{key:i,style:{padding:'15px 8px',fontSize:'12.5px',fontWeight:700,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',textAlign:'center',minWidth:'96px'}},hd)))),
+                          h('tbody',null,ROLE_ROWS.map((row,ri)=>h('tr',{key:ri},
+                            h('td',{style:{textAlign:'left',padding:'13px 22px',fontSize:'13.5px',fontWeight:700,borderBottom:'1px solid #F0F0F0'}},row[0]),
+                            row.slice(1).map((v,ci)=>h('td',{key:ci,style:{textAlign:'center',padding:'13px 8px',borderBottom:'1px solid #F0F0F0'}},h(CellMark,{v})))))))))),
+                activeTab==='whoHasAccess'&&h('div',null,
+                  h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
+                    ?'A complete breakdown of which platform capabilities each organisation type in your network can access.'
+                    :'A complete breakdown of which permission areas each role in your organisation can access. Use this to understand what you\'re granting when you assign someone a role.'),
+                  whoHasAccessPanel));
             })()),
 
           screen==='orgs'&&h('div',null,
