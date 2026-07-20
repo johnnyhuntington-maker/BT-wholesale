@@ -802,106 +802,109 @@ function App(){
                   whoHasAccessPanel));
             })()),
 
-          screen==='orgs'&&h('div',null,
-            h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
-              h('div',{style:{display:'grid',gridTemplateColumns:'2.4fr 1.2fr 1.8fr 0.6fr 0.8fr 0.7fr',padding:'13px 22px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontSize:'12px',fontWeight:700,letterSpacing:'0.05em',textTransform:'uppercase',color:'#808080'}},
-                h('div',null,'Organisation'),
-                h(SortHdr,{label:'Type',col:'type',sort:orgSort,setSort:setOrgSort}),
-                h(SortHdr,{label:'Primary contact',col:'contact',sort:orgSort,setSort:setOrgSort}),
-                h(SortHdr,{label:'Users',col:'users',sort:orgSort,setSort:setOrgSort}),
-                h(SortHdr,{label:'Sub-orgs',col:'suborgs',sort:orgSort,setSort:setOrgSort}),
-                h('div',null,'')),
-              (()=>{
-                let sortedFlat=[...flat];
-                if(orgSort.col){
-                  sortedFlat.sort((a,b)=>{
-                    const o1=a.org,o2=b.org;
-                    let v1,v2;
-                    if(orgSort.col==='type'){v1=TYPE_LABELS[o1.typeKey]||'';v2=TYPE_LABELS[o2.typeKey]||'';}
-                    else if(orgSort.col==='contact'){v1=o1.contact||'';v2=o2.contact||'';}
-                    else if(orgSort.col==='users'){v1=userCountFor(o1.id);v2=userCountFor(o2.id);return orgSort.dir*(v1-v2);}
-                    else if(orgSort.col==='suborgs'){v1=childrenOf(o1.id).length;v2=childrenOf(o2.id).length;return orgSort.dir*(v1-v2);}
-                    else{v1='';v2='';}
-                    return orgSort.dir*v1.localeCompare(v2);
-                  });
-                }
-                return sortedFlat.map((row,i)=>{
-                const o=row.org;const parent=o.parentId?orgById(o.parentId):null;
-                const isSelected=o.id===selOrgId;
-                return h('div',{key:o.id,onClick:()=>setSelOrgId(isSelected?null:o.id),
-                  style:{display:'grid',gridTemplateColumns:'2.4fr 1.2fr 1.8fr 0.6fr 0.8fr 0.7fr',padding:'13px 22px',borderBottom:'1px solid #F0F0F0',alignItems:'center',cursor:'pointer',background:isSelected?'#FAF6FF':'transparent'},
-                  onMouseEnter:e=>{if(!isSelected)e.currentTarget.style.background='#FAF6FF';},
-                  onMouseLeave:e=>{if(!isSelected)e.currentTarget.style.background='transparent';}},
-                  h('div',{style:{display:'flex',alignItems:'center',gap:'6px',minWidth:0}},
-                    h('div',{style:{width:(row.depth*20)+'px',flexShrink:0}}),
-                    row.depth>0&&h('span',{style:{color:'#D0D0D0',fontSize:'13px',fontFamily:'monospace',flexShrink:0}},'└'),
-                    h('span',{style:{...dotSt(o.typeKey),flexShrink:0,marginLeft:row.depth>0?'4px':'0'}}),
-                    h('div',{style:{minWidth:0,marginLeft:'8px'}},
-                      h('div',{style:{fontWeight:o.depth===0||o.id===home?700:600,fontSize:'14px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:isSelected?'#5514B4':'#2A2A2A'}},o.name),
-                      parent&&o.typeKey!=='reseller'&&h('div',{style:{fontSize:'12px',color:'#AAAAAA',marginTop:'1px'}},'via '+parent.name))),
-                  h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
-                    h('span',{style:s(badgeSt(o.typeKey))},TYPE_LABELS[o.typeKey]),
-                    o.id===home&&h('span',{style:{fontSize:'11px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 7px',borderRadius:'5px'}},'You')),
-                  h('div',{style:{fontSize:'13px',color:'#434343',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.primaryName||o.contact),
-                  h('div',{style:{fontSize:'14px',fontWeight:700,color:'#5514B4'}},String(userCountFor(o.id))),
-                  h('div',{style:{fontSize:'14px',color:'#434343'}},String(childrenOf(o.id).length)),
-                  h('div',{style:{display:'flex',justifyContent:'flex-end'}},
-                    h('span',{onClick:e=>{e.stopPropagation();setSelOrgId(o.id);},style:{display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'12px',fontWeight:700,color:'#5514B4',cursor:'pointer'}},
-                      'View',ic('m9 18 6-6-6-6',{s:13,c:'#5514B4'}))));
-                });
-              })())),
-
-            // Org detail drawer
-            selOrgId&&screen==='orgs'&&(()=>{
-              const dSel=orgById(selOrgId);
-              if(!dSel) return null;
-              const dParent=dSel.parentId?orgById(dSel.parentId):null;
-              function EntRow({entKey}){
-                const owned=dSel.entitlements.includes(entKey);
-                const parentHas=dParent?dParent.entitlements.includes(entKey):true;
-                const e=ENT.find(x=>x.key===entKey);
-                return h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'7px 0',borderBottom:'1px solid #F3F3F3'}},
-                  parentHas&&owned
-                    ?ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C',w:2.4})
-                    :parentHas&&!owned
-                      ?h('span',{style:{width:14,height:14,display:'flex',alignItems:'center',justifyContent:'center'}},ic('M5 12h14',{s:14,c:'#D88C00',w:2}))
-                      :h('span',{style:{width:14,height:14,display:'flex',alignItems:'center',justifyContent:'center'}},ic('M5 12h14',{s:14,c:'#E0E0E0',w:2})),
-                  h('span',{style:{fontSize:'13.5px',fontWeight:owned?600:400,color:!parentHas?'#CCCCCC':owned?'#1A1A1A':'#808080',flex:1}},e.label),
-                  parentHas&&!owned&&h('span',{style:{fontSize:'11px',color:'#D88C00',fontWeight:700,flexShrink:0}},'Available'),
-                  !parentHas&&h('span',{style:{fontSize:'11px',color:'#C8C8C8',fontWeight:600,flexShrink:0}},'Not in parent'));
-              }
-              return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex'}},
-                h('div',{onClick:()=>setSelOrgId(null),style:{flex:1,background:'rgba(20,10,40,0.42)'}}),
-                h('div',{style:{width:'480px',background:'#fff',display:'flex',flexDirection:'column',overflowY:'auto',boxShadow:'-16px 0 40px rgba(20,10,40,0.18)'}},
-                  h('div',{style:{padding:'22px 24px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}},
-                    h('div',null,
-                      h('div',{style:{fontSize:'18px',fontWeight:700}},dSel.name),
-                      h('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginTop:'6px'}},
+          screen==='orgs'&&(()=>{
+            const dSel=selOrgId?orgById(selOrgId):null;
+            const dParent=dSel&&dSel.parentId?orgById(dSel.parentId):null;
+            const q=(orgSearch||'').toLowerCase();
+            const visFlat=q||orgTypeFilter
+              ?flat.filter(row=>{
+                  const o=row.org;
+                  if(orgTypeFilter&&o.typeKey!==orgTypeFilter) return false;
+                  if(q&&!o.name.toLowerCase().includes(q)) return false;
+                  return true;
+                })
+              :flat;
+            function EntRow({entKey}){
+              const e=ENT.find(x=>x.key===entKey);
+              const owned=dSel.entitlements.includes(entKey);
+              const parentHas=dParent?dParent.entitlements.includes(entKey):true;
+              return h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'7px 0',borderBottom:'1px solid #F3F3F3'}},
+                parentHas&&owned
+                  ?ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C',w:2.4})
+                  :parentHas&&!owned
+                    ?h('span',{style:{width:14,height:14,display:'flex',alignItems:'center',justifyContent:'center'}},ic('M5 12h14',{s:14,c:'#D88C00',w:2}))
+                    :h('span',{style:{width:14,height:14,display:'flex',alignItems:'center',justifyContent:'center'}},ic('M5 12h14',{s:14,c:'#E0E0E0',w:2})),
+                h('span',{style:{fontSize:'13.5px',fontWeight:owned?600:400,color:!parentHas?'#CCCCCC':owned?'#1A1A1A':'#808080',flex:1}},e.label),
+                parentHas&&!owned&&h('span',{style:{fontSize:'11px',color:'#D88C00',fontWeight:700,flexShrink:0}},'Available'),
+                !parentHas&&h('span',{style:{fontSize:'11px',color:'#C8C8C8',fontWeight:600,flexShrink:0}},'Not in parent'));
+            }
+            return h('div',{style:{maxWidth:'1120px',display:'flex',height:'calc(100vh - 140px)',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',background:'#fff'}},
+              // LEFT PANEL — org tree
+              h('div',{style:{width:'340px',flexShrink:0,borderRight:'1px solid #E3E3E3',display:'flex',flexDirection:'column',background:'#fff'}},
+                h('div',{style:{padding:'13px 13px 10px',borderBottom:'1px solid #E3E3E3',flexShrink:0}},
+                  h('div',{style:{position:'relative',marginBottom:'8px'}},
+                    h('span',{style:{position:'absolute',left:'10px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex',color:'#AAAAAA'}},
+                      ic('M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0',{s:14})),
+                    h('input',{value:orgSearch,onChange:e=>setOrgSearch(e.target.value),placeholder:'Search organisations…',
+                      style:{width:'100%',padding:'8px 10px 8px 30px',border:'1px solid #E3E3E3',borderRadius:'7px',fontSize:'13px',fontFamily:'inherit',outline:'none',boxSizing:'border-box'}})),
+                  h('select',{value:orgTypeFilter,onChange:e=>setOrgTypeFilter(e.target.value),
+                    style:{width:'100%',padding:'6px 10px',border:'1px solid #E3E3E3',borderRadius:'6px',fontSize:'12px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343'}},
+                    h('option',{value:''},'All types'),
+                    h('option',{value:'reseller'},'Reseller'),
+                    h('option',{value:'subReseller'},'Sub-Reseller'),
+                    h('option',{value:'childReseller'},'Child Reseller'),
+                    h('option',{value:'dealer'},'Dealer'))),
+                h('div',{style:{flex:1,overflowY:'auto'}},
+                  visFlat.length===0
+                    ?h('div',{style:{padding:'32px 14px',textAlign:'center',color:'#AAAAAA',fontSize:'13px'}},'No organisations match')
+                    :visFlat.map(row=>{
+                      const o=row.org;
+                      const isSel=selOrgId===o.id;
+                      return h('div',{key:o.id,onClick:()=>setSelOrgId(isSel?null:o.id),
+                        style:{display:'flex',alignItems:'center',gap:'0',padding:'10px 13px',borderBottom:'1px solid #F0F0F0',cursor:'pointer',background:isSel?'#FAF6FF':'transparent'},
+                        onMouseEnter:e=>{if(!isSel)e.currentTarget.style.background='#FAF6FF';},
+                        onMouseLeave:e=>{if(!isSel)e.currentTarget.style.background='transparent';}},
+                        h('div',{style:{width:(row.depth*16)+'px',flexShrink:0}}),
+                        row.depth>0&&h('span',{style:{color:'#D0D0D0',fontSize:'12px',fontFamily:'monospace',flexShrink:0,marginRight:'4px'}},'└'),
+                        h('span',{style:{...dotSt(o.typeKey),flexShrink:0}}),
+                        h('div',{style:{minWidth:0,flex:1,marginLeft:'8px'}},
+                          h('div',{style:{fontWeight:o.depth===0||o.id===home?700:600,fontSize:'13.5px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:isSel?'#5514B4':'#1A1A1A'}},o.name),
+                          h('div',{style:{display:'flex',alignItems:'center',gap:'5px',marginTop:'3px'}},
+                            h('span',{style:{...s(badgeSt(o.typeKey)),fontSize:'10px',padding:'2px 6px'}},TYPE_LABELS[o.typeKey]),
+                            o.id===home&&h('span',{style:{fontSize:'10px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 6px',borderRadius:'5px'}},'You'))));
+                    })),
+                canAdmin&&h('div',{style:{padding:'12px 13px',borderTop:'1px solid #E3E3E3',flexShrink:0}},
+                  h('button',{onClick:()=>{
+                    if(!canAdmin)return deny();
+                    const tp=childTypes()[0];
+                    setOrgWiz({step:1,name:'',email:'',type:tp,ent:defEnt(tp)});
+                  },style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'7px',width:'100%',padding:'9px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},
+                    ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create organisation'))),
+              // RIGHT PANEL — org detail
+              dSel
+                ?h('div',{style:{flex:1,overflowY:'auto',padding:'28px',minWidth:0}},
+                    h('div',{style:{marginBottom:'22px'}},
+                      h('div',{style:{fontSize:'19px',fontWeight:700,letterSpacing:'-0.01em',marginBottom:'8px'}},dSel.name),
+                      h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}},
                         h('span',{style:s(badgeSt(dSel.typeKey))},TYPE_LABELS[dSel.typeKey]),
-                        h('span',{style:{fontSize:'13px',color:'#808080'}},dSel.id===home?'Your organisation':dParent?'Reports to '+dParent.name:'Platform root'))),
-                    h('button',{onClick:()=>setSelOrgId(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},
-                      ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
-                  h('div',{style:{padding:'24px',flex:1}},
-                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'12px'}},
+                        dSel.id===home&&h('span',{style:{fontSize:'11px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'3px 8px',borderRadius:'5px'}},'Your organisation'),
+                        h('span',{style:{fontSize:'13px',color:'#808080'}},dSel.id===home?'':dParent?'Reports to '+dParent.name:'Platform root'))),
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'22px'}},
                       [['Primary contact',dSel.primaryName||dSel.contact||'—'],['Users',String(userCountFor(dSel.id))],['Sub-orgs',String(childrenOf(dSel.id).length)]].map(([label,val])=>
-                        h('div',{key:label,style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px'}},
-                          h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'6px'}},label),
-                          h('div',{style:{fontWeight:700,fontSize:'14px',wordBreak:'break-all',color:'#5514B4'}},val)))),
-                    h('div',{style:{marginBottom:'24px'}},
-                      h('button',{onClick:()=>{setSelOrgId(dSel.id);setScreen('orgDetail');},style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:0,color:'#5514B4',fontWeight:700,fontSize:'13px',cursor:'pointer',padding:'0 0 16px 0',fontFamily:'inherit'}},
-                        'View full profile',ic('m9 18 6-6-6-6',{s:14,c:'#5514B4'}))),
-                    h('div',{style:{marginBottom:'24px'}},
-                      dParent&&h('div',{style:{display:'flex',gap:'12px',marginBottom:'12px',flexWrap:'wrap'}},
+                        h('div',{key:label,style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'10px',padding:'12px'}},
+                          h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'5px'}},label),
+                          h('div',{style:{fontWeight:700,fontSize:'13px',color:'#5514B4'}},val)))),
+                    h('button',{onClick:()=>{setSelOrgId(dSel.id);setScreen('orgDetail');},
+                      style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:0,color:'#5514B4',fontWeight:700,fontSize:'13px',cursor:'pointer',padding:'0',fontFamily:'inherit',marginBottom:'22px'}},
+                      'View full profile',ic('m9 18 6-6-6-6',{s:14,c:'#5514B4'})),
+                    dParent&&h('div',{style:{display:'flex',gap:'12px',marginBottom:'10px',flexWrap:'wrap'}},
                       h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11.5px',color:'#357E3C',fontWeight:700}},ic('M20 6 9 17l-5-5',{s:11,c:'#357E3C',w:2.5}),'Granted'),
                       h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11.5px',color:'#D88C00',fontWeight:700}},h('span',{style:{width:'11px',height:'2px',borderRadius:'1px',background:'#D88C00',display:'inline-block'}}),'Available'),
                       h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11.5px',color:'#AAAAAA',fontWeight:600}},h('span',{style:{width:'11px',height:'2px',borderRadius:'1px',background:'#CCCCCC',display:'inline-block'}}),'Not in parent')),
                     h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'4px',paddingBottom:'6px',borderBottom:'1px solid #E3E3E3'}},'Product entitlements'),
-                      PRODUCT_KEYS.map(k=>h(EntRow,{key:k,entKey:k})),
-                      h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'4px',paddingBottom:'6px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Services & capabilities'),
-                      ENT.filter(e=>e.kind==='service').map(e=>h(EntRow,{key:e.key,entKey:e.key}))),
-                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},ic('M12 5v14M5 12h14',{s:15,c:'#fff'}),'Assign entitlements'),
-                    h('div',null))));
-            })(),
+                    PRODUCT_KEYS.map(k=>h(EntRow,{key:k,entKey:k})),
+                    h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'4px',paddingBottom:'6px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Services & capabilities'),
+                    ENT.filter(e=>e.kind==='service').map(e=>h(EntRow,{key:e.key,entKey:e.key})),
+                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{
+                      onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),
+                      style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 18px',fontWeight:700,fontSize:'13.5px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px'}},
+                      ic('M12 5v14M5 12h14',{s:15,c:'#fff'}),'Assign entitlements'))
+                :h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'12px',padding:'40px'}},
+                    h('div',{style:{width:'52px',height:'52px',borderRadius:'14px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'4px'}},
+                      ic('M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2',{s:24,c:'#5514B4'})),
+                    h('div',{style:{fontWeight:700,fontSize:'14px',color:'#434343'}},'Select an organisation'),
+                    h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'Choose from the tree on the left to view its details')));
+          })(),
 
           screen==='orgDetail'&&selOrgId&&(()=>{
             const od=orgById(selOrgId);
