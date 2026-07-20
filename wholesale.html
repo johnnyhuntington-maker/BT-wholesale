@@ -613,8 +613,7 @@ function App(){
                 h('div',{style:{fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',letterSpacing:'-0.01em',color:'#fff'}},'BT Wholesale'),
                 h('div',{style:{fontSize:'11.5px',color:'rgba(255,255,255,0.65)',fontWeight:600,letterSpacing:'0.01em'}},'Platform Administration')))
           :h('div',null,
-              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'16px'}},BT_LOGO),
-              h('div',{style:{height:'1px',background:'rgba(255,255,255,0.2)',marginBottom:'12px'}})),
+              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'16px'}},BT_LOGO)),
 
         h('div',{style:{height:'1px',background:'rgba(255,255,255,0.15)',margin:'0 0 16px'}}),
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.5)',padding:'0 10px 8px'}},'Manage'),
@@ -661,7 +660,6 @@ function App(){
                 h('span',{style:{fontSize:'13.5px',fontWeight:500}},item.label))),
               h('div',{style:{borderTop:'1px solid #F0F0F0',marginTop:'4px',padding:'6px 6px 2px'}},
                 h('button',{onClick:()=>setAvatarMenuOpen(false),style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',width:'100%',padding:'9px 12px',border:'1.5px solid #5514B4',borderRadius:'8px',background:'transparent',cursor:'pointer',fontFamily:'inherit',color:'#5514B4',fontWeight:700,fontSize:'13.5px'}},
-                  ic('M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',{s:15,c:'#5514B4'}),
                   'Log out')))))
 ,
 
