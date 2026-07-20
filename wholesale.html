@@ -670,8 +670,10 @@ function App(){
         // Content
         h('div',{style:{flex:1,overflowY:'auto',padding:'30px 32px 48px'}},
 
-          screen!=='orgs'&&screen!=='users'&&h('div',{style:{fontSize:'22px',fontWeight:700,letterSpacing:'-0.01em',marginBottom:'24px'}},
+          h('div',{style:{fontSize:'22px',fontWeight:700,letterSpacing:'-0.01em',marginBottom:'24px'}},
             screen==='orgDetail'?(orgById(selOrgId)||{name:'Organisation'}).name:
+            screen==='orgs'?(isBt?'Reseller organisations':'Organisations'):
+            screen==='users'?'Users':
             screen==='roles'&&overviewTab!=='roles'?'Roles & permissions':
             screen==='helpSupport'?'Help & support':
             screen==='accountSettings'?'Profile & settings':P.title),
@@ -731,17 +733,18 @@ function App(){
           })(),
 
           screen==='overview'&&persona!=='user'&&h('div',{style:{maxWidth:'1120px'}},
-            h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',marginBottom:'24px'}},
+            h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',marginBottom:'24px'}},
               [
-                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:18,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Reseller organisations':'Downstream organisations',sub:isBt?'Across the platform':'Sub-resellers, child & dealers'},
-                {icon:ic([{el:'circle',cx:9,cy:7,r:4},{el:'circle',cx:17,cy:9,r:3},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87'],{s:18,c:'#5514B4'}),value:String(visibleUsers.length),label:'Users',sub:isBt?'Across all reseller orgs':'In your network'},
-                {icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18,c:'#5514B4'}),value:String(ROLES.length),label:isBt?'Role types':'Assignable roles',sub:isBt?'Across the network':'Role-based access'},
-                {icon:ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:18,c:'#5514B4'}),value:String(ENT.length),label:'Products',sub:isBt?'Available to resellers':'Products & services'},
-              ].map((k,i)=>h('div',{key:i,style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px'}},
-                h('span',{style:{width:'38px',height:'38px',borderRadius:'10px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'14px'}},k.icon),
-                h('div',{style:{fontSize:'32px',fontWeight:700,letterSpacing:'-0.02em',lineHeight:1,color:'#5514B4'}},k.value),
-                h('div',{style:{fontSize:'14px',color:'#434343',marginTop:'5px',fontWeight:700}},k.label),
-                h('div',{style:{fontSize:'12.5px',color:'#808080',marginTop:'1px'}},k.sub)))),
+                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:16,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Reseller orgs.':'Downstream orgs.',sub:isBt?'Across the platform':'Sub-resellers, child & dealers'},
+                {icon:ic([{el:'circle',cx:9,cy:7,r:4},{el:'circle',cx:17,cy:9,r:3},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87'],{s:16,c:'#5514B4'}),value:String(visibleUsers.length),label:'Users',sub:isBt?'Across all reseller orgs':'In your network'},
+                {icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#5514B4'}),value:String(ROLES.length),label:isBt?'Role types':'Assignable roles',sub:isBt?'Across the network':'Role-based access'},
+                {icon:ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:16,c:'#5514B4'}),value:String(ENT.length),label:'Products',sub:isBt?'Available to resellers':'Products & services'},
+              ].map((k,i)=>h('div',{key:i,style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'14px',padding:'14px 16px',display:'flex',gap:'12px',alignItems:'flex-start'}},
+                h('span',{style:{width:'34px',height:'34px',borderRadius:'9px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'2px'}},k.icon),
+                h('div',null,
+                  h('div',{style:{fontSize:'20px',fontWeight:700,letterSpacing:'-0.02em',lineHeight:1,color:'#5514B4'}},k.value),
+                  h('div',{style:{fontSize:'13px',color:'#434343',fontWeight:600,marginTop:'3px'}},k.label),
+                  h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'2px'}},k.sub))))),
 
             h('div',{style:{borderBottom:'1px solid #E3E3E3',marginBottom:'24px',display:'flex'}},
               [
