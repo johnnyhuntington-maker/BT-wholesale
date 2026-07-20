@@ -288,19 +288,21 @@ function App(){
 
       // Sidebar
       h('aside',{style:{width:sidebarOpen?'252px':'64px',flexShrink:0,background:'#5514B4',borderRight:'none',display:'flex',flexDirection:'column',padding:sidebarOpen?'22px 16px':'16px 8px',transition:'width 200ms ease',overflow:'hidden'}},
-        // Toggle button — always at top, same position collapsed or expanded
-        h('div',{style:{display:'flex',justifyContent:sidebarOpen?'flex-end':'center',marginBottom:'14px'}},
-          h('button',{onClick:()=>setSidebarOpen(o=>!o),title:sidebarOpen?'Collapse menu':'Expand menu',
-            style:{flexShrink:0,width:'28px',height:'28px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}},
-            ic(sidebarOpen?'m15 18-6-6 6-6':'m9 18 6-6-6-6',{s:15,c:'#fff'}))),
-        // Logo row
+        // Logo row + toggle button
         sidebarOpen
           ?h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'22px',minWidth:0}},
               h('span',{style:{color:'#fff',display:'flex',flexShrink:0}},BT_LOGO),
-              h('div',{style:{lineHeight:1.1,minWidth:0}},
-                h('div',{style:{fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',letterSpacing:'-0.01em',color:'#fff'}},'BT Wholesale')))
+              h('div',{style:{lineHeight:1.1,minWidth:0,flex:1}},
+                h('div',{style:{fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',letterSpacing:'-0.01em',color:'#fff'}},'BT Wholesale')),
+              h('button',{onClick:()=>setSidebarOpen(o=>!o),title:'Collapse menu',
+                style:{flexShrink:0,width:'28px',height:'28px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}},
+                ic('m15 18-6-6 6-6',{s:15,c:'#fff'})))
           :h('div',null,
-              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'16px'}},BT_LOGO)),
+              h('span',{style:{color:'#fff',display:'flex',justifyContent:'center',marginBottom:'10px'}},BT_LOGO),
+              h('div',{style:{display:'flex',justifyContent:'center',marginBottom:'6px'}},
+                h('button',{onClick:()=>setSidebarOpen(o=>!o),title:'Expand menu',
+                  style:{flexShrink:0,width:'28px',height:'28px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.25)',background:'rgba(255,255,255,0.12)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}},
+                  ic('m9 18 6-6-6-6',{s:15,c:'#fff'})))),
 
         h('div',{style:{height:'1px',background:'rgba(255,255,255,0.15)',margin:'0 0 16px'}}),
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.5)',padding:'0 10px 8px'}},'Manage'),
