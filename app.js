@@ -984,7 +984,7 @@ function App(){
                               setDrawerPendingRole(null);
                               showToast('success',du.name+' changed to '+previewRole.label+'.');
                             },
-                            style:{width:'100%',padding:'10px',background:isPreviewing?'#5514B4':'#E3E3E3',color:isPreviewing?'#fff':'#AAAAAA',border:0,borderRadius:'8px',fontWeight:700,fontSize:'13.5px',cursor:isPreviewing?'pointer':'default',fontFamily:'inherit'}},
+                            style:{padding:'10px 24px',background:isPreviewing?'#5514B4':'#D9C9F5',color:'#fff',border:0,borderRadius:'999px',fontWeight:700,fontSize:'13.5px',cursor:isPreviewing?'pointer':'default',fontFamily:'inherit',opacity:isPreviewing?1:0.55}},
                             'Confirm role change')));
                     })(),
                     // Actions
@@ -1274,7 +1274,7 @@ function App(){
                         closeUserDrawer();
                         showToast('success',drawerUser.name+' changed to '+previewRole.label+'.');
                       },
-                      style:{width:'100%',padding:'11px',marginTop:'12px',background:isPreviewing?'#5514B4':'#E3E3E3',color:isPreviewing?'#fff':'#AAAAAA',border:0,borderRadius:'10px',fontWeight:700,fontSize:'14px',cursor:isPreviewing?'pointer':'default',fontFamily:'inherit'}},
+                      style:{padding:'11px 26px',marginTop:'12px',background:isPreviewing?'#5514B4':'#D9C9F5',color:'#fff',border:0,borderRadius:'999px',fontWeight:700,fontSize:'14px',cursor:isPreviewing?'pointer':'default',fontFamily:'inherit',opacity:isPreviewing?1:0.55}},
                       'Confirm role change')))
               })()))),
 
