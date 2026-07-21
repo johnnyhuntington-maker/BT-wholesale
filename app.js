@@ -92,6 +92,11 @@ const PERSONAS={
     desc:'You set up and govern the reseller network. Everything your resellers and their downstream organisations can do on the platform is based on what you define and grant here.',
     can:['Create and manage reseller organisations','Assign products and entitlements to resellers','Set up reseller administrators','Define platform-wide access rules for the whole network'],
     cannot:["Carry out a reseller's day-to-day order management"]},
+  btAccountMgr:{key:'btAccountMgr',name:'BT Account Manager',signedInAs:'BT Account Manager',org:'BT Wholesale',orgInitials:'BT',crumb:'BT Wholesale · Account management',title:'Dashboard',
+    person:{name:'Claire Ashton',meta:'BT Wholesale · Account Manager',avatar:'CA'},accent:'#2A1C4A',
+    desc:'You manage BT Wholesale\'s relationships with reseller partners. You view their entitlements, support their onboarding, and ensure their accounts are configured correctly — but platform-wide settings are handled by the Platform Administrator.',
+    can:['View and manage reseller organisation profiles','Support reseller onboarding and account setup','Review entitlements across the reseller network','Assist resellers with user and role queries'],
+    cannot:['Create new reseller organisations','Change platform-wide access rules','Modify BT Wholesale-level entitlement definitions']},
   reseller:{key:'reseller',name:'Reseller Administrator',signedInAs:'Northgate Telecom Administrator',org:'Northgate Telecom',orgInitials:'NT',crumb:'Northgate Telecom · Reseller administration',title:'Dashboard',
     person:{name:'Sarah Whitfield',meta:'Northgate Telecom · Admin',avatar:'SW',photo:'https://randomuser.me/api/portraits/women/44.jpg'},accent:'#5514B4',
     desc:'You run the Northgate Telecom account. You manage your team, invite users, assign their roles, and build out your downstream network of sub-resellers, child resellers and dealers.',
@@ -99,9 +104,9 @@ const PERSONAS={
     cannot:["Access products Northgate Telecom hasn't been granted","Change BT platform-level settings"]},
   subReseller:{key:'subReseller',name:'Sub-Reseller Administrator',signedInAs:'Metro Connect Administrator',org:'Metro Connect',orgInitials:'MC',crumb:'Metro Connect · Sub-Reseller administration',title:'Dashboard',
     person:{name:'Marcus Webb',meta:'Metro Connect · Admin',avatar:'MW',photo:'https://randomuser.me/api/portraits/men/41.jpg'},accent:'#5514B4',
-    desc:'You run the Metro Connect account under Northgate Telecom. You manage your team, invite users, assign roles, and control what your downstream dealers can access.',
-    can:['Invite team members and assign them roles','Create and manage dealer organisations','Control what downstream dealers can access','Manage entitlements for your organisation'],
-    cannot:['Create sub-reseller organisations','Access products not granted by Northgate Telecom','Change BT or Northgate Telecom platform settings']},
+    desc:'You run the Metro Connect account under Northgate Telecom. You manage your team, invite users, assign roles, and place orders on behalf of your customers.',
+    can:['Invite team members and assign them roles','Place and manage orders','Choose which services to expose to your users','Receive customer KCIs'],
+    cannot:['Create child organisations of any type','Manage entitlements or billing','Access Business Zone, hardware ordering, or FMS tools','Raise support tickets with BT']},
   childReseller:{key:'childReseller',name:'Child Reseller Administrator',signedInAs:'Halo Networks Administrator',org:'Halo Networks',orgInitials:'HN',crumb:'Halo Networks · Child Reseller administration',title:'Dashboard',
     person:{name:'Joanna Park',meta:'Halo Networks · Admin',avatar:'JP'},accent:'#5514B4',
     desc:'You run the Halo Networks account under Northgate Telecom. You manage your team, invite users, assign roles, and control what your downstream network can access.',
@@ -236,8 +241,9 @@ function App(){
 
   function openUserDrawer(id){setUserDrawer(id);setDrawerPendingRole(null);}
   function closeUserDrawer(){setUserDrawer(null);setDrawerPendingRole(null);}
-  const isBt=persona==='bt';
+  const isBt=persona==='bt'||persona==='btAccountMgr';
   const canAdmin=persona!=='user';
+  const canCreateOrg=persona==='bt'||persona==='reseller'||persona==='childReseller';
   const home=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
   const P=PERSONAS[persona];
 
@@ -245,8 +251,8 @@ function App(){
   const roleLabel=k=>{const r=ROLES.find(r=>r.key===k);return r?r.label:k;};
   const childrenOf=id=>orgs.filter(o=>o.parentId===id);
   const userCountFor=id=>users.filter(u=>u.orgId===id).length;
-  const wizParent=()=>isBt?orgById('btw'):orgById('northgate');
-  const childTypes=()=>isBt?['reseller']:['subReseller','childReseller','dealer'];
+  const wizParent=()=>isBt?orgById('btw'):orgById(home);
+  const childTypes=()=>isBt?['reseller']:persona==='childReseller'?['dealer']:['subReseller','childReseller','dealer'];
   const typeAllows=(tk,key)=>{
     if(tk==='reseller') return true;
     if(tk==='subReseller') return PRODUCT_KEYS.includes(key)||key==='kci'||key==='branding';
@@ -338,9 +344,9 @@ function App(){
         h('div',{style:{marginTop:'auto'}}),
         h('div',{style:{height:'1px',background:'rgba(255,255,255,0.15)',margin:'8px 0'}}),
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.45)',padding:'0 10px 8px'}},'Switch view'),
-        ...(['bt','reseller','subReseller','childReseller','user'].map(k=>{
-          const labels={bt:'BT Wholesale Admin',reseller:'Reseller Admin',subReseller:'Sub-Reseller Admin',childReseller:'Child Reseller Admin',user:'Standard User'};
-          const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',subReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',childReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
+        ...(['bt','btAccountMgr','reseller','subReseller','childReseller','user'].map(k=>{
+          const labels={bt:'BT Wholesale Admin',btAccountMgr:'BT Account Manager',reseller:'Reseller Admin',subReseller:'Sub-Reseller Admin',childReseller:'Child Reseller Admin',user:'Standard User'};
+          const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',btAccountMgr:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',subReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',childReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
           const active=persona===k;
           return h('button',{key:k,onClick:()=>{setPsn(k);setScreen('overview');},title:!sidebarOpen?labels[k]:undefined,
             style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:!sidebarOpen?'10px 0':'10px 12px',justifyContent:!sidebarOpen?'center':'flex-start',border:0,borderRadius:'11px',cursor:'pointer',fontSize:'13.5px',fontWeight:active?700:500,marginBottom:'3px',background:active?'rgba(255,255,255,0.18)':'transparent',color:active?'#fff':'rgba(255,255,255,0.6)',fontFamily:'inherit',transition:'background 150ms'}},
@@ -393,7 +399,7 @@ function App(){
               screen==='billingSupport'?'Billing Support':
               screen==='apiPortal'?'API Portal':
               screen==='accountSettings'?'Profile & settings':P.title),
-            screen==='orgs'&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,createOrg.label)),
+            screen==='orgs'&&canCreateOrg&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,createOrg.label)),
             screen==='users'&&usersTab==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
           screen==='knowledgeHub'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
             h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
@@ -860,7 +866,7 @@ function App(){
                     PROD_KEYS.map(k=>h(OdEntRow,{key:k,entKey:k})),
                     h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Services & capabilities'),
                     ENT.filter(e=>e.kind==='service').map(e=>h(OdEntRow,{key:e.key,entKey:e.key})),
-                    canAdmin&&od.id!=='btw'&&od.id!==home&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
+                    canAdmin&&od.id!=='btw'&&od.id!==home&&od.typeKey!=='subReseller'&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
