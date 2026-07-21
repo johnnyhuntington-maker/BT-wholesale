@@ -909,13 +909,7 @@ function App(){
                               h('span',{style:{width:'5px',height:'5px',borderRadius:'50%',background:'currentColor',flexShrink:0}}),
                               u.status)),
                           h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'1px'}},roleLabel(u.roleKey))));
-                    })),
-                h('div',{style:{padding:'12px 13px',borderTop:'1px solid #E3E3E3',flexShrink:0}},
-                  canAdmin
-                    ?h('button',{onClick:()=>setUserWiz({step:1,name:'',email:'',phone:'',orgId:'northgate',profileType:'regular',role:'orderManager'}),
-                        style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'7px',width:'100%',padding:'9px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},
-                        ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Invite user')
-                    :null)),
+                    }))),
               // RIGHT PANEL — user detail
               du
                 ?h('div',{style:{flex:1,overflowY:'auto',padding:'28px',minWidth:0}},
