@@ -903,7 +903,11 @@ function App(){
                             :h('div',{style:{width:'34px',height:'34px',borderRadius:'999px',background:isSel?'#5514B4':'#F3EBFE',color:isSel?'#fff':'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'12px'}},initials(u.name)),
                           h('span',{style:{position:'absolute',bottom:0,right:'-1px',width:'9px',height:'9px',borderRadius:'999px',border:'2px solid #fff',background:sc[0]}})),
                         h('div',{style:{minWidth:0,flex:1}},
-                          h('div',{style:{fontWeight:isSel?700:600,fontSize:'13.5px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:isSel?'#5514B4':'#1A1A1A'}},u.name),
+                          h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
+                            h('span',{style:{fontWeight:isSel?700:600,fontSize:'13.5px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:isSel?'#5514B4':'#1A1A1A',flex:1,minWidth:0}},u.name),
+                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'10px',fontWeight:700,flexShrink:0,padding:'2px 7px',borderRadius:'999px',color:sc[0],background:sc[1],border:'1px solid '+sc[0]+'33'}},
+                              h('span',{style:{width:'5px',height:'5px',borderRadius:'50%',background:'currentColor',flexShrink:0}}),
+                              u.status)),
                           h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'1px'}},roleLabel(u.roleKey))));
                     })),
                 h('div',{style:{padding:'12px 13px',borderTop:'1px solid #E3E3E3',flexShrink:0}},
