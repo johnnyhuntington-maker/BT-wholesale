@@ -153,7 +153,7 @@ const INIT_ORGS=[
   {id:'metro',name:'Metro Connect',typeKey:'subReseller',status:'Active',parentId:'northgate',contact:'ops@metroconnect.co.uk',primaryName:'Marcus Webb',primaryEmail:'marcus.webb@metroconnect.co.uk',primaryPhone:'+44 161 234 5678',billingName:'Marcus Webb',billingEmail:'billing@metroconnect.co.uk',billingPhone:'+44 161 234 5679',address:'22 Northern Quarter, Manchester, M4 1HQ',website:'www.metroconnect.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
   {id:'halo',name:'Halo Networks',typeKey:'childReseller',status:'Active',parentId:'northgate',contact:'support@halonetworks.co.uk',primaryName:'Joanna Park',primaryEmail:'joanna.park@halonetworks.co.uk',primaryPhone:'+44 113 456 7890',billingName:'Finance Team',billingEmail:'finance@halonetworks.co.uk',billingPhone:'+44 113 456 7891',address:'Halo House, 5 Innovation Drive, Leeds, LS1 5AE',website:'www.halonetworks.co.uk',entitlements:['broadband','digitalVoice','strategicBroadband','hardware','kci','businessZone','fmsEmpirix','branding']},
   {id:'riverside',name:'Riverside Comms',typeKey:'subReseller',status:'Inactive',parentId:'northgate',contact:'hello@riverside-comms.co.uk',primaryName:'Dan Osei',primaryEmail:'dan.osei@riverside-comms.co.uk',primaryPhone:'+44 117 890 1234',billingName:'Dan Osei',billingEmail:'billing@riverside-comms.co.uk',billingPhone:'+44 117 890 1235',address:'Unit 3, Riverside Business Park, Bath, BA1 1RW',website:'www.riverside-comms.co.uk',entitlements:['broadband','digitalVoice','kci','support','branding']},
-  {id:'apex',name:'Apex Telecom',typeKey:'dealer',status:'Suspended',parentId:'northgate',contact:'sales@apextelecom.co.uk',primaryName:'Fatima Al-Rashid',primaryEmail:'fatima.alrashid@apextelecom.co.uk',primaryPhone:'+44 1908 123 456',billingName:'Accounts Dept',billingEmail:'accounts@apextelecom.co.uk',billingPhone:'+44 1908 123 457',address:'12 Apex Way, Northampton, NN1 2BP',website:'www.apextelecom.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
+  {id:'apex',name:'Apex Telecom',typeKey:'dealer',status:'Inactive',parentId:'northgate',contact:'sales@apextelecom.co.uk',primaryName:'Fatima Al-Rashid',primaryEmail:'fatima.alrashid@apextelecom.co.uk',primaryPhone:'+44 1908 123 456',billingName:'Accounts Dept',billingEmail:'accounts@apextelecom.co.uk',billingPhone:'+44 1908 123 457',address:'12 Apex Way, Northampton, NN1 2BP',website:'www.apextelecom.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
 ];
 const INIT_USERS=[
   {id:'u1',name:'Sarah Whitfield',email:'sarah.whitfield@northgate.co.uk',roleKey:'admin',orgId:'northgate',status:'Active',roleDate:'Jan 2024',photo:'https://randomuser.me/api/portraits/women/44.jpg',isPrimary:true},
@@ -162,7 +162,7 @@ const INIT_USERS=[
   {id:'u4',name:'Tom Reeves',email:'tom.reeves@metroconnect.co.uk',roleKey:'support',orgId:'metro',status:'Active',roleDate:'Jun 2024',photo:'https://randomuser.me/api/portraits/men/41.jpg'},
   {id:'u5',name:'Lucy Chen',email:'lucy.chen@northgate.co.uk',roleKey:'reporting',orgId:'northgate',status:'Invited',roleDate:'May 2025',photo:'https://randomuser.me/api/portraits/women/63.jpg'},
   {id:'u6',name:'Daniel Frost',email:'daniel.frost@northgate.co.uk',roleKey:'apiDev',orgId:'northgate',status:'Active',roleDate:'Sep 2024'},
-  {id:'u7',name:'Aisha Bello',email:'aisha.bello@apextelecom.co.uk',roleKey:'readonly',orgId:'apex',status:'Suspended',roleDate:'Nov 2023',photo:'https://randomuser.me/api/portraits/women/26.jpg'},
+  {id:'u7',name:'Aisha Bello',email:'aisha.bello@apextelecom.co.uk',roleKey:'readonly',orgId:'apex',status:'Inactive',roleDate:'Nov 2023',photo:'https://randomuser.me/api/portraits/women/26.jpg'},
   {id:'u8',name:'Robert Haines',email:'robert.haines@beaconwholesale.co.uk',roleKey:'admin',orgId:'beacon',status:'Active',roleDate:'Feb 2024'},
 ];
 const ROLE_CAPS={
@@ -277,7 +277,7 @@ function App(){
   const visibleUsers=isBt?users:users.filter(u=>{const o=orgById(u.orgId);return o&&(o.id===home||o.parentId===home);});
   const sel=orgById(selOrgId)||orgById(home);
   const selParent=sel.parentId?orgById(sel.parentId):null;
-  const statusMap={Active:['#1F5A26','#EAF6EA'],Invited:['#8A5A00','#FEF6DE'],Suspended:['#A0121B','#FDECEC'],Inactive:['#666666','#F0F0F0']};
+  const statusMap={Active:['#1F5A26','#EAF6EA'],Invited:['#8A5A00','#FEF6DE'],Inactive:['#666666','#F0F0F0']};
 
   function mkActionBtn(kind){
     const isOrg=kind==='org';
@@ -285,7 +285,7 @@ function App(){
     const hint=isOrg?(isBt?'Set up a new reseller organisation':'Delegate access to a downstream org'):(isBt?'Add a user & assign them a role':'Add a team member & assign a role');
     const onClick=isOrg
       ?()=>{if(!canAdmin)return deny();const t=childTypes()[0];setOrgWiz({step:1,name:'',email:'',type:t,ent:defEnt(t)});}
-      :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:'northgate',profileType:'regular',role:'orderManager'});};
+      :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:home,profileType:'regular',role:'orderManager'});};
     return {label,hint,onClick,
       rowStyle:{display:'flex',alignItems:'center',gap:'12px',width:'100%',borderRadius:'12px',padding:'13px 14px',marginBottom:'10px',textAlign:'left',border:'1px solid #E3E3E3',background:canAdmin?'#fff':'#F7F7F7',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
       ctaStyle:{display:'inline-flex',alignItems:'center',gap:'8px',border:0,borderRadius:'999px',padding:'11px 18px',fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',background:canAdmin?'#5514B4':'#EDEDED',color:canAdmin?'#fff':'#AAAAAA',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
@@ -729,7 +729,7 @@ function App(){
                     PRODUCT_KEYS.map(k=>h(EntRow,{key:k,entKey:k})),
                     h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'6px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3',marginTop:'22px'}},'Services & capabilities'),
                     ENT.filter(e=>e.kind==='service').map(e=>h(EntRow,{key:e.key,entKey:e.key})),
-                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{
+                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&dSel.typeKey!=='subReseller'&&dSel.typeKey!=='dealer'&&h('button',{
                       onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),
                       style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 18px',fontWeight:700,fontSize:'13.5px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px'}},
                       ic('M12 5v14M5 12h14',{s:15,c:'#fff'}),'Assign entitlements'))
@@ -866,7 +866,7 @@ function App(){
                     PROD_KEYS.map(k=>h(OdEntRow,{key:k,entKey:k})),
                     h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Services & capabilities'),
                     ENT.filter(e=>e.kind==='service').map(e=>h(OdEntRow,{key:e.key,entKey:e.key})),
-                    canAdmin&&od.id!=='btw'&&od.id!==home&&od.typeKey!=='subReseller'&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
+                    canAdmin&&od.id!=='btw'&&od.id!==home&&od.typeKey!=='subReseller'&&od.typeKey!=='dealer'&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
@@ -899,7 +899,7 @@ function App(){
                   h('div',{style:{display:'flex',gap:'6px'}},
                     h('select',{value:filterStatus,onChange:e=>setFilterStatus(e.target.value),style:{flex:1,padding:'6px 8px',border:'1px solid #E3E3E3',borderRadius:'6px',fontSize:'12px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343'}},
                       h('option',{value:''},'All statuses'),
-                      ['Active','Invited','Inactive','Suspended'].map(s=>h('option',{key:s,value:s},s))),
+                      ['Active','Invited','Inactive'].map(s=>h('option',{key:s,value:s},s))),
                     h('select',{value:filterRole,onChange:e=>setFilterRole(e.target.value),style:{flex:1,padding:'6px 8px',border:'1px solid #E3E3E3',borderRadius:'6px',fontSize:'12px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343'}},
                       h('option',{value:''},'All roles'),
                       ROLES.map(r=>h('option',{key:r.key,value:r.key},r.label))))),
@@ -1015,7 +1015,7 @@ function App(){
                           onClick:()=>setDeactivateConfirm(du.id),
                           style:{display:'flex',alignItems:'center',gap:'8px',padding:'9px 14px',border:'1px solid #F8E0C0',borderRadius:'8px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'13px',color:'#8A5A00',textAlign:'left'}},
                           ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:14,c:'#8A5A00'}),'Deactivate user'),
-                        (du.status==='Suspended'||du.status==='Inactive')&&h('button',{
+                        du.status==='Inactive'&&h('button',{
                           onClick:()=>{setUsers(us=>us.map(u=>u.id===du.id?{...u,status:'Active'}:u));showToast('success',du.name+' has been reactivated.');},
                           style:{display:'flex',alignItems:'center',gap:'8px',padding:'9px 14px',border:'1px solid #BFE0BF',borderRadius:'8px',background:'#F0F8EF',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'13px',color:'#1F5A26',textAlign:'left'}},
                           ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C'}),'Reactivate user'),
