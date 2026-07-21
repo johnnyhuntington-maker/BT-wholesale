@@ -310,7 +310,6 @@ var d=null!=c&&c.hydratedSources||null,e=!1,f="",g=aj;null!==c&&void 0!==c&&(!0=
 function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmountComponentAtNode=function(a){if(!Vd(a))throw Error(m(40));return a._reactRootContainer?(yb(function(){Wd(null,null,a,!1,function(){a._reactRootContainer=null;a[Ja]=null})}),!0):!1};Q.unstable_batchedUpdates=Tf;Q.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!Vd(c))throw Error(m(200));if(null==a||void 0===a._reactInternals)throw Error(m(38));return Wd(a,b,c,!1,d)};Q.version="18.3.1-next-f1338f8080-20240426"});
 })();
 </script><script id="app-script">
-
 (function(){
 'use strict';
 
@@ -796,23 +795,6 @@ function App(){
                   h('div',{style:{fontSize:'13px',color:'#434343',fontWeight:600,marginTop:'3px'}},k.label),
                   h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'2px'}},k.sub))))),
 
-            h('div',{style:{borderBottom:'1px solid #E3E3E3',marginBottom:'24px',display:'flex'}},
-              [
-                {key:'network',label:'Your network'},
-                {key:'create',label:isBt?'Create reseller':'Create organisation'},
-              ].map(t=>h('button',{key:t.key,
-                onClick:()=>{
-                  if(t.key==='network'){setOrgWiz(null);setOverviewTab('network');return;}
-                  if(t.key==='create'){
-                    if(!canAdmin)return deny();
-                    const tp=childTypes()[0];
-                    setOrgWiz({step:1,name:'',email:'',type:tp,ent:defEnt(tp)});
-                    setOverviewTab('create');
-                    return;
-                  }
-                  setOverviewTab(t.key);
-                },
-                style:{background:'none',border:'none',borderBottom:'2px solid '+(overviewTab===t.key?'#5514B4':'transparent'),padding:'10px 20px',fontWeight:overviewTab===t.key?700:500,fontSize:'14px',color:overviewTab===t.key?'#5514B4':'#808080',cursor:'pointer',fontFamily:'inherit',marginBottom:'-1px',whiteSpace:'nowrap'}},t.label))),
 
             overviewTab==='network'&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
               h('div',{style:{padding:'20px 22px',borderBottom:'1px solid #E3E3E3'}},
@@ -879,10 +861,7 @@ function App(){
                         'View',ic('m9 18 6-6-6-6',{s:13,c:'#5514B4'}))));
                 });
               })(),
-              h('div',{style:{padding:'16px 22px',borderTop:'1px solid #F0F0F0'}},
-                h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},
-                  canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),
-                  h('span',null,createOrg.label)))),
+),
 
             overviewTab==='invite'&&userWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',maxWidth:'760px'}},
               h('div',{style:{padding:'22px 26px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
@@ -952,79 +931,7 @@ function App(){
                   const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
                   setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setOverviewTab('network');
                   showToast('success','Invitation sent to '+user.name+' as '+roleLabel(rk)+' at '+(o?o.name:'Northgate Telecom')+'.');
-                },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue'))),
-
-            overviewTab==='create'&&orgWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',width:'100%'}},
-              h('div',{style:{maxWidth:'640px',margin:'0 auto',padding:'32px 0 0'}},
-              h('div',{style:{padding:'0 24px 20px',borderBottom:'1px solid #E3E3E3'}},
-                h('div',{style:{display:'flex',alignItems:'center',gap:'0',maxWidth:'480px',margin:'0 auto'}},
-                  ['Details','Contact','Entitlements','Review'].map((label,i)=>{
-                    const stepNum=i+1;const done=orgWiz.step>stepNum;const active=orgWiz.step===stepNum;
-                    return h('div',{key:label,style:{display:'flex',alignItems:'center',flex:i<3?1:'auto'}},
-                      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'5px'}},
-                        h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,background:done?'#5514B4':active?'#5514B4':'#F0F0F0',border:'none',transition:'background 200ms'}},
-                          done?ic('M20 6 9 17l-5-5',{s:13,c:'#fff',w:2.5}):h('span',{style:{fontSize:'12px',fontWeight:700,color:active?'#fff':'#808080'}},stepNum)),
-                        h('span',{style:{fontSize:'11px',fontWeight:active||done?700:400,color:active?'#5514B4':done?'#5514B4':'#808080',whiteSpace:'nowrap'}},label)),
-                      i<3&&h('div',{style:{flex:1,height:'2px',background:done?'#5514B4':'#E3E3E3',margin:'0 6px',marginBottom:'18px',transition:'background 200ms'}}));
-                  }))),
-              h('div',{style:{padding:'26px'}},
-                orgWiz.step===1&&h('div',null,
-                  h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Organisation name'),
-                  h('input',{value:orgWiz.name,onChange:e=>setOrgWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Beacon Communications',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit'}}),
-                  h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Administrator email'),
-                  h('input',{value:orgWiz.email,onChange:e=>setOrgWiz(w=>({...w,email:e.target.value})),placeholder:'admin@organisation.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'22px',fontFamily:'inherit'}}),
-                  h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'10px'}},'Organisation type'),
-                  h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
-                    childTypes().map(tk=>{
-                      const active=orgWiz.type===tk;
-                      return h('button',{key:tk,onClick:()=>setOrgWiz(w=>{const ent={};const p=wizParent();ENT.forEach(x=>{if(p.entitlements.includes(x.key)&&typeAllows(tk,x.key))ent[x.key]=true;});return{...w,type:tk,ent};}),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'13px 14px',borderRadius:'11px',textAlign:'left',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                        h('span',{style:{width:'20px',height:'20px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                        h('span',null,h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},TYPE_LABELS[tk]),h('span',{style:{display:'block',fontSize:'12.5px',color:'#808080'}},TYPE_DESC[tk])));
-                    }))),
-                orgWiz.step===2&&(()=>{
-                  const fld=(label,key,placeholder,half)=>h('div',{style:{gridColumn:half?'span 1':'span 2'}},
-                    h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},label),
-                    h('input',{value:orgWiz[key]||'',onChange:e=>setOrgWiz(w=>({...w,[key]:e.target.value})),placeholder,style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'14px',fontFamily:'inherit'}}));
-                  const sec=(title)=>h('div',{style:{gridColumn:'span 2',fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',paddingTop:'8px',marginBottom:'-4px'}},title);
-                  return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}},
-                    sec('Primary contact'),fld('Name','primaryName','e.g. Sarah Whitfield',true),fld('Email','primaryEmail','sarah@organisation.co.uk',true),fld('Phone','primaryPhone','+44 1234 567 890',true),
-                    sec('Billing contact'),fld('Name','billingName','e.g. Priya Nair',true),fld('Email','billingEmail','billing@organisation.co.uk',true),fld('Phone','billingPhone','+44 1234 567 891',true),
-                    sec('Organisation'),fld('Registered address','address','14 Commerce Park, Milton Keynes, MK9 2EA',false),fld('Website','website','www.organisation.co.uk',false));
-                })(),
-                orgWiz.step===3&&h('div',null,
-                  h('div',{style:{display:'flex',gap:'10px',background:'#F3EBFE',border:'1px solid #E4D3FA',borderRadius:'12px',padding:'13px 15px',marginBottom:'22px'}},
-                    h('span',{style:{color:'#5514B4',flexShrink:0}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18})),
-                    h('div',{style:{fontSize:'13px',color:'#3F187F',lineHeight:1.4}},'A ',h('b',null,TYPE_LABELS[orgWiz.type]),' can only inherit capabilities that ',h('b',null,wizParent().name),' already holds.')),
-                  ['product','service'].map(kind=>h('div',{key:kind},
-                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},kind==='product'?'Products':'Services & capabilities'),
-                    h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',marginBottom:'22px'}},
-                      ENT.filter(e=>e.kind===kind).map(e=>{
-                        const p=wizParent();const held=p.entitlements.includes(e.key);const allowed=typeAllows(orgWiz.type,e.key);const locked=!held||!allowed;const checked=!!orgWiz.ent[e.key]&&!locked;
-                        return h('button',{key:e.key,onClick:()=>{if(!locked)setOrgWiz(w=>({...w,ent:{...w.ent,[e.key]:!w.ent[e.key]}}));},style:{display:'flex',alignItems:'center',gap:'11px',width:'100%',padding:'12px 14px',borderRadius:'10px',border:'1px solid '+(checked?'#5514B4':'#E3E3E3'),background:locked?'#F7F7F7':'#fff',cursor:locked?'not-allowed':'pointer',fontFamily:'inherit'}},
-                          h('span',{style:{width:'22px',height:'22px',borderRadius:'6px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:checked?'#5514B4':locked?'#EDEDED':'#fff',border:'1px solid '+(checked?'#5514B4':locked?'#E3E3E3':'#C8C8C8')}},checked&&ic('M20 6 9 17l-5-5',{s:13,c:'#fff',w:3})),
-                          h('span',{style:{fontWeight:700,fontSize:'14px',color:locked?'#AAAAAA':'#2A2A2A'}},e.label),
-                          h('span',{style:{flex:1}}),
-                          locked&&h('span',{style:{fontSize:'11.5px',color:'#808080',display:'flex',gap:'4px',alignItems:'center'}},lockEl('#808080'),!held?'Not held by '+p.name:'N/A for '+TYPE_LABELS[orgWiz.type]));
-                      }))))),
-                orgWiz.step===4&&h('div',null,
-                  h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'20px'}},
-                    [['Name',orgWiz.name||'(untitled)'],['Type',TYPE_LABELS[orgWiz.type]],['Admin email',orgWiz.email||'(none)'],['Parent',wizParent().name],['Primary contact',orgWiz.primaryName||(orgWiz.primaryEmail||'(none)')],['Billing contact',orgWiz.billingName||(orgWiz.billingEmail||'(none)')],['Website',orgWiz.website||'(none)']].map(([k,v],i,a)=>
-                      h('div',{key:k,style:{display:'flex',justifyContent:'space-between',padding:'13px 16px',borderBottom:i<a.length-1?'1px solid #F0F0F0':'none'}},
-                        h('span',{style:{color:'#808080',fontSize:'13px'}},k),h('span',{style:{fontWeight:700,fontSize:'14px'}},v)))),
-                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Entitlements granted ('+Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]).length+')'),
-                  h('div',{style:{display:'flex',flexWrap:'wrap',gap:'8px'}},
-                    Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]).length===0
-                      ?h('span',{style:{fontSize:'13px',color:'#808080'}},'None selected.')
-                      :ENT.filter(e=>orgWiz.ent[e.key]).map(e=>h('span',{key:e.key,style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#F0F8EF',border:'1px solid #BFE0BF',color:'#1F5A26',borderRadius:'5px',padding:'6px 11px',fontSize:'13px',fontWeight:700}},ic('M20 6 9 17l-5-5',{s:12,c:'#357E3C',w:3}),e.label))))),
-              h('div',{style:{padding:'18px 26px',borderTop:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between',alignItems:'center'}},
-                h('button',{onClick:()=>{if(orgWiz.step===1){setOrgWiz(null);setOverviewTab('network');}else setOrgWiz(w=>({...w,step:Math.max(1,w.step-1)}));},style:{background:'#fff',border:'1px solid #C8C8C8',borderRadius:'999px',padding:'11px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===1?'Cancel':'Back'),
-                h('button',{onClick:()=>{
-                  if(orgWiz.step<4){setOrgWiz(w=>({...w,step:w.step+1}));return;}
-                  const p=wizParent();const id='org'+seq;const ents=Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]);
-                  const org={id,name:orgWiz.name.trim()||'New organisation',typeKey:orgWiz.type,parentId:p.id,contact:orgWiz.email.trim()||'—',primaryName:orgWiz.primaryName||'',primaryEmail:orgWiz.primaryEmail||'',primaryPhone:orgWiz.primaryPhone||'',billingName:orgWiz.billingName||'',billingEmail:orgWiz.billingEmail||'',billingPhone:orgWiz.billingPhone||'',address:orgWiz.address||'',website:orgWiz.website||'',entitlements:ents};
-                  setOrgs(os=>[...os,org]);setSeq(n=>n+1);setOrgWiz(null);setSelOrgId(id);setScreen('orgs');
-                  showToast('success',org.name+' created as a '+TYPE_LABELS[orgWiz.type]+' under '+p.name+'.');
-                },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue'))))),
+                },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue')))),
 
           screen==='orgs'&&(()=>{
             const dSel=selOrgId?orgById(selOrgId):null;
@@ -1086,14 +993,7 @@ function App(){
                           h('div',{style:{display:'flex',alignItems:'center',gap:'5px',marginTop:'3px'}},
                             h('span',{style:{...s(badgeSt(o.typeKey)),fontSize:'10px',padding:'2px 6px'}},TYPE_LABELS[o.typeKey]),
                             o.id===home&&h('span',{style:{fontSize:'10px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 6px',borderRadius:'5px'}},'You'))));
-                    })),
-                canAdmin&&h('div',{style:{padding:'12px 13px',borderTop:'1px solid #E3E3E3',flexShrink:0}},
-                  h('button',{onClick:()=>{
-                    if(!canAdmin)return deny();
-                    const tp=childTypes()[0];
-                    setOrgWiz({step:1,name:'',email:'',type:tp,ent:defEnt(tp)});
-                  },style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'7px',width:'100%',padding:'9px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},
-                    ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create organisation'))),
+                    }))),
               // RIGHT PANEL — org detail
               dSel
                 ?h('div',{style:{flex:1,overflowY:'auto',padding:'28px',minWidth:0}},
@@ -1760,6 +1660,89 @@ function App(){
                 },style:{padding:'10px 20px',border:0,borderRadius:'999px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#A0121B',color:'#fff',fontFamily:'inherit'}},'Remove')))):null;
         })(),
 
+        // Org wizard drawer
+        orgWiz&&h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex'}},
+          h('div',{onClick:()=>setOrgWiz(null),style:{flex:1,background:'rgba(20,10,40,0.42)'}}),
+          h('div',{style:{width:'540px',background:'#fff',display:'flex',flexDirection:'column',boxShadow:'-16px 0 40px rgba(20,10,40,0.18)'}},
+            // Header
+            h('div',{style:{padding:'22px 26px',borderBottom:'1px solid #E3E3E3',flexShrink:0}},
+              h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'18px'}},
+                h('div',null,
+                  h('div',{style:{fontSize:'18px',fontWeight:700}},isBt?'Create reseller':'Create organisation'),
+                  h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+orgWiz.step+' of 4 · '+['Details','Contacts','Entitlements','Review'][orgWiz.step-1])),
+                h('button',{onClick:()=>setOrgWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
+              // Step progress bar
+              h('div',{style:{display:'flex',alignItems:'center',gap:'0',maxWidth:'100%'}},
+                ['Details','Contacts','Entitlements','Review'].map((label,i)=>{
+                  const stepNum=i+1;const done=orgWiz.step>stepNum;const active=orgWiz.step===stepNum;
+                  return h('div',{key:label,style:{display:'flex',alignItems:'center',flex:i<3?1:'auto'}},
+                    h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'4px'}},
+                      h('div',{style:{width:'24px',height:'24px',borderRadius:'999px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,background:done?'#5514B4':active?'#5514B4':'#F0F0F0',transition:'background 200ms'}},
+                        done?ic('M20 6 9 17l-5-5',{s:12,c:'#fff',w:2.5}):h('span',{style:{fontSize:'11px',fontWeight:700,color:active?'#fff':'#808080'}},stepNum)),
+                      h('span',{style:{fontSize:'10.5px',fontWeight:active||done?700:400,color:active?'#5514B4':done?'#5514B4':'#808080',whiteSpace:'nowrap'}},label)),
+                    i<3&&h('div',{style:{flex:1,height:'2px',background:done?'#5514B4':'#E3E3E3',margin:'0 5px',marginBottom:'16px',transition:'background 200ms'}}));
+                }))),
+            // Body
+            h('div',{style:{flex:1,overflowY:'auto',padding:'26px'}},
+              orgWiz.step===1&&h('div',null,
+                h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Organisation name'),
+                h('input',{value:orgWiz.name,onChange:e=>setOrgWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Beacon Communications',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'20px',fontFamily:'inherit',boxSizing:'border-box'}}),
+                h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},'Administrator email'),
+                h('input',{value:orgWiz.email,onChange:e=>setOrgWiz(w=>({...w,email:e.target.value})),placeholder:'admin@organisation.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',marginBottom:'22px',fontFamily:'inherit',boxSizing:'border-box'}}),
+                h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'10px'}},'Organisation type'),
+                h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
+                  childTypes().map(tk=>{
+                    const active=orgWiz.type===tk;
+                    return h('button',{key:tk,onClick:()=>setOrgWiz(w=>{const ent={};const p=wizParent();ENT.forEach(x=>{if(p.entitlements.includes(x.key)&&typeAllows(tk,x.key))ent[x.key]=true;});return{...w,type:tk,ent};}),style:{display:'flex',alignItems:'flex-start',gap:'11px',width:'100%',padding:'13px 14px',borderRadius:'11px',textAlign:'left',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
+                      h('span',{style:{width:'20px',height:'20px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
+                      h('span',null,h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},TYPE_LABELS[tk]),h('span',{style:{display:'block',fontSize:'12.5px',color:'#808080'}},TYPE_DESC[tk])));
+                  }))),
+              orgWiz.step===2&&(()=>{
+                const fld=(label,key,placeholder,half)=>h('div',{style:{gridColumn:half?'span 1':'span 2'}},
+                  h('label',{style:{display:'block',fontSize:'13px',fontWeight:700,marginBottom:'7px'}},label),
+                  h('input',{value:orgWiz[key]||'',onChange:e=>setOrgWiz(w=>({...w,[key]:e.target.value})),placeholder,style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'14px',fontFamily:'inherit',boxSizing:'border-box'}}));
+                const sec=(title)=>h('div',{style:{gridColumn:'span 2',fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',paddingTop:'8px',marginBottom:'-4px'}},title);
+                return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}},
+                  sec('Primary contact'),fld('Name','primaryName','e.g. Sarah Whitfield',true),fld('Email','primaryEmail','sarah@organisation.co.uk',true),fld('Phone','primaryPhone','+44 1234 567 890',true),
+                  sec('Billing contact'),fld('Name','billingName','e.g. Priya Nair',true),fld('Email','billingEmail','billing@organisation.co.uk',true),fld('Phone','billingPhone','+44 1234 567 891',true),
+                  sec('Organisation'),fld('Registered address','address','14 Commerce Park, Milton Keynes, MK9 2EA',false),fld('Website','website','www.organisation.co.uk',false));
+              })(),
+              orgWiz.step===3&&h('div',null,
+                h('div',{style:{display:'flex',gap:'10px',background:'#F3EBFE',border:'1px solid #E4D3FA',borderRadius:'12px',padding:'13px 15px',marginBottom:'22px'}},
+                  h('span',{style:{color:'#5514B4',flexShrink:0}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18})),
+                  h('div',{style:{fontSize:'13px',color:'#3F187F',lineHeight:1.4}},'A ',h('b',null,TYPE_LABELS[orgWiz.type]),' can only inherit capabilities that ',h('b',null,wizParent().name),' already holds.')),
+                ['product','service'].map(kind=>h('div',{key:kind},
+                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},kind==='product'?'Products':'Services & capabilities'),
+                  h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',marginBottom:'22px'}},
+                    ENT.filter(e=>e.kind===kind).map(e=>{
+                      const p=wizParent();const held=p.entitlements.includes(e.key);const allowed=typeAllows(orgWiz.type,e.key);const locked=!held||!allowed;const checked=!!orgWiz.ent[e.key]&&!locked;
+                      return h('button',{key:e.key,onClick:()=>{if(!locked)setOrgWiz(w=>({...w,ent:{...w.ent,[e.key]:!w.ent[e.key]}}));},style:{display:'flex',alignItems:'center',gap:'11px',width:'100%',padding:'12px 14px',borderRadius:'10px',border:'1px solid '+(checked?'#5514B4':'#E3E3E3'),background:locked?'#F7F7F7':'#fff',cursor:locked?'not-allowed':'pointer',fontFamily:'inherit'}},
+                        h('span',{style:{width:'22px',height:'22px',borderRadius:'6px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:checked?'#5514B4':locked?'#EDEDED':'#fff',border:'1px solid '+(checked?'#5514B4':locked?'#E3E3E3':'#C8C8C8')}},checked&&ic('M20 6 9 17l-5-5',{s:13,c:'#fff',w:3})),
+                        h('span',{style:{fontWeight:700,fontSize:'14px',color:locked?'#AAAAAA':'#2A2A2A'}},e.label),
+                        h('span',{style:{flex:1}}),
+                        locked&&h('span',{style:{fontSize:'11.5px',color:'#808080',display:'flex',gap:'4px',alignItems:'center'}},lockEl('#808080'),!held?'Not held by '+p.name:'N/A for '+TYPE_LABELS[orgWiz.type]));
+                    }))))),
+              orgWiz.step===4&&h('div',null,
+                h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'20px'}},
+                  [['Name',orgWiz.name||'(untitled)'],['Type',TYPE_LABELS[orgWiz.type]],['Admin email',orgWiz.email||'(none)'],['Parent',wizParent().name],['Primary contact',orgWiz.primaryName||(orgWiz.primaryEmail||'(none)')],['Billing contact',orgWiz.billingName||(orgWiz.billingEmail||'(none)')],['Website',orgWiz.website||'(none)']].map(([k,v],i,a)=>
+                    h('div',{key:k,style:{display:'flex',justifyContent:'space-between',padding:'13px 16px',borderBottom:i<a.length-1?'1px solid #F0F0F0':'none'}},
+                      h('span',{style:{color:'#808080',fontSize:'13px'}},k),h('span',{style:{fontWeight:700,fontSize:'14px'}},v)))),
+                h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'11px'}},'Entitlements granted ('+Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]).length+')'),
+                h('div',{style:{display:'flex',flexWrap:'wrap',gap:'8px'}},
+                  Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]).length===0
+                    ?h('span',{style:{fontSize:'13px',color:'#808080'}},'None selected.')
+                    :ENT.filter(e=>orgWiz.ent[e.key]).map(e=>h('span',{key:e.key,style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#F0F8EF',border:'1px solid #BFE0BF',color:'#1F5A26',borderRadius:'5px',padding:'6px 11px',fontSize:'13px',fontWeight:700}},ic('M20 6 9 17l-5-5',{s:12,c:'#357E3C',w:3}),e.label))))),
+            // Footer
+            h('div',{style:{padding:'18px 26px',borderTop:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}},
+              h('button',{onClick:()=>{if(orgWiz.step===1)setOrgWiz(null);else setOrgWiz(w=>({...w,step:w.step-1}));},style:{background:'#fff',border:'1px solid #C8C8C8',borderRadius:'999px',padding:'11px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===1?'Cancel':'Back'),
+              h('button',{onClick:()=>{
+                if(orgWiz.step<4){setOrgWiz(w=>({...w,step:w.step+1}));return;}
+                const p=wizParent();const id='org'+seq;const ents=Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]);
+                const org={id,name:orgWiz.name.trim()||'New organisation',typeKey:orgWiz.type,parentId:p.id,contact:orgWiz.email.trim()||'—',primaryName:orgWiz.primaryName||'',primaryEmail:orgWiz.primaryEmail||'',primaryPhone:orgWiz.primaryPhone||'',billingName:orgWiz.billingName||'',billingEmail:orgWiz.billingEmail||'',billingPhone:orgWiz.billingPhone||'',address:orgWiz.address||'',website:orgWiz.website||'',entitlements:ents};
+                setOrgs(os=>[...os,org]);setSeq(n=>n+1);setOrgWiz(null);setSelOrgId(id);setScreen('orgs');
+                showToast('success',org.name+' created as a '+TYPE_LABELS[orgWiz.type]+' under '+p.name+'.');
+              },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'11px 22px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue')))),
+
         // Toast
         toast&&h('div',{style:{position:'fixed',bottom:'24px',right:'24px',zIndex:80,display:'flex',alignItems:'center',gap:'12px',padding:'15px 18px',borderRadius:'14px',background:'#fff',border:'1px solid #E3E3E3',boxShadow:'0 12px 32px rgba(20,10,40,0.18)',maxWidth:'420px'}},
           h('span',{style:{width:'34px',height:'34px',borderRadius:'999px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',background:toast.kind==='success'?'#357E3C':toast.kind==='error'?'#DA020F':'#5514B4'}},
@@ -1771,7 +1754,6 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 })();
-
 
 </script>  <script>
     (function(){
