@@ -97,6 +97,16 @@ const PERSONAS={
     desc:'You run the Northgate Telecom account. You manage your team, invite users, assign their roles, and build out your downstream network of sub-resellers, child resellers and dealers.',
     can:['Create sub-reseller, child reseller & dealer organisations','Invite team members and assign them roles','Control what downstream organisations can access','Set permissions for your downstream network'],
     cannot:["Access products Northgate Telecom hasn't been granted","Change BT platform-level settings"]},
+  subReseller:{key:'subReseller',name:'Sub-Reseller Administrator',signedInAs:'Metro Connect Administrator',org:'Metro Connect',orgInitials:'MC',crumb:'Metro Connect · Sub-Reseller administration',title:'Dashboard',
+    person:{name:'Marcus Webb',meta:'Metro Connect · Admin',avatar:'MW',photo:'https://randomuser.me/api/portraits/men/41.jpg'},accent:'#5514B4',
+    desc:'You run the Metro Connect account under Northgate Telecom. You manage your team, invite users, assign roles, and control what your downstream dealers can access.',
+    can:['Invite team members and assign them roles','Create and manage dealer organisations','Control what downstream dealers can access','Manage entitlements for your organisation'],
+    cannot:['Create sub-reseller organisations','Access products not granted by Northgate Telecom','Change BT or Northgate Telecom platform settings']},
+  childReseller:{key:'childReseller',name:'Child Reseller Administrator',signedInAs:'Halo Networks Administrator',org:'Halo Networks',orgInitials:'HN',crumb:'Halo Networks · Child Reseller administration',title:'Dashboard',
+    person:{name:'Joanna Park',meta:'Halo Networks · Admin',avatar:'JP'},accent:'#5514B4',
+    desc:'You run the Halo Networks account under Northgate Telecom. You manage your team, invite users, assign roles, and control what your downstream network can access.',
+    can:['Invite team members and assign them roles','Create dealer organisations','Control what downstream organisations can access','Manage entitlements for your organisation'],
+    cannot:['Raise support tickets directly to BT','Access Business Zone or FMS tools','Change Northgate Telecom platform settings']},
   user:{key:'user',name:'Standard User',signedInAs:'Northgate Telecom Order Manager',org:'Northgate Telecom',orgInitials:'NT',crumb:'Northgate Telecom · Standard user',title:'Dashboard',
     person:{name:'James Okafor',meta:'Northgate Telecom · Order Manager',avatar:'JO'},accent:'#357E3C',
     desc:'You work within the platform as an end user. Everything you can see and do is determined by the role your administrator has assigned to you.',
@@ -228,7 +238,7 @@ function App(){
   function closeUserDrawer(){setUserDrawer(null);setDrawerPendingRole(null);}
   const isBt=persona==='bt';
   const canAdmin=persona!=='user';
-  const home=isBt?'btw':'northgate';
+  const home=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
   const P=PERSONAS[persona];
 
   const orgById=id=>orgs.find(o=>o.id===id);
@@ -261,7 +271,7 @@ function App(){
   const visibleUsers=isBt?users:users.filter(u=>{const o=orgById(u.orgId);return o&&(o.id===home||o.parentId===home);});
   const sel=orgById(selOrgId)||orgById(home);
   const selParent=sel.parentId?orgById(sel.parentId):null;
-  const statusMap={Active:['#1F5A26','#EAF6EA'],Invited:['#8A5A00','#FEF6DE'],Suspended:['#A0121B','#FDECEC']};
+  const statusMap={Active:['#1F5A26','#EAF6EA'],Invited:['#8A5A00','#FEF6DE'],Suspended:['#A0121B','#FDECEC'],Inactive:['#666666','#F0F0F0']};
 
   function mkActionBtn(kind){
     const isOrg=kind==='org';
@@ -322,15 +332,15 @@ function App(){
         h(NavBtn,{id:'overview',screen,setScreen,label:'Dashboard',collapsed:!sidebarOpen,icon:h('svg',{width:19,height:19,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'},h('rect',{x:3,y:3,width:7,height:7,rx:'1.5'}),h('rect',{x:14,y:3,width:7,height:7,rx:'1.5'}),h('rect',{x:14,y:14,width:7,height:7,rx:'1.5'}),h('rect',{x:3,y:14,width:7,height:7,rx:'1.5'}))}),
         persona!=='user'&&h(NavBtn,{id:'orgs',screen,setScreen,label:'Organisations',collapsed:!sidebarOpen,icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4M10 14h4'],{s:19})}),
         persona!=='user'&&h(NavBtn,{id:'billingSupport',screen,setScreen,label:'Billing Support',collapsed:!sidebarOpen,icon:ic(['M12 2v20','M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],{s:19})}),
-        h(NavBtn,{id:'users',screen,setScreen,label:'Users',collapsed:!sidebarOpen,icon:ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'],{s:19})}),
+        persona!=='user'&&h(NavBtn,{id:'users',screen,setScreen,label:'Users',collapsed:!sidebarOpen,icon:ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'],{s:19})}),
         h(NavBtn,{id:'knowledgeHub',screen,setScreen,label:'Knowledge Hub',collapsed:!sidebarOpen,icon:ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:19})}),
         persona!=='user'&&h(NavBtn,{id:'apiPortal',screen,setScreen,label:'API Portal',collapsed:!sidebarOpen,icon:ic(['M10 20l4-16','M4 9l-3 3 3 3','M20 9l3 3-3 3'],{s:19})}),
         h('div',{style:{marginTop:'auto'}}),
         h('div',{style:{height:'1px',background:'rgba(255,255,255,0.15)',margin:'8px 0'}}),
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.45)',padding:'0 10px 8px'}},'Switch view'),
-        ...(['bt','reseller','user'].map(k=>{
-          const labels={bt:'BT Wholesale Admin',reseller:'Reseller Admin',user:'Standard User'};
-          const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
+        ...(['bt','reseller','subReseller','childReseller','user'].map(k=>{
+          const labels={bt:'BT Wholesale Admin',reseller:'Reseller Admin',subReseller:'Sub-Reseller Admin',childReseller:'Child Reseller Admin',user:'Standard User'};
+          const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',subReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',childReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
           const active=persona===k;
           return h('button',{key:k,onClick:()=>{setPsn(k);setScreen('overview');},title:!sidebarOpen?labels[k]:undefined,
             style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:!sidebarOpen?'10px 0':'10px 12px',justifyContent:!sidebarOpen?'center':'flex-start',border:0,borderRadius:'11px',cursor:'pointer',fontSize:'13.5px',fontWeight:active?700:500,marginBottom:'3px',background:active?'rgba(255,255,255,0.18)':'transparent',color:active?'#fff':'rgba(255,255,255,0.6)',fontFamily:'inherit',transition:'background 150ms'}},
@@ -883,7 +893,7 @@ function App(){
                   h('div',{style:{display:'flex',gap:'6px'}},
                     h('select',{value:filterStatus,onChange:e=>setFilterStatus(e.target.value),style:{flex:1,padding:'6px 8px',border:'1px solid #E3E3E3',borderRadius:'6px',fontSize:'12px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343'}},
                       h('option',{value:''},'All statuses'),
-                      ['Active','Invited','Suspended'].map(s=>h('option',{key:s,value:s},s))),
+                      ['Active','Invited','Inactive','Suspended'].map(s=>h('option',{key:s,value:s},s))),
                     h('select',{value:filterRole,onChange:e=>setFilterRole(e.target.value),style:{flex:1,padding:'6px 8px',border:'1px solid #E3E3E3',borderRadius:'6px',fontSize:'12px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343'}},
                       h('option',{value:''},'All roles'),
                       ROLES.map(r=>h('option',{key:r.key,value:r.key},r.label))))),
@@ -999,7 +1009,7 @@ function App(){
                           onClick:()=>setDeactivateConfirm(du.id),
                           style:{display:'flex',alignItems:'center',gap:'8px',padding:'9px 14px',border:'1px solid #F8E0C0',borderRadius:'8px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'13px',color:'#8A5A00',textAlign:'left'}},
                           ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:14,c:'#8A5A00'}),'Deactivate user'),
-                        du.status==='Suspended'&&h('button',{
+                        (du.status==='Suspended'||du.status==='Inactive')&&h('button',{
                           onClick:()=>{setUsers(us=>us.map(u=>u.id===du.id?{...u,status:'Active'}:u));showToast('success',du.name+' has been reactivated.');},
                           style:{display:'flex',alignItems:'center',gap:'8px',padding:'9px 14px',border:'1px solid #BFE0BF',borderRadius:'8px',background:'#F0F8EF',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'13px',color:'#1F5A26',textAlign:'left'}},
                           ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C'}),'Reactivate user'),
@@ -1076,9 +1086,12 @@ function App(){
                     h('div',{style:{display:'flex',background:'#EDE8F8',borderRadius:'10px',padding:'3px',gap:'2px',width:'fit-content'}},
                       tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
                   activeTab==='roleDirectory'&&h('div',null,
-                    h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},isBt
-                      ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
-                      :'Each role controls exactly what a user can see and do in the platform. When you assign someone a role, they get access to everything it covers — no more, no less.'),
+                    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',marginBottom:'16px'}},
+                      h('p',{style:{fontSize:'13.5px',color:'#6B6B6B',lineHeight:1.55,margin:0,flex:1}},isBt
+                        ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
+                        :'Each role controls exactly what a user can see and do in the platform. When you assign someone a role, they get access to everything it covers — no more, no less.'),
+                      !isBt&&h('button',{onClick:()=>showToast('info','Custom role creation is in development. You\'ll be able to define exactly what each custom role can see and do.'),style:{display:'inline-flex',alignItems:'center',gap:'7px',background:'#5514B4',color:'#fff',border:0,borderRadius:'999px',padding:'9px 18px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
+                        ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create custom role')),
                     h('div',{style:{borderTop:'1px solid #E8E8E8'}},
                       h('table',{style:{borderCollapse:'collapse',width:'100%'}},
                         h('thead',null,h('tr',null,
@@ -1325,7 +1338,7 @@ function App(){
               h('div',{style:{display:'flex',gap:'10px',justifyContent:'flex-end'}},
                 h('button',{onClick:()=>setDeactivateConfirm(null),style:{padding:'10px 20px',border:'1px solid #E3E3E3',borderRadius:'999px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#fff',fontFamily:'inherit'}},'Cancel'),
                 h('button',{onClick:()=>{
-                  setUsers(us=>us.map(u=>u.id===deactivateConfirm?{...u,status:'Suspended'}:u));
+                  setUsers(us=>us.map(u=>u.id===deactivateConfirm?{...u,status:'Inactive'}:u));
                   setDeactivateConfirm(null);
                   showToast('success',dUser.name+' has been deactivated. Reactivate from their profile.');
                 },style:{padding:'10px 20px',border:0,borderRadius:'999px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#8A5A00',color:'#fff',fontFamily:'inherit'}},'Deactivate')))):null;
