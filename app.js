@@ -346,12 +346,21 @@ function App(){
         sidebarOpen&&h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'rgba(255,255,255,0.45)',padding:'0 10px 8px'}},'Switch view'),
         ...(['bt','btAccountMgr','reseller','subReseller','childReseller','user'].map(k=>{
           const labels={bt:'BT Wholesale Admin',btAccountMgr:'BT Account Manager',reseller:'Reseller Admin',subReseller:'Sub-Reseller Admin',childReseller:'Child Reseller Admin',user:'Standard User'};
-          const icons={bt:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',btAccountMgr:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',reseller:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',subReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',childReseller:'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10',user:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'};
+          const icons={
+            reseller:'M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2',
+            subReseller:'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+            childReseller:'M6 3v12M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9c0 2-1.5 3.5-12 12',
+            user:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
+          };
           const active=persona===k;
+          const isBtKey=k==='bt'||k==='btAccountMgr';
+          const iconEl=isBtKey
+            ?h('span',{style:{width:'17px',height:'17px',borderRadius:'3px',border:'1.5px solid #fff',color:'#fff',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:'8px',fontWeight:900,flexShrink:0,letterSpacing:'-0.02em',lineHeight:1}},'BT')
+            :ic(icons[k],{s:17,c:'#fff'});
           return h('button',{key:k,onClick:()=>{setPsn(k);setScreen('overview');},title:!sidebarOpen?labels[k]:undefined,
-            style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:!sidebarOpen?'10px 0':'10px 12px',justifyContent:!sidebarOpen?'center':'flex-start',border:0,borderRadius:'11px',cursor:'pointer',fontSize:'13.5px',fontWeight:active?700:500,marginBottom:'3px',background:active?'rgba(255,255,255,0.18)':'transparent',color:active?'#fff':'rgba(255,255,255,0.6)',fontFamily:'inherit',transition:'background 150ms'}},
-            ic(icons[k],{s:17,c:active?'#fff':'rgba(255,255,255,0.6)'}),
-            sidebarOpen&&h('span',{style:{flex:1,textAlign:'left'}},labels[k]));
+            style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:!sidebarOpen?'10px 0':'10px 12px',justifyContent:!sidebarOpen?'center':'flex-start',border:0,borderRadius:'11px',cursor:'pointer',fontSize:'13.5px',fontWeight:active?700:500,marginBottom:'3px',background:active?'rgba(255,255,255,0.18)':'transparent',color:'#fff',fontFamily:'inherit',transition:'background 150ms'}},
+            iconEl,
+            sidebarOpen&&h('span',{style:{flex:1,textAlign:'left',opacity:active?1:0.75}},labels[k]));
         }))),
 
       // Main
@@ -398,8 +407,10 @@ function App(){
               screen==='knowledgeHub'?'Knowledge Hub':
               screen==='billingSupport'?'Billing Support':
               screen==='apiPortal'?'API Portal':
-              screen==='accountSettings'?'Profile & settings':P.title),
-            screen==='orgs'&&canCreateOrg&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,createOrg.label)),
+              screen==='accountSettings'?'Profile & settings':
+              screen==='overview'?('Welcome back, '+P.person.name.split(' ')[0]):P.title),
+            (screen==='orgs'&&canCreateOrg||screen==='overview'&&persona==='bt')&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,screen==='overview'?'Create reseller':createOrg.label)),
+            screen==='overview'&&persona==='reseller'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,'Invite user')),
             screen==='users'&&usersTab==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
           screen==='knowledgeHub'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
             h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',textAlign:'center',maxWidth:'440px',width:'100%'}},
@@ -427,9 +438,6 @@ function App(){
             const myColIdx=ROLE_COL_MAP[me.roleKey]??0;
             const sc=statusMap[me.status]||statusMap.Active;
             return h('div',{style:{maxWidth:'900px'}},
-              h('div',{style:{marginBottom:'28px'}},
-                h('div',{style:{fontSize:'24px',fontWeight:700,letterSpacing:'-0.01em',marginBottom:'4px'}},'Welcome back, '+me.name.split(' ')[0]),
-                h('div',{style:{fontSize:'14px',color:'#808080'}},'Your access is defined by the '+myRole.label+' role at '+myOrg.name+'.')),
               h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'20px',marginBottom:'24px'}},
                 h('div',{style:{background:'#fff',border:'2px solid #5514B4',borderRadius:'16px',padding:'22px'}},
                   h('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}},
@@ -473,26 +481,42 @@ function App(){
                       h('div',{style:{fontSize:'11.5px',color:fg,fontWeight:600}},v==='y'?'Full access':v==='p'?'Partial access':'No access'));
                   }))),
               h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'22px'}},
-                h('div',{style:{fontWeight:700,fontSize:'15px',marginBottom:'6px'}},'Your admins'),
-                h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'14px'}},'Contact these people if you need to change your role or access permissions.'),
-                h('div',null,
-                  users.filter(u=>u.orgId===myOrg.id&&u.roleKey==='admin').map(u=>
-                    h('div',{key:u.id,style:{display:'flex',alignItems:'center',gap:'12px',padding:'11px 0',borderTop:'1px solid #F0F0F0'}},
-                      u.photo
-                        ?h('img',{src:u.photo,alt:u.name,style:{width:'38px',height:'38px',borderRadius:'999px',objectFit:'cover',flexShrink:0}})
-                        :h('div',{style:{width:'38px',height:'38px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'13px',flexShrink:0}},initials(u.name)),
-                      h('div',null,
-                        h('div',{style:{fontWeight:700,fontSize:'13.5px'}},u.name),
-                        h('a',{href:'mailto:'+u.email,style:{fontSize:'12.5px',color:'#5514B4',textDecoration:'none'}},u.email)))))));
+                h('div',{style:{fontWeight:700,fontSize:'15px',marginBottom:'4px'}},'Your administrator'),
+                h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'16px'}},'Contact this person if you need to change your role or access permissions.'),
+                (()=>{
+                  const admin=users.find(u=>u.orgId===myOrg.id&&u.roleKey==='admin');
+                  if(!admin) return h('div',{style:{color:'#AAAAAA',fontSize:'13px'}},'No administrator found.');
+                  const adminOrg=orgById(admin.orgId);
+                  return h('div',{style:{display:'flex',gap:'16px',alignItems:'flex-start'}},
+                    admin.photo
+                      ?h('img',{src:admin.photo,alt:admin.name,style:{width:'52px',height:'52px',borderRadius:'999px',objectFit:'cover',flexShrink:0}})
+                      :h('div',{style:{width:'52px',height:'52px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'15px',flexShrink:0}},initials(admin.name)),
+                    h('div',{style:{flex:1}},
+                      h('div',{style:{fontWeight:700,fontSize:'15px',color:'#1A1A1A',marginBottom:'2px'}},admin.name),
+                      h('div',{style:{fontSize:'12px',color:'#808080',marginBottom:'12px'}},'Administrator · '+myOrg.name),
+                      h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
+                        h('div',{style:{display:'flex',alignItems:'center',gap:'10px'}},
+                          h('span',{style:{width:'28px',height:'28px',borderRadius:'7px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                            ic('M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6',{s:13,c:'#5514B4'})),
+                          h('a',{href:'mailto:'+admin.email,style:{fontSize:'13px',color:'#5514B4',textDecoration:'none',fontWeight:500}},admin.email)),
+                        (admin.phone||(adminOrg&&adminOrg.primaryPhone))&&h('div',{style:{display:'flex',alignItems:'center',gap:'10px'}},
+                          h('span',{style:{width:'28px',height:'28px',borderRadius:'7px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                            ic('M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6A16 16 0 0 0 12 12.69a16 16 0 0 0 4.07 2.09l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 24 16.92z',{s:13,c:'#5514B4'})),
+                          h('span',{style:{fontSize:'13px',color:'#434343',fontWeight:500}},admin.phone||(adminOrg&&adminOrg.primaryPhone))),
+                        adminOrg&&adminOrg.address&&h('div',{style:{display:'flex',alignItems:'flex-start',gap:'10px'}},
+                          h('span',{style:{width:'28px',height:'28px',borderRadius:'7px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'1px'}},
+                            ic('M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',{s:13,c:'#5514B4'})),
+                          h('span',{style:{fontSize:'13px',color:'#434343',fontWeight:500,lineHeight:1.4}},adminOrg.address)))));
+                })()));
           })(),
 
           screen==='overview'&&persona!=='user'&&h('div',{style:{maxWidth:'1120px'}},
             h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',marginBottom:'24px'}},
               [
-                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:16,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Reseller orgs.':'Downstream orgs.',sub:isBt?'Across the platform':'Sub-resellers, child & dealers'},
+                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:16,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Partner orgs.':'Downstream orgs.',sub:isBt?'Resellers, sub-resellers & dealers':'Sub-resellers, child & dealers'},
                 {icon:ic([{el:'circle',cx:9,cy:7,r:4},{el:'circle',cx:17,cy:9,r:3},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87'],{s:16,c:'#5514B4'}),value:String(visibleUsers.length),label:'Users',sub:isBt?'Across all reseller orgs':'In your network'},
-                {icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#5514B4'}),value:String(ROLES.length),label:isBt?'Role types':'Assignable roles',sub:isBt?'Across the network':'Role-based access'},
-                {icon:ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:16,c:'#5514B4'}),value:String(ENT.length),label:'Products',sub:isBt?'Available to resellers':'Products & services'},
+                {icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#5514B4'}),value:String(isBt?ROLES.length+BT_ROLES.length:ROLES.length),label:isBt?'Role types':'Assignable roles',sub:isBt?'Reseller & BT-side roles':'Role-based access'},
+                {icon:ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:16,c:'#5514B4'}),value:isBt?String(ENT.length):String((orgById(home)||{entitlements:[]}).entitlements.length),label:'Products',sub:isBt?'Available to resellers':'Enabled for your org'},
               ].map((k,i)=>h('div',{key:i,style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'14px',padding:'14px 16px',display:'flex',gap:'12px',alignItems:'flex-start'}},
                 h('span',{style:{width:'34px',height:'34px',borderRadius:'9px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'2px'}},k.icon),
                 h('div',null,
@@ -501,7 +525,262 @@ function App(){
                   h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'2px'}},k.sub))))),
 
 
-            overviewTab==='network'&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
+            isBt&&(()=>{
+              const inactiveOrgs=flat.filter(r=>r.org.status==='Inactive').length;
+              const pendingInvites=visibleUsers.filter(u=>u.status==='Invited').length;
+              const inactiveUsers=visibleUsers.filter(u=>u.status==='Inactive').length;
+              const emptyOrgs=flat.filter(r=>r.org.id!=='btw'&&visibleUsers.filter(u=>u.orgId===r.org.id).length===0).length;
+              const items=[
+                {label:'Inactive orgs',value:inactiveOrgs,warn:inactiveOrgs>0,icon:'M3 21h18M9 21V8l3-5 3 5v13M9 12h6'},
+                {label:'Pending invites',value:pendingInvites,warn:pendingInvites>0,icon:'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6'},
+                {label:'Inactive users',value:inactiveUsers,warn:inactiveUsers>0,icon:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'},
+                {label:'Orgs with no users',value:emptyOrgs,warn:emptyOrgs>0,icon:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75'},
+              ];
+              const allClear=items.every(it=>!it.warn);
+              const alertCount=items.filter(it=>it.warn).length;
+              return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'13px 18px',marginBottom:'16px',display:'flex',alignItems:'center',gap:'14px',flexWrap:'wrap'}},
+                h('span',{style:{fontSize:'13px',fontWeight:700,color:'#1A1A1A',flexShrink:0}},'Network alerts'),
+                h('div',{style:{width:'1px',height:'16px',background:'#E3E3E3',flexShrink:0}}),
+                h('div',{style:{display:'flex',gap:'20px',flex:1,flexWrap:'wrap'}},
+                  items.map((it,i)=>
+                    h('div',{key:i,style:{display:'flex',alignItems:'center',gap:'5px'}},
+                      ic(it.icon,{s:13,c:it.warn?'#434343':'#C8C8C8'}),
+                      h('span',{style:{fontSize:'13px',color:it.warn?'#1A1A1A':'#AAAAAA',fontWeight:it.warn?600:400}},
+                        String(it.value)+' '+it.label)))),
+                !allClear&&h('span',{style:{fontSize:'11.5px',fontWeight:600,color:'#92400E',background:'#FEF3C7',border:'1px solid #FDE68A',borderRadius:'999px',padding:'3px 10px',flexShrink:0,whiteSpace:'nowrap'}},alertCount+' to review'));
+            })(),
+
+            persona==='reseller'&&(()=>{
+              const pendingInvites=visibleUsers.filter(u=>u.status==='Invited').length;
+              const inactiveUsers=visibleUsers.filter(u=>u.status==='Inactive').length;
+              const inactiveOrgs=flat.filter(r=>r.org.id!==home&&r.org.status==='Inactive').length;
+              const items=[
+                {label:'Inactive downstream orgs',value:inactiveOrgs,warn:inactiveOrgs>0},
+                {label:'Pending invites',value:pendingInvites,warn:pendingInvites>0},
+                {label:'Inactive users',value:inactiveUsers,warn:inactiveUsers>0},
+              ];
+              const allClear=items.every(it=>!it.warn);
+              const hasAlert=!allClear;
+              return h('div',{style:{background:hasAlert?'#F3EBFE':'#FAF6FF',border:'1px solid '+(hasAlert?'#C4A0F0':'#DDD0F8'),borderRadius:'14px',padding:'13px 18px',marginBottom:'16px',display:'flex',alignItems:'center',gap:'16px',flexWrap:'wrap'}},
+                h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flex:'0 0 auto'}},
+                  h('span',{style:{width:'30px',height:'30px',borderRadius:'8px',background:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center'}},
+                    ic(allClear?'M20 6 9 17l-5-5':'M12 9v4M12 17h.01',{s:15,c:'#fff'})),
+                  h('span',{style:{fontWeight:700,fontSize:'13px',color:'#5514B4',letterSpacing:'-0.01em'}},allClear?'Network healthy':'Network alerts')),
+                h('div',{style:{width:'1px',height:'28px',background:'#C4A0F0',flex:'0 0 auto'}}),
+                h('div',{style:{display:'flex',gap:'20px',flex:1,flexWrap:'wrap'}},
+                  items.map((it,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:'6px'}},
+                    h('span',{style:{fontSize:'17px',fontWeight:700,color:it.warn?'#5514B4':'#9B72D4'}},String(it.value)),
+                    h('span',{style:{fontSize:'12px',color:it.warn?'#3D0E82':'#9B72D4',fontWeight:it.warn?600:500}},it.label)))));
+            })(),
+
+            (persona==='subReseller'||persona==='childReseller')&&(()=>{
+              const myOrg=orgById(home);
+              const parentOrg=myOrg&&myOrg.parentId?orgById(myOrg.parentId):null;
+              const myEnts=myOrg?myOrg.entitlements:[];
+              const products=ENT.filter(e=>myEnts.includes(e.key)&&e.kind==='product');
+              const services=ENT.filter(e=>myEnts.includes(e.key)&&e.kind==='service');
+              return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'16px'}},
+                h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                  h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'14px'}},'Your enabled products & services'),
+                  products.length>0&&h('div',{style:{marginBottom:'12px'}},
+                    h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',marginBottom:'8px'}},'Products'),
+                    h('div',{style:{display:'flex',flexWrap:'wrap',gap:'7px'}},
+                      products.map(e=>h('span',{key:e.key,style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#F0F8EF',border:'1px solid #BFE0BF',color:'#1F5A26',borderRadius:'6px',padding:'5px 10px',fontSize:'12px',fontWeight:700}},
+                        ic('M20 6 9 17l-5-5',{s:11,c:'#357E3C',w:2.5}),e.label)))),
+                  services.length>0&&h('div',null,
+                    h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',marginBottom:'8px'}},'Services'),
+                    h('div',{style:{display:'flex',flexWrap:'wrap',gap:'7px'}},
+                      services.map(e=>h('span',{key:e.key,style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#F3EBFE',border:'1px solid #C4A0F0',color:'#5514B4',borderRadius:'6px',padding:'5px 10px',fontSize:'12px',fontWeight:700}},
+                        ic('M20 6 9 17l-5-5',{s:11,c:'#5514B4',w:2.5}),e.label)))),
+                  (products.length===0&&services.length===0)&&h('div',{style:{color:'#AAAAAA',fontSize:'13px'}},'No entitlements configured')),
+                h('div',{style:{display:'flex',flexDirection:'column',gap:'12px'}},
+                  parentOrg&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'14px'}},'Your parent organisation'),
+                    h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'14px'}},
+                      h('div',{style:{width:'40px',height:'40px',borderRadius:'10px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'15px',flexShrink:0}},
+                        (parentOrg.name||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()),
+                      h('div',null,
+                        h('div',{style:{fontWeight:700,fontSize:'15px',color:'#1A1A1A'}},parentOrg.name),
+                        h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',background:'#F3EBFE',border:'1px solid #C4A0F0',color:'#5514B4',borderRadius:'5px',padding:'2px 8px',fontSize:'11px',fontWeight:700,marginTop:'4px'}},TYPE_LABELS[parentOrg.typeKey]||parentOrg.typeKey))),
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',marginBottom:'8px'}},'Primary contact'),
+                    h('div',{style:{fontSize:'13.5px',fontWeight:600,color:'#2A2A2A',marginBottom:'3px'}},parentOrg.primaryName),
+                    h('a',{href:'mailto:'+parentOrg.primaryEmail,style:{fontSize:'12.5px',color:'#5514B4',textDecoration:'none'}},parentOrg.primaryEmail)),
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'12px'}},'Quick actions'),
+                    h('button',{onClick:inviteUser.onClick,style:{display:'flex',alignItems:'center',gap:'10px',width:'100%',padding:'11px 14px',borderRadius:'10px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',fontFamily:'inherit',textAlign:'left',marginBottom:'8px'}},
+                      h('span',{style:{width:'30px',height:'30px',borderRadius:'8px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                        ic('M12 5v14M5 12h14',{s:14,c:'#5514B4'})),
+                      h('div',null,
+                        h('div',{style:{fontSize:'13px',fontWeight:700,color:'#2A2A2A'}},persona==='childReseller'?'Invite a team member':'Invite a team member'),
+                        h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'1px'}},'Add a user and assign a role'))),
+                    persona==='childReseller'&&h('button',{onClick:createOrg.onClick,style:{display:'flex',alignItems:'center',gap:'10px',width:'100%',padding:'11px 14px',borderRadius:'10px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}},
+                      h('span',{style:{width:'30px',height:'30px',borderRadius:'8px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                        ic('M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2',{s:14,c:'#5514B4'})),
+                      h('div',null,
+                        h('div',{style:{fontSize:'13px',fontWeight:700,color:'#2A2A2A'}},'Create a dealer org'),
+                        h('div',{style:{fontSize:'11.5px',color:'#808080',marginTop:'1px'}},'Set up a downstream dealer organisation'))))));
+            })(),
+
+            overviewTab==='network'&&isBt&&(()=>{
+              // --- derived data for analytics panels ---
+              const resellerOrgs=orgs.filter(o=>o.typeKey==='reseller');
+              const downstreamOrgs=orgs.filter(o=>o.typeKey!=='root');
+              const typeBreakdown=Object.entries(
+                downstreamOrgs.reduce((acc,o)=>{acc[o.typeKey]=(acc[o.typeKey]||0)+1;return acc;},{})
+              ).map(([k,count])=>({key:k,label:TYPE_LABELS[k]||k,count,color:{reseller:'#5514B4',subReseller:'#7A3DD6',childReseller:'#9B6FE8',dealer:'#C4A0F0'}[k]||'#C4A0F0'}));
+              const totalDown=downstreamOrgs.length||1;
+
+              const productAdoption=ENT.filter(e=>e.kind==='product').map(e=>{
+                const adoptedBy=resellerOrgs.filter(o=>o.entitlements&&o.entitlements.includes(e.key)).length;
+                return {label:e.label,key:e.key,count:adoptedBy,total:resellerOrgs.length,pct:resellerOrgs.length?Math.round(adoptedBy/resellerOrgs.length*100):0};
+              });
+
+              const statusCounts={Active:0,Invited:0,Inactive:0};
+              users.forEach(u=>{if(statusCounts[u.status]!==undefined)statusCounts[u.status]++;});
+              const totalUsers=users.length||1;
+              const statusItems=[
+                {label:'Active',count:statusCounts.Active,color:'#1F5A26',bg:'#EAF6EA',pct:Math.round(statusCounts.Active/totalUsers*100)},
+                {label:'Invited',count:statusCounts.Invited,color:'#8A5A00',bg:'#FEF6DE',pct:Math.round(statusCounts.Invited/totalUsers*100)},
+                {label:'Inactive',count:statusCounts.Inactive,color:'#666666',bg:'#F0F0F0',pct:Math.round(statusCounts.Inactive/totalUsers*100)},
+              ];
+
+              const topResellers=resellerOrgs.map(o=>({
+                org:o,
+                userCount:userCountFor(o.id)+childrenOf(o.id).reduce((s,c)=>s+userCountFor(c.id),0),
+                subOrgCount:childrenOf(o.id).length,
+              })).sort((a,b)=>b.userCount-a.userCount);
+
+              return h('div',{style:{marginBottom:'16px'}},
+                // Row 1: three panels
+                h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'12px'}},
+
+                  // Network composition — donut chart
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'16px'}},'Network composition'),
+                    h('div',{style:{display:'flex',alignItems:'center',gap:'18px'}},
+                      (()=>{
+                        const r=38,cx=50,cy=50,C=2*Math.PI*r;
+                        let a=-90;
+                        return h('svg',{width:100,height:100,viewBox:'0 0 100 100',style:{flexShrink:0}},
+                          h('circle',{cx,cy,r,fill:'none',stroke:'#F0F0F0',strokeWidth:11}),
+                          totalDown>0&&typeBreakdown.map(t=>{
+                            const pct=t.count/totalDown;
+                            const arc=typeBreakdown.length>1?Math.max(0,C*pct-2):C;
+                            const start=a;
+                            a+=pct*360;
+                            return h('circle',{key:t.key,cx,cy,r,fill:'none',stroke:t.color,strokeWidth:11,
+                              strokeDasharray:arc+' '+(C-arc),
+                              transform:'rotate('+start+' '+cx+' '+cy+')'});
+                          }),
+                          h('text',{x:cx,y:cy-4,textAnchor:'middle',style:{fontSize:'17px',fontWeight:700,fill:'#2A2A2A'}},String(totalDown)),
+                          h('text',{x:cx,y:cy+13,textAnchor:'middle',style:{fontSize:'8px',fill:'#AAAAAA',fontWeight:600,letterSpacing:'0.06em'}},'ORGS'));
+                      })(),
+                      h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',flex:1}},
+                        typeBreakdown.map(t=>
+                          h('div',{key:t.key,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px'}},
+                            h('div',{style:{display:'flex',alignItems:'center',gap:'7px',minWidth:0}},
+                              h('span',{style:{width:'8px',height:'8px',borderRadius:'999px',background:t.color,flexShrink:0}}),
+                              h('span',{style:{fontSize:'12px',color:'#434343',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},t.label)),
+                            h('span',{style:{fontSize:'12px',fontWeight:700,color:'#2A2A2A',flexShrink:0}},t.count)))))),
+
+                  // Product adoption — bar chart
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'3px'}},'Product adoption'),
+                    h('div',{style:{fontSize:'11px',color:'#AAAAAA',marginBottom:'16px'}},'Across '+resellerOrgs.length+' reseller'+(resellerOrgs.length===1?'':'s')),
+                    h('div',{style:{display:'flex',flexDirection:'column',gap:'13px'}},
+                      productAdoption.map(p=>
+                        h('div',{key:p.key},
+                          h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:'5px'}},
+                            h('span',{style:{fontSize:'12px',color:'#434343',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'68%'}},p.label),
+                            h('span',{style:{fontSize:'11.5px',fontWeight:700,color:p.pct===100?'#1F5A26':p.pct>=50?'#5514B4':'#AAAAAA',flexShrink:0}},p.count+' / '+p.total)),
+                          h('div',{style:{height:'7px',borderRadius:'999px',background:'#F0F0F0',overflow:'hidden'}},
+                            h('div',{style:{height:'100%',borderRadius:'999px',background:p.pct===100?'#357E3C':p.pct>=50?'#5514B4':'#C4A0F0',width:(p.pct||0)+'%'}})))))),
+
+                  // User health — donut chart
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'16px'}},'User health'),
+                    h('div',{style:{display:'flex',alignItems:'center',gap:'18px'}},
+                      (()=>{
+                        const r=38,cx=50,cy=50,C=2*Math.PI*r;
+                        let a=-90;
+                        const total=users.length||1;
+                        const active=statusItems.filter(s=>s.count>0);
+                        return h('svg',{width:100,height:100,viewBox:'0 0 100 100',style:{flexShrink:0}},
+                          h('circle',{cx,cy,r,fill:'none',stroke:'#F0F0F0',strokeWidth:11}),
+                          active.map(s=>{
+                            const pct=s.count/total;
+                            const arc=active.length>1?Math.max(0,C*pct-2):C;
+                            const start=a;
+                            a+=pct*360;
+                            return h('circle',{key:s.label,cx,cy,r,fill:'none',stroke:s.color,strokeWidth:11,
+                              strokeDasharray:arc+' '+(C-arc),
+                              transform:'rotate('+start+' '+cx+' '+cy+')'});
+                          }),
+                          h('text',{x:cx,y:cy-4,textAnchor:'middle',style:{fontSize:'17px',fontWeight:700,fill:'#2A2A2A'}},String(users.length)),
+                          h('text',{x:cx,y:cy+13,textAnchor:'middle',style:{fontSize:'8px',fill:'#AAAAAA',fontWeight:600,letterSpacing:'0.06em'}},'USERS'));
+                      })(),
+                      h('div',{style:{display:'flex',flexDirection:'column',gap:'9px',flex:1}},
+                        statusItems.map(s=>
+                          h('div',{key:s.label,style:{display:'flex',alignItems:'center',gap:'8px'}},
+                            h('span',{style:{width:'8px',height:'8px',borderRadius:'999px',background:s.color,flexShrink:0}}),
+                            h('span',{style:{fontSize:'12px',color:'#434343',flex:1}},s.label),
+                            h('span',{style:{fontSize:'12px',fontWeight:700,color:'#2A2A2A'}},s.count),
+                            h('span',{style:{fontSize:'11px',color:'#AAAAAA',minWidth:'26px',textAlign:'right'}},s.pct+'%'))))))),
+
+                // Row 2: reseller snapshot + two coming-soon panels
+                h('div',{style:{display:'grid',gridTemplateColumns:'1.4fr 1fr 1fr',gap:'12px'}},
+
+                  // Top resellers
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'16px'}},'Reseller snapshot'),
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 52px 52px',gap:'0',marginBottom:'8px'}},
+                      h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',paddingBottom:'6px'}},'Reseller'),
+                      h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',paddingBottom:'6px',textAlign:'right'}},'Users'),
+                      h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#AAAAAA',paddingBottom:'6px',textAlign:'right'}},'Sub-orgs')),
+                    h('div',null,
+                      topResellers.map(({org:o,userCount,subOrgCount},i)=>
+                        h('div',{key:o.id,style:{display:'grid',gridTemplateColumns:'1fr 52px 52px',alignItems:'center',padding:'9px 0',borderTop:'1px solid #F0F0F0'}},
+                          h('div',{style:{display:'flex',alignItems:'center',gap:'8px',minWidth:0}},
+                            h('div',{style:{width:'28px',height:'28px',borderRadius:'8px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',flexShrink:0}},
+                              (o.name||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()),
+                            h('div',{style:{fontWeight:600,fontSize:'13px',color:'#2A2A2A',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},o.name)),
+                          h('div',{style:{fontWeight:700,fontSize:'13px',color:'#5514B4',textAlign:'right'}},userCount),
+                          h('div',{style:{fontSize:'13px',color:'#434343',textAlign:'right'}},subOrgCount))))),
+
+                  // Billing overview — coming soon
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px',display:'flex',flexDirection:'column'}},
+                    h('div',{style:{marginBottom:'14px'}},
+                      h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080'}},'Billing overview'),
+                      h('div',{style:{fontSize:'11.5px',color:'#C0C0C0',marginTop:'3px'}},'Coming soon')),
+                    h('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:'0'}},
+                      [{label:'Resellers with billing set up',value:String(resellerOrgs.filter(o=>o.billingEmail).length)+' of '+resellerOrgs.length},
+                       {label:'Invoicing contacts configured',value:String(resellerOrgs.filter(o=>o.billingName).length)+' of '+resellerOrgs.length},
+                       {label:'Billing queries open',value:'—'},
+                      ].map((row,i)=>
+                        h('div',{key:i,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderBottom:i<2?'1px solid #F0F0F0':'none'}},
+                          h('span',{style:{fontSize:'12.5px',color:'#808080',flex:1,paddingRight:'12px'}},row.label),
+                          h('span',{style:{fontSize:'13px',fontWeight:700,color:'#2A2A2A',flexShrink:0}},row.value))))),
+
+                  // Knowledge Hub — coming soon
+                  h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px 22px',display:'flex',flexDirection:'column'}},
+                    h('div',{style:{marginBottom:'14px'}},
+                      h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080'}},'Knowledge Hub'),
+                      h('div',{style:{fontSize:'11.5px',color:'#C0C0C0',marginTop:'3px'}},'Coming soon')),
+                    h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
+                      [
+                        {title:'Getting started with Nexus RBAC',tag:'Guide'},
+                        {title:'Setting up your first reseller org',tag:'Tutorial'},
+                        {title:'Entitlement inheritance explained',tag:'Reference'},
+                      ].map((a,i)=>
+                        h('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:'10px',padding:'8px 0',borderBottom:i<2?'1px solid #F0F0F0':'none',opacity:0.6}},
+                          h('span',{style:{width:'28px',height:'28px',borderRadius:'7px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:'1px'}},
+                            ic('M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20',{s:13,c:'#5514B4'})),
+                          h('div',null,
+                            h('div',{style:{fontSize:'12.5px',fontWeight:600,color:'#2A2A2A',lineHeight:1.3,marginBottom:'3px'}},a.title),
+                            h('span',{style:{fontSize:'10.5px',fontWeight:700,color:'#808080',letterSpacing:'0.05em',textTransform:'uppercase'}},a.tag))))))))
+            ;})(),
+
+            overviewTab==='network'&&persona!=='subReseller'&&persona!=='childReseller'&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
               h('div',{style:{padding:'20px 22px',borderBottom:'1px solid #E3E3E3'}},
                 h('div',{style:{fontWeight:700,fontSize:'17px'}},'Your organisation network')),
               h('div',{style:{display:'flex',gap:'10px',padding:'12px 22px',borderBottom:'1px solid #E3E3E3',alignItems:'center'}},
@@ -567,6 +846,7 @@ function App(){
                 });
               })(),
 ),
+
 
             overviewTab==='invite'&&userWiz&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden',maxWidth:'760px'}},
               h('div',{style:{padding:'22px 26px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
