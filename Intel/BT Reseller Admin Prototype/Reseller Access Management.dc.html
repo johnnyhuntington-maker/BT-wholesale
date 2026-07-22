@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<style>
+@font-face{font-family:'BT Curve';src:url('fonts/BTCurve_Rg.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'BT Curve';src:url('fonts/BTCurve_Bd.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:'BT Curve';src:url('fonts/BTCurve_It.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap;}
+@keyframes scIn{from{transform:translateY(14px)}to{transform:translateY(0)}}
+@keyframes scFade{from{transform:translateY(6px)}to{transform:translateY(0)}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+button{font-family:inherit}
+input,select{font-family:inherit;outline:none}
+input:focus,select:focus{border-color:#5514B4 !important}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:#D9D9D9;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+</style>
+</helmet>
+
+<div style="display:flex;height:100vh;width:100%;overflow:hidden;font-family:'BT Curve',system-ui,sans-serif;color:#2A2A2A;background:#F7F7F7;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased">
+
+  <aside style="width:264px;flex-shrink:0;background:#fff;border-right:1px solid #E3E3E3;display:flex;flex-direction:column;padding:22px 16px">
+    <div style="display:flex;align-items:center;gap:12px;padding:6px 8px 22px 8px">
+      <span style="color:#5514B4;display:flex"><svg width="34" height="34" viewBox="0 0 40 40" fill="currentColor"><path d="M 20.98 13.18 L 30.94 13.18 L 30.94 16.1 L 27.6 16.1 L 27.6 26.78 L 24.32 26.78 L 24.32 16.1 L 20.98 16.1 L 20.98 13.18 Z M 20 37.541 C 10.32 37.541 2.46 29.68 2.46 20 C 2.46 10.32 10.32 2.46 20 2.46 C 29.68 2.46 37.541 10.32 37.541 20 C 37.541 29.68 29.681 37.541 20 37.541 Z M 20 40 C 31.04 40 40 31.04 40 20 C 40 8.959 31.04 0 20 0 C 8.96 0 0 8.96 0 20 C 0 31.041 8.96 40 20 40 Z M 16.62 22.62 C 16.62 21.76 16.08 21.18 15.16 21.18 L 12.96 21.18 L 12.96 24.02 L 15.16 24.02 C 16.08 24.021 16.62 23.44 16.62 22.62 Z M 16.221 17.16 C 16.221 16.44 15.761 15.94 14.981 15.94 L 12.961 15.94 L 12.961 18.421 L 14.981 18.421 C 15.761 18.42 16.221 17.921 16.221 17.16 Z M 19.94 22.78 C 19.94 25.36 18.12 26.781 15.521 26.781 L 9.724 26.781 L 9.724 13.18 L 15.141 13.18 C 17.761 13.18 19.541 14.52 19.541 16.98 C 19.541 18.1 19.041 19.1 18.241 19.701 C 19.16 20.24 19.94 21.28 19.94 22.78 Z"/></svg></span>
+      <div style="line-height:1.1">
+        <div style="font-weight:700;font-size:15px;letter-spacing:-0.01em">Wholesale Portal</div>
+        <div style="font-size:12px;color:#6B6B6B">Access management</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#808080;padding:8px 10px">Manage</div>
+    <button onClick="{{ nav.overview.onSelect }}" style="{{ nav.overview.style }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg><span style="flex:1;text-align:left">Overview</span></button>
+    <button onClick="{{ nav.orgs.onSelect }}" style="{{ nav.orgs.style }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2"/><path d="M10 6h4M10 10h4M10 14h4"/></svg><span style="flex:1;text-align:left">Organisations</span></button>
+    <button onClick="{{ nav.users.onSelect }}" style="{{ nav.users.style }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span style="flex:1;text-align:left">Users</span></button>
+    <button onClick="{{ nav.roles.onSelect }}" style="{{ nav.roles.style }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg><span style="flex:1;text-align:left">Roles &amp; permissions</span></button>
+    <div style="margin-top:auto;border-top:1px solid #E3E3E3;padding-top:14px">
+      <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:12px;background:#F7F7F7">
+        <div style="{{ identity.avatarStyle }}">{{ identity.avatar }}</div>
+        <div style="line-height:1.15;min-width:0">
+          <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ identity.name }}</div>
+          <div style="font-size:12px;color:#6B6B6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ identity.meta }}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
+    <header style="height:74px;flex-shrink:0;background:#fff;border-bottom:1px solid #E3E3E3;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:24px">
+      <div style="min-width:0">
+        <div style="font-size:12px;color:#6B6B6B;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ screenEyebrow }}</div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;white-space:nowrap">{{ screenTitle }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+        <span style="font-size:13px;font-weight:700;color:#6B6B6B;white-space:nowrap">Viewing as</span>
+        <div style="display:flex;gap:4px;background:#F7F7F7;border:1px solid #E3E3E3;border-radius:999px;padding:4px">
+          <button onClick="{{ personaBtns.bt.onSelect }}" style="{{ personaBtns.bt.style }}">BT Wholesale Admin</button>
+          <button onClick="{{ personaBtns.reseller.onSelect }}" style="{{ personaBtns.reseller.style }}">Reseller Admin</button>
+          <button onClick="{{ personaBtns.user.onSelect }}" style="{{ personaBtns.user.style }}">Standard User</button>
+        </div>
+      </div>
+    </header>
+
+    <div style="flex-shrink:0;background:#fff;border-bottom:1px solid #E3E3E3;padding:18px 32px;display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-start">
+      <div style="{{ banner.iconStyle }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg></div>
+      <div style="flex:1;min-width:320px">
+        <div style="font-weight:700;font-size:15px;margin-bottom:3px">Signed in as a <span style="color:#5514B4">{{ banner.name }}</span></div>
+        <div style="font-size:14px;color:#434343;max-width:640px;line-height:1.45">{{ banner.desc }}</div>
+      </div>
+      <div style="display:flex;gap:26px;flex-shrink:0">
+        <div style="min-width:186px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#357E3C;margin-bottom:7px">Can</div>
+          <sc-for list="{{ banner.can }}" as="item" hint-placeholder-count="3">
+            <div style="display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:#434343;margin-bottom:5px;line-height:1.3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M20 6 9 17l-5-5"/></svg><span>{{ item }}</span></div>
+          </sc-for>
+        </div>
+        <div style="min-width:186px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#DA020F;margin-bottom:7px">Cannot</div>
+          <sc-for list="{{ banner.cannot }}" as="item" hint-placeholder-count="2">
+            <div style="display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:#434343;margin-bottom:5px;line-height:1.3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DA020F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M18 6 6 18M6 6l12 12"/></svg><span>{{ item }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding:30px 32px 48px">
+
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:scFade 260ms ease;max-width:1120px">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;padding:20px">
+              <span style="width:38px;height:38px;border-radius:10px;background:#F3EBFE;color:#5514B4;display:flex;align-items:center;justify-content:center;margin-bottom:14px">{{ k.icon }}</span>
+              <div style="font-size:32px;font-weight:700;letter-spacing:-0.02em;line-height:1">{{ k.value }}</div>
+              <div style="font-size:14px;color:#434343;margin-top:5px;font-weight:700">{{ k.label }}</div>
+              <div style="font-size:12.5px;color:#808080;margin-top:1px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:20px">
+          <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;padding:24px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:6px;border-bottom:2px dashed #E3E3E3">
+              <div style="font-weight:700;font-size:17px">Your organisation network</div>
+              <button onClick="{{ nav.orgs.onSelect }}" style="background:none;border:0;color:#5514B4;font-weight:700;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px">View all</button>
+            </div>
+            <sc-for list="{{ miniTree }}" as="n" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid #F7F7F7">
+                <div style="width:{{ n.indent }};flex-shrink:0"></div>
+                <sc-if value="{{ n.connector }}"><span style="color:#C8C8C8;font-size:13px">&#9492;</span></sc-if>
+                <span style="{{ n.dotStyle }}"></span>
+                <span style="font-weight:{{ n.weight }};font-size:14px">{{ n.name }}</span>
+                <span style="{{ n.badgeStyle }}">{{ n.typeLabel }}</span>
+                <sc-if value="{{ n.isYou }}"><span style="font-size:11px;font-weight:700;color:#5514B4;background:#F3EBFE;padding:2px 8px;border-radius:5px">You</span></sc-if>
+                <span style="flex:1"></span>
+                <span style="font-size:12.5px;color:#808080">{{ n.userLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;padding:24px">
+            <div style="font-weight:700;font-size:17px;padding-bottom:14px;margin-bottom:14px;border-bottom:2px dashed #E3E3E3">Quick actions</div>
+            <button onClick="{{ createOrgBtn.onClick }}" style="{{ createOrgBtn.rowStyle }}">
+              <span style="width:36px;height:36px;border-radius:9px;background:{{ createOrgBtn.iconBg }};color:{{ createOrgBtn.iconFg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2"/><path d="M10 6h4M10 10h4"/></svg></span>
+              <span style="flex:1;text-align:left"><span style="display:block;font-weight:700;font-size:14px">{{ createOrgBtn.label }}</span><span style="display:block;font-size:12.5px;color:#808080">{{ createOrgBtn.hint }}</span></span>
+              <span style="color:#AAAAAA">{{ createOrgBtn.trail }}</span>
+            </button>
+            <button onClick="{{ inviteBtn.onClick }}" style="{{ inviteBtn.rowStyle }}">
+              <span style="width:36px;height:36px;border-radius:9px;background:{{ inviteBtn.iconBg }};color:{{ inviteBtn.iconFg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>
+              <span style="flex:1;text-align:left"><span style="display:block;font-weight:700;font-size:14px">{{ inviteBtn.label }}</span><span style="display:block;font-size:12.5px;color:#808080">{{ inviteBtn.hint }}</span></span>
+              <span style="color:#AAAAAA">{{ inviteBtn.trail }}</span>
+            </button>
+            <button onClick="{{ nav.roles.onSelect }}" style="display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid #E3E3E3;border-radius:12px;padding:13px 14px;cursor:pointer;margin-bottom:10px">
+              <span style="width:36px;height:36px;border-radius:9px;background:#F3EBFE;color:#5514B4;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg></span>
+              <span style="flex:1;text-align:left"><span style="display:block;font-weight:700;font-size:14px">Review roles &amp; permissions</span><span style="display:block;font-size:12.5px;color:#808080">See the full RBAC model</span></span>
+              <span style="color:#AAAAAA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isOrgs }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:scFade 260ms ease">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:20px">
+          <div style="font-size:14px;color:#434343;max-width:640px">Hierarchy defines <b>who reports to whom</b>. Product entitlements are layered on top &mdash; a child organisation can never exceed its parent.</div>
+          <button onClick="{{ createOrgBtn.onClick }}" style="{{ createOrgBtn.cta }}">{{ createOrgBtn.ctaIcon }}<span>{{ createOrgBtn.label }}</span></button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:20px;align-items:start">
+          <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;padding:12px">
+            <sc-for list="{{ tree }}" as="n" hint-placeholder-count="6">
+              <button onClick="{{ n.onSelect }}" style="{{ n.rowStyle }}">
+                <div style="width:{{ n.indent }};flex-shrink:0"></div>
+                <sc-if value="{{ n.connector }}"><span style="color:#C8C8C8">&#9492;</span></sc-if>
+                <span style="{{ n.dotStyle }}"></span>
+                <span style="font-weight:{{ n.weight }};font-size:14px">{{ n.name }}</span>
+                <span style="{{ n.badgeStyle }}">{{ n.typeLabel }}</span>
+                <sc-if value="{{ n.isYou }}"><span style="font-size:11px;font-weight:700;color:#5514B4;background:#F3EBFE;padding:2px 7px;border-radius:5px">You</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;padding:26px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px">
+              <div>
+                <div style="font-size:21px;font-weight:700;letter-spacing:-0.01em">{{ orgDetail.name }}</div>
+                <div style="display:flex;align-items:center;gap:9px;margin-top:8px">
+                  <span style="{{ orgDetail.badgeStyle }}">{{ orgDetail.typeLabel }}</span>
+                  <span style="font-size:13px;color:#808080">{{ orgDetail.parentLine }}</span>
+                </div>
+              </div>
+              <sc-if value="{{ orgDetail.showEntEdit }}"><button onClick="{{ orgDetail.onEntEdit }}" style="background:#fff;border:1px solid #2A2A2A;border-radius:999px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">Assign entitlements</button></sc-if>
+            </div>
+            <div style="display:flex;gap:26px;margin:20px 0;padding:16px 0;border-top:1px solid #E3E3E3;border-bottom:1px solid #E3E3E3">
+              <div><div style="font-size:12px;color:#808080">Contact</div><div style="font-size:14px;font-weight:700;margin-top:2px">{{ orgDetail.contact }}</div></div>
+              <div><div style="font-size:12px;color:#808080">Users</div><div style="font-size:14px;font-weight:700;margin-top:2px">{{ orgDetail.userCount }}</div></div>
+              <div><div style="font-size:12px;color:#808080">Sub-organisations</div><div style="font-size:14px;font-weight:700;margin-top:2px">{{ orgDetail.childCount }}</div></div>
+            </div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:12px">Product entitlements</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px">
+              <sc-for list="{{ orgDetail.products }}" as="p" hint-placeholder-count="4"><span style="{{ p.chipStyle }}">{{ p.mark }}{{ p.label }}</span></sc-for>
+            </div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:12px">Services &amp; capabilities</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ orgDetail.services }}" as="p" hint-placeholder-count="6"><span style="{{ p.chipStyle }}">{{ p.mark }}{{ p.label }}</span></sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:scFade 260ms ease;max-width:1120px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:20px">
+          <div style="font-size:14px;color:#434343;max-width:640px">Every user's access is defined by their assigned <b>role</b>. A user has no inherent permissions &mdash; the role supplies them all.</div>
+          <button onClick="{{ inviteBtn.onClick }}" style="{{ inviteBtn.cta }}">{{ inviteBtn.ctaIcon }}<span>{{ inviteBtn.label }}</span></button>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:2.2fr 1.5fr 1.4fr 1fr;padding:14px 22px;background:#F7F7F7;border-bottom:1px solid #E3E3E3;font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#808080">
+            <div>User</div><div>Role</div><div>Organisation</div><div>Status</div>
+          </div>
+          <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="7">
+            <div style="display:grid;grid-template-columns:2.2fr 1.5fr 1.4fr 1fr;padding:14px 22px;border-bottom:1px solid #F0F0F0;align-items:center">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0">
+                <div style="{{ u.avatarStyle }}">{{ u.initials }}</div>
+                <div style="min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</div><div style="font-size:12.5px;color:#808080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.email }}</div></div>
+              </div>
+              <div><span style="display:inline-flex;align-items:center;gap:6px;background:#F7F7F7;border:1px solid #E3E3E3;border-radius:5px;padding:5px 11px;font-size:13px;font-weight:700">{{ u.roleName }}</span></div>
+              <div style="font-size:14px;color:#434343">{{ u.orgName }}</div>
+              <div><span style="{{ u.statusStyle }}"><span style="{{ u.statusDot }}"></span>{{ u.statusLabel }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isRoles }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:scFade 260ms ease;max-width:1180px">
+        <div style="font-size:14px;color:#434343;margin-bottom:22px;max-width:840px">Access is <b>role-based and dynamic</b> &mdash; capabilities are configured, not hard-wired. Three layers work together: <b>access personas</b> who administer the platform, the <b>organisation profiles</b> a reseller network is built from, and the <b>user roles</b> assigned to people within any organisation.</div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:12px">Access personas</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:34px">
+          <sc-for list="{{ personaCards }}" as="p" hint-placeholder-count="3">
+            <div style="{{ p.cardStyle }}">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <span style="{{ p.iconStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg></span>
+                <div style="font-weight:700;font-size:15px">{{ p.name }}</div>
+                <sc-if value="{{ p.active }}"><span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#fff;background:#5514B4;padding:3px 8px;border-radius:5px">CURRENT</span></sc-if>
+              </div>
+              <div style="font-size:13px;color:#434343;line-height:1.45;margin-bottom:14px">{{ p.desc }}</div>
+              <sc-for list="{{ p.can }}" as="c" hint-placeholder-count="3">
+                <div style="display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:#434343;margin-bottom:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M20 6 9 17l-5-5"/></svg><span>{{ c }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:12px">Organisation profiles &mdash; capability matrix</div>
+        <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;overflow:hidden;margin-bottom:34px">
+          <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;min-width:640px">
+            <thead><tr>
+              <th style="text-align:left;padding:15px 22px;font-size:13px;font-weight:700;background:#F7F7F7;border-bottom:1px solid #E3E3E3">Capability</th>
+              <sc-for list="{{ profileMatrix.headers }}" as="h" hint-placeholder-count="4"><th style="padding:15px 10px;font-size:13px;font-weight:700;background:#F7F7F7;border-bottom:1px solid #E3E3E3;text-align:center;min-width:120px">{{ h }}</th></sc-for>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ profileMatrix.rows }}" as="r" hint-placeholder-count="13">
+                <tr>
+                  <td style="text-align:left;padding:12px 22px;font-size:13.5px;color:#2A2A2A;border-bottom:1px solid #F0F0F0">{{ r.label }}</td>
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4">
+                    <td style="text-align:center;padding:12px 10px;border-bottom:1px solid #F0F0F0">
+                      <sc-if value="{{ c.yes }}"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:999px;background:#F0F8EF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></sc-if>
+                      <sc-if value="{{ c.partial }}"><span style="display:inline-block;width:9px;height:9px;border-radius:999px;background:#D88C00"></span></sc-if>
+                      <sc-if value="{{ c.no }}"><span style="display:inline-block;width:14px;height:2px;border-radius:2px;background:#D9D9D9"></span></sc-if>
+                    </td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:12px">User roles &mdash; permission matrix</div>
+        <div style="display:flex;gap:18px;align-items:center;margin-bottom:12px;font-size:12.5px;color:#6B6B6B">
+          <span style="display:inline-flex;align-items:center;gap:7px"><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:999px;background:#F0F8EF"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Full</span>
+          <span style="display:inline-flex;align-items:center;gap:7px"><span style="display:inline-block;width:9px;height:9px;border-radius:999px;background:#D88C00"></span>Partial</span>
+          <span style="display:inline-flex;align-items:center;gap:7px"><span style="display:inline-block;width:14px;height:2px;border-radius:2px;background:#D9D9D9"></span>None</span>
+        </div>
+        <div style="background:#fff;border:1px solid #E3E3E3;border-radius:16px;overflow:hidden">
+          <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;min-width:820px">
+            <thead><tr>
+              <th style="text-align:left;padding:15px 22px;font-size:13px;font-weight:700;background:#F7F7F7;border-bottom:1px solid #E3E3E3">Permission category</th>
+              <sc-for list="{{ roleMatrix.headers }}" as="h" hint-placeholder-count="7"><th style="padding:15px 8px;font-size:12.5px;font-weight:700;background:#F7F7F7;border-bottom:1px solid #E3E3E3;text-align:center;min-width:96px">{{ h }}</th></sc-for>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ roleMatrix.rows }}" as="r" hint-placeholder-count="9">
+                <tr>
+                  <td style="text-align:left;padding:13px 22px;font-size:13.5px;font-weight:700;color:#2A2A2A;border-bottom:1px solid #F0F0F0">{{ r.label }}</td>
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+                    <td style="text-align:center;padding:13px 8px;border-bottom:1px solid #F0F0F0">
+                      <sc-if value="{{ c.yes }}"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:999px;background:#F0F8EF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></sc-if>
+                      <sc-if value="{{ c.partial }}"><span style="display:inline-block;width:9px;height:9px;border-radius:999px;background:#D88C00"></span></sc-if>
+                      <sc-if value="{{ c.no }}"><span style="display:inline-block;width:14px;height:2px;border-radius:2px;background:#D9D9D9"></span></sc-if>
+                    </td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <sc-if value="{{ orgWizardOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ orgWiz.close }}" style="position:fixed;inset:0;background:rgba(20,10,40,0.42);display:flex;align-items:center;justify-content:center;padding:32px;z-index:50;animation:scFade 160ms ease">
+    <div onClick="{{ orgWiz.stop }}" style="background:#fff;border-radius:16px;width:640px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:scIn 220ms cubic-bezier(0.4,0,0.2,1)">
+      <div style="padding:22px 26px;border-bottom:1px solid #E3E3E3;display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:18px;font-weight:700">{{ orgWiz.title }}</div><div style="font-size:13px;color:#808080;margin-top:2px">Step {{ orgWiz.step }} of 3 &middot; {{ orgWiz.stepLabel }}</div></div>
+        <button onClick="{{ orgWiz.close }}" style="width:34px;height:34px;border-radius:999px;border:1px solid #E3E3E3;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#434343"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div style="height:4px;background:#F0F0F0"><div style="height:100%;background:#5514B4;width:{{ orgWiz.progress }};transition:width 240ms ease"></div></div>
+      <div style="padding:26px;overflow-y:auto">
+        <sc-if value="{{ orgWiz.s1 }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px">Organisation name</label>
+          <input value="{{ orgWiz.name }}" onChange="{{ orgWiz.onName }}" placeholder="e.g. Beacon Communications" style="width:100%;padding:12px 14px;border:1px solid #C8C8C8;border-radius:8px;font-size:15px;margin-bottom:20px" />
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px">Administrator email</label>
+          <input value="{{ orgWiz.email }}" onChange="{{ orgWiz.onEmail }}" placeholder="admin@organisation.co.uk" style="width:100%;padding:12px 14px;border:1px solid #C8C8C8;border-radius:8px;font-size:15px;margin-bottom:22px" />
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:10px">Organisation type</label>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ orgWiz.types }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.onSelect }}" style="{{ t.style }}">
+                <span style="{{ t.radio }}"><sc-if value="{{ t.active }}"><span style="width:10px;height:10px;border-radius:999px;background:#fff"></span></sc-if></span>
+                <span style="text-align:left"><span style="display:block;font-weight:700;font-size:14px">{{ t.label }}</span><span style="display:block;font-size:12.5px;color:#808080">{{ t.desc }}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ orgWiz.s2 }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex;gap:10px;background:#F3EBFE;border:1px solid #E4D3FA;border-radius:12px;padding:13px 15px;margin-bottom:22px">
+            <span style="color:#5514B4;flex-shrink:0;margin-top:1px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+            <div style="font-size:13px;color:#3F187F;line-height:1.4">A <b>{{ orgWiz.typeLabel }}</b> can only inherit capabilities that <b>{{ orgWiz.parentName }}</b> already holds. Locked items are unavailable to this organisation.</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:11px">Products</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px">
+            <sc-for list="{{ orgWiz.productRows }}" as="e" hint-placeholder-count="4">
+              <button onClick="{{ e.onToggle }}" style="{{ e.rowStyle }}">
+                <span style="{{ e.boxStyle }}"><sc-if value="{{ e.checked }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if></span>
+                <span style="font-weight:700;font-size:14px;color:{{ e.textColor }}">{{ e.label }}</span>
+                <span style="flex:1"></span>
+                <sc-if value="{{ e.locked }}"><span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#808080"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{{ e.lockReason }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:11px">Services &amp; capabilities</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ orgWiz.serviceRows }}" as="e" hint-placeholder-count="6">
+              <button onClick="{{ e.onToggle }}" style="{{ e.rowStyle }}">
+                <span style="{{ e.boxStyle }}"><sc-if value="{{ e.checked }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if></span>
+                <span style="font-weight:700;font-size:14px;color:{{ e.textColor }}">{{ e.label }}</span>
+                <span style="flex:1"></span>
+                <sc-if value="{{ e.locked }}"><span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#808080"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{{ e.lockReason }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ orgWiz.s3 }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="border:1px solid #E3E3E3;border-radius:12px;overflow:hidden;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #F0F0F0"><span style="color:#808080;font-size:13px">Name</span><span style="font-weight:700;font-size:14px">{{ orgWiz.name }}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #F0F0F0"><span style="color:#808080;font-size:13px">Type</span><span style="font-weight:700;font-size:14px">{{ orgWiz.typeLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #F0F0F0"><span style="color:#808080;font-size:13px">Administrator</span><span style="font-weight:700;font-size:14px">{{ orgWiz.email }}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 16px"><span style="color:#808080;font-size:13px">Parent</span><span style="font-weight:700;font-size:14px">{{ orgWiz.parentName }}</span></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:11px">Entitlements granted ({{ orgWiz.grantCount }})</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ orgWiz.summaryChips }}" as="s" hint-placeholder-count="4"><span style="display:inline-flex;align-items:center;gap:6px;background:#F0F8EF;border:1px solid #BFE0BF;color:#1F5A26;border-radius:5px;padding:6px 11px;font-size:13px;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#357E3C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>{{ s }}</span></sc-for>
+            <sc-if value="{{ orgWiz.noGrants }}"><span style="font-size:13px;color:#808080">No entitlements selected.</span></sc-if>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      <div style="padding:18px 26px;border-top:1px solid #E3E3E3;display:flex;align-items:center;justify-content:space-between">
+        <button onClick="{{ orgWiz.back }}" style="{{ orgWiz.backStyle }}">Back</button>
+        <button onClick="{{ orgWiz.next }}" style="{{ orgWiz.nextStyle }}">{{ orgWiz.nextLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ userWizardOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ userWiz.close }}" style="position:fixed;inset:0;background:rgba(20,10,40,0.42);display:flex;align-items:center;justify-content:center;padding:32px;z-index:50;animation:scFade 160ms ease">
+    <div onClick="{{ userWiz.stop }}" style="background:#fff;border-radius:16px;width:680px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:scIn 220ms cubic-bezier(0.4,0,0.2,1)">
+      <div style="padding:22px 26px;border-bottom:1px solid #E3E3E3;display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:18px;font-weight:700">Invite a user</div><div style="font-size:13px;color:#808080;margin-top:2px">Step {{ userWiz.step }} of 3 &middot; {{ userWiz.stepLabel }}</div></div>
+        <button onClick="{{ userWiz.close }}" style="width:34px;height:34px;border-radius:999px;border:1px solid #E3E3E3;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#434343"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div style="height:4px;background:#F0F0F0"><div style="height:100%;background:#5514B4;width:{{ userWiz.progress }};transition:width 240ms ease"></div></div>
+      <div style="padding:26px;overflow-y:auto">
+        <sc-if value="{{ userWiz.s1 }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px">Full name</label>
+          <input value="{{ userWiz.name }}" onChange="{{ userWiz.onName }}" placeholder="e.g. Morgan Hale" style="width:100%;padding:12px 14px;border:1px solid #C8C8C8;border-radius:8px;font-size:15px;margin-bottom:20px" />
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px">Email address</label>
+          <input value="{{ userWiz.email }}" onChange="{{ userWiz.onEmail }}" placeholder="morgan.hale@northgate.co.uk" style="width:100%;padding:12px 14px;border:1px solid #C8C8C8;border-radius:8px;font-size:15px;margin-bottom:20px" />
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:7px">Organisation</label>
+          <select value="{{ userWiz.orgId }}" onChange="{{ userWiz.onOrg }}" style="width:100%;padding:12px 14px;border:1px solid #C8C8C8;border-radius:8px;font-size:15px;background:#fff;cursor:pointer">
+            <sc-for list="{{ userWiz.orgOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+          </select>
+        </div>
+        </sc-if>
+        <sc-if value="{{ userWiz.s2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:20px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:11px">Assign a role</div>
+            <div style="display:flex;flex-direction:column;gap:9px;max-height:344px;overflow-y:auto;padding-right:4px">
+              <sc-for list="{{ userWiz.roleOptions }}" as="r" hint-placeholder-count="7">
+                <button onClick="{{ r.onSelect }}" style="{{ r.style }}">
+                  <span style="{{ r.radio }}"><sc-if value="{{ r.active }}"><span style="width:10px;height:10px;border-radius:999px;background:#fff"></span></sc-if></span>
+                  <span style="text-align:left"><span style="display:block;font-weight:700;font-size:14px">{{ r.name }}</span><span style="display:block;font-size:12px;color:#808080;line-height:1.35">{{ r.desc }}</span></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#808080;margin-bottom:11px">Permissions granted</div>
+            <div style="background:#F7F7F7;border:1px solid #E3E3E3;border-radius:12px;padding:16px;max-height:344px;overflow-y:auto">
+              <div style="font-weight:700;font-size:14px;margin-bottom:12px">{{ userWiz.roleName }}</div>
+              <sc-for list="{{ userWiz.previewPerms }}" as="pm" hint-placeholder-count="5"><div style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#434343;margin-bottom:7px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5514B4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M20 6 9 17l-5-5"/></svg><span>{{ pm }}</span></div></sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ userWiz.s3 }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+            <div style="{{ userWiz.avatarStyle }}">{{ userWiz.initials }}</div>
+            <div><div style="font-weight:700;font-size:17px">{{ userWiz.name }}</div><div style="font-size:13px;color:#808080">{{ userWiz.email }}</div></div>
+          </div>
+          <div style="border:1px solid #E3E3E3;border-radius:12px;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #F0F0F0"><span style="color:#808080;font-size:13px">Role</span><span style="font-weight:700;font-size:14px">{{ userWiz.roleName }}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #F0F0F0"><span style="color:#808080;font-size:13px">Organisation</span><span style="font-weight:700;font-size:14px">{{ userWiz.orgName }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px"><span style="color:#808080;font-size:13px">Status on creation</span><span style="display:inline-flex;align-items:center;gap:6px;background:#FEF6DE;color:#8A5A00;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700"><span style="width:6px;height:6px;border-radius:999px;background:currentColor"></span>Invited</span></div>
+          </div>
+          <div style="font-size:12.5px;color:#808080;margin-top:12px;line-height:1.5">An invitation email will be sent. The user gains access once they accept and set a password.</div>
+        </div>
+        </sc-if>
+      </div>
+      <div style="padding:18px 26px;border-top:1px solid #E3E3E3;display:flex;align-items:center;justify-content:space-between">
+        <button onClick="{{ userWiz.back }}" style="{{ userWiz.backStyle }}">Back</button>
+        <button onClick="{{ userWiz.next }}" style="{{ userWiz.nextStyle }}">{{ userWiz.nextLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:24px;right:24px;z-index:80;display:flex;align-items:center;gap:12px;padding:15px 18px;border-radius:14px;background:#fff;border:1px solid #E3E3E3;box-shadow:0 12px 32px rgba(20,10,40,0.18);max-width:420px;animation:scIn 240ms cubic-bezier(0.4,0,0.2,1)">
+    <span style="{{ toast.iconStyle }}">{{ toast.icon }}</span>
+    <div style="font-size:13.5px;color:#2A2A2A;line-height:1.4;flex:1">{{ toast.msg }}</div>
+    <button onClick="{{ dismissToast }}" style="border:0;background:transparent;cursor:pointer;color:#AAAAAA;display:flex;padding:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  </sc-if>
+
+</div></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  ENT = [
+    {key:'broadband',label:'Broadband',kind:'product'},
+    {key:'digitalVoice',label:'Digital Voice for Business',kind:'product'},
+    {key:'strategicBroadband',label:'Strategic Broadband',kind:'product'},
+    {key:'ukFabric',label:'UK Fabric (Ethernet)',kind:'product'},
+    {key:'hardware',label:'Hardware ordering',kind:'service'},
+    {key:'kci',label:'Customer KCIs',kind:'service'},
+    {key:'businessZone',label:'Business Zone',kind:'service'},
+    {key:'fmsEmpirix',label:'FMS / Empirix',kind:'service'},
+    {key:'support',label:'Support tickets',kind:'service'},
+    {key:'branding',label:'Custom branding',kind:'service'},
+  ];
+  PRODUCT_KEYS = ['broadband','digitalVoice','strategicBroadband','ukFabric'];
+  TYPE_LABELS = {root:'BT Wholesale',reseller:'Reseller',subReseller:'Sub-Reseller',childReseller:'Child Reseller',dealer:'Dealer'};
+  TYPE_DESC = {
+    reseller:'Direct contract with BT Wholesale. Full downstream control.',
+    subReseller:'No direct BT contract. Sells your services under your relationship.',
+    childReseller:'A reseller with selected restrictions \u2014 the broadest downstream role.',
+    dealer:'Most restricted. Inherits specific services and your branding only.',
+  };
+  ROLES = [
+    {key:'admin',label:'Administrator',desc:'Full control of the organisation, its users and entitlements.',grants:['Manage organisation settings','Create, edit & remove users','Assign & change roles','Manage product entitlements','Billing, invoices & reporting','Support & API key management']},
+    {key:'orderManager',label:'Order Manager',desc:'Places and manages product orders and faults.',grants:['View & place product orders','Modify & track orders','Raise & manage faults','Dashboard access']},
+    {key:'billingManager',label:'Billing Manager',desc:'Manages invoices and billing reports.',grants:['View & download invoices','Run billing reports','Reporting & exports','View orders (read-only)']},
+    {key:'support',label:'Support Agent',desc:'Handles faults and support tickets.',grants:['Raise, track & escalate tickets','Full fault management','View orders & products']},
+    {key:'reporting',label:'Reporting Analyst',desc:'Read-only access to dashboards and reports.',grants:['Dashboard access','Export reports','View billing reports']},
+    {key:'readonly',label:'Read-only User',desc:'Can view but never change anything.',grants:['View orders, products & invoices','View reports','No create, edit or delete']},
+    {key:'apiDev',label:'API Developer',desc:'Integrates via API and manages keys.',grants:['API & sandbox access','Manage API keys','View products & orders']},
+  ];
+  PERSONAS = {
+    bt:{key:'bt',name:'BT Wholesale Administrator',crumb:'BT Wholesale \u00b7 Platform administration',title:'Platform overview',
+      person:{name:'Alex Morgan',meta:'BT Wholesale',avatar:'AM'},accent:'#2A1C4A',
+      desc:'You establish reseller organisations and govern the platform-wide access model. Everything downstream inherits from what you grant here.',
+      can:['Create reseller organisations','Assign product entitlements to resellers','Create reseller administrators','Define global RBAC templates'],
+      cannot:['Operate a reseller\u2019s day-to-day orders']},
+    reseller:{key:'reseller',name:'Reseller Administrator',crumb:'Northgate Telecom \u00b7 Reseller administration',title:'Overview',
+      person:{name:'Sarah Whitfield',meta:'Northgate Telecom \u00b7 Admin',avatar:'SW'},accent:'#5514B4',
+      desc:'You are the primary administrator for Northgate Telecom. You manage its users and build out downstream sub-reseller, child reseller and dealer organisations.',
+      can:['Create sub-reseller, child reseller & dealer orgs','Invite users & assign roles','Restrict product access for child entities','Define child-organisation permissions'],
+      cannot:['Grant products Northgate doesn\u2019t hold','Edit BT platform-level settings']},
+    user:{key:'user',name:'Standard User',crumb:'Northgate Telecom \u00b7 Standard user',title:'Overview',
+      person:{name:'James Okafor',meta:'Northgate Telecom \u00b7 Order Manager',avatar:'JO'},accent:'#357E3C',
+      desc:'You are an operational portal user. Every capability you have comes from the role assigned to you \u2014 nothing is inherent.',
+      can:['Access the portal','Do what your assigned role permits','View orders & reports where allowed'],
+      cannot:['Create or manage organisations','Create or invite users','Change roles or permissions']},
+  };
+  PROFILE_HEADERS = ['Reseller','Sub-Reseller','Child Reseller','Dealer'];
+  PROFILE_ROWS = [
+    ['Portal access','y','y','y','y'],
+    ['Place & manage orders','y','y','y','p'],
+    ['Manage own users','y','p','y','n'],
+    ['Create child organisations','y','n','y','n'],
+    ['Choose exposed services','y','y','y','p'],
+    ['Custom branding','y','y','y','y'],
+    ['Receive customer KCIs','y','y','y','n'],
+    ['Business Zone access','y','n','y','n'],
+    ['Hardware ordering','y','n','y','n'],
+    ['FMS / Empirix access','y','n','y','n'],
+    ['Raise support tickets','y','n','p','n'],
+    ['View BT billing','y','n','p','n'],
+    ['Manage entitlements','y','n','p','n'],
+  ];
+  ROLE_HEADERS = ['Admin','Order Mgr','Billing Mgr','Support','Reporting','Read-only','API Dev'];
+  ROLE_ROWS = [
+    ['Organisation management','y','n','n','n','n','n','n'],
+    ['User administration','y','n','n','n','n','n','n'],
+    ['Product management','y','p','p','p','p','p','p'],
+    ['Operations & orders','y','y','p','p','p','p','p'],
+    ['Fault management','y','p','n','y','n','p','n'],
+    ['Billing & invoices','y','n','y','n','p','p','n'],
+    ['Reporting','y','p','y','p','y','p','n'],
+    ['Support tickets','y','p','n','y','n','p','n'],
+    ['API access','y','n','n','n','n','n','y'],
+  ];
+
+  state = {
+    persona:'reseller', screen:'overview', selectedOrgId:'northgate', seq:1,
+    orgWizard:null, userWizard:null, toast:null,
+    orgs:[
+      {id:'btw',name:'BT Wholesale',typeKey:'root',parentId:null,contact:'Platform operator',entitlements:['broadband','digitalVoice','strategicBroadband','ukFabric','hardware','kci','businessZone','fmsEmpirix','support','branding']},
+      {id:'northgate',name:'Northgate Telecom',typeKey:'reseller',parentId:'btw',contact:'partners@northgate.co.uk',entitlements:['broadband','digitalVoice','strategicBroadband','hardware','kci','businessZone','fmsEmpirix','support','branding']},
+      {id:'beacon',name:'Beacon Wholesale Ltd',typeKey:'reseller',parentId:'btw',contact:'admin@beaconwholesale.co.uk',entitlements:['broadband','digitalVoice','hardware','kci','support','branding']},
+      {id:'metro',name:'Metro Connect',typeKey:'subReseller',parentId:'northgate',contact:'ops@metroconnect.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
+      {id:'halo',name:'Halo Networks',typeKey:'childReseller',parentId:'northgate',contact:'support@halonetworks.co.uk',entitlements:['broadband','digitalVoice','strategicBroadband','hardware','kci','businessZone','fmsEmpirix','branding']},
+      {id:'riverside',name:'Riverside Comms',typeKey:'subReseller',parentId:'northgate',contact:'hello@riverside-comms.co.uk',entitlements:['broadband','kci','branding']},
+      {id:'apex',name:'Apex Telecom',typeKey:'dealer',parentId:'northgate',contact:'sales@apextelecom.co.uk',entitlements:['broadband','branding']},
+    ],
+    users:[
+      {id:'u1',name:'Sarah Whitfield',email:'sarah.whitfield@northgate.co.uk',roleKey:'admin',orgId:'northgate',status:'Active'},
+      {id:'u2',name:'James Okafor',email:'james.okafor@northgate.co.uk',roleKey:'orderManager',orgId:'northgate',status:'Active'},
+      {id:'u3',name:'Priya Nair',email:'priya.nair@northgate.co.uk',roleKey:'billingManager',orgId:'northgate',status:'Active'},
+      {id:'u4',name:'Tom Reeves',email:'tom.reeves@metroconnect.co.uk',roleKey:'support',orgId:'metro',status:'Active'},
+      {id:'u5',name:'Lucy Chen',email:'lucy.chen@northgate.co.uk',roleKey:'reporting',orgId:'northgate',status:'Invited'},
+      {id:'u6',name:'Daniel Frost',email:'daniel.frost@northgate.co.uk',roleKey:'apiDev',orgId:'northgate',status:'Active'},
+      {id:'u7',name:'Aisha Bello',email:'aisha.bello@apextelecom.co.uk',roleKey:'readonly',orgId:'apex',status:'Suspended'},
+    ],
+  };
+
+  initials(n){ return (n||'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
+  orgById(id){ return this.state.orgs.find(o=>o.id===id); }
+  roleLabel(k){ const r=this.ROLES.find(r=>r.key===k); return r?r.label:k; }
+  childrenOf(id){ return this.state.orgs.filter(o=>o.parentId===id); }
+  userCountFor(id){ return this.state.users.filter(u=>u.orgId===id).length; }
+  isReseller(){ return this.state.persona==='reseller'; }
+  isBt(){ return this.state.persona==='bt'; }
+  canAdmin(){ return this.state.persona!=='user'; }
+  wizardParent(){ return this.isBt()?this.orgById('btw'):this.orgById('northgate'); }
+  childTypeKeys(){ return this.isBt()?['reseller']:['subReseller','childReseller','dealer']; }
+  typeAllows(typeKey,key){
+    if(typeKey==='reseller') return true;
+    if(typeKey==='subReseller') return this.PRODUCT_KEYS.includes(key)||key==='kci'||key==='branding';
+    if(typeKey==='childReseller') return key!=='support';
+    if(typeKey==='dealer') return this.PRODUCT_KEYS.includes(key)||key==='branding';
+    return true;
+  }
+  badgeStyle(typeKey){
+    const base='font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;';
+    const m={
+      root:'background:#2A2A2A;color:#fff',
+      reseller:'background:#F3EBFE;color:#3F187F',
+      childReseller:'background:rgba(46,66,127,0.12);color:#2E427F',
+      subReseller:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9',
+      dealer:'background:#fff;color:#6B6B6B;border:1px solid #E3E3E3',
+    };
+    return base+(m[typeKey]||m.subReseller);
+  }
+  dotStyle(typeKey){
+    const c={root:'#2A2A2A',reseller:'#5514B4',childReseller:'#2E427F',subReseller:'#AAAAAA',dealer:'#C8C8C8'}[typeKey]||'#AAAAAA';
+    return 'width:8px;height:8px;border-radius:999px;flex-shrink:0;background:'+c;
+  }
+  defaultEnt(type){ const p=this.wizardParent(),e={}; this.ENT.forEach(x=>{ if(p.entitlements.includes(x.key)&&this.typeAllows(type,x.key)) e[x.key]=true; }); return e; }
+
+  go(screen){ this.setState({screen}); }
+  setPersona(p){ this.setState({persona:p,orgWizard:null,userWizard:null,selectedOrgId:(p==='bt'?'btw':'northgate')}); }
+  selectOrg(id){ this.setState({selectedOrgId:id}); }
+  showToast(kind,msg){ this.setState({toast:{kind,msg}}); }
+  dismissToast(){ this.setState({toast:null}); }
+  deny(){ this.showToast('error','That action needs an Administrator role. A Standard User cannot manage organisations or users.'); }
+
+  openOrgWizard(){ if(!this.canAdmin()) return this.deny(); const t=this.childTypeKeys()[0]; this.setState({orgWizard:{step:1,name:'',email:'',type:t,ent:this.defaultEnt(t)}}); }
+  closeOrgWizard(){ this.setState({orgWizard:null}); }
+  setOrgType(t){ this.setState(s=>({orgWizard:{...s.orgWizard,type:t,ent:this.defaultEnt(t)}})); }
+  setOrgField(k,v){ this.setState(s=>({orgWizard:{...s.orgWizard,[k]:v}})); }
+  toggleEnt(key){ this.setState(s=>({orgWizard:{...s.orgWizard,ent:{...s.orgWizard.ent,[key]:!s.orgWizard.ent[key]}}})); }
+  orgNext(){ const w=this.state.orgWizard; if(w.step>=3) return this.submitOrg(); this.setState(s=>({orgWizard:{...s.orgWizard,step:s.orgWizard.step+1}})); }
+  orgBack(){ this.setState(s=>({orgWizard:{...s.orgWizard,step:Math.max(1,s.orgWizard.step-1)}})); }
+  submitOrg(){
+    const w=this.state.orgWizard, parent=this.wizardParent(), id='org'+this.state.seq;
+    const ents=Object.keys(w.ent).filter(k=>w.ent[k]);
+    const org={id,name:(w.name.trim()||'New organisation'),typeKey:w.type,parentId:parent.id,contact:(w.email.trim()||'\u2014'),entitlements:ents};
+    this.setState(s=>({orgs:[...s.orgs,org],seq:s.seq+1,orgWizard:null,selectedOrgId:id,screen:'orgs',
+      toast:{kind:'success',msg:org.name+' created as a '+this.TYPE_LABELS[w.type]+' under '+parent.name+'.'}}));
+  }
+
+  userOrgOptions(){ const ng=this.orgById('northgate'); return [ng,...this.childrenOf('northgate')]; }
+  openUserWizard(){ if(!this.canAdmin()) return this.deny(); this.setState({userWizard:{step:1,name:'',email:'',orgId:'northgate',role:'orderManager'}}); }
+  closeUserWizard(){ this.setState({userWizard:null}); }
+  setUserField(k,v){ this.setState(s=>({userWizard:{...s.userWizard,[k]:v}})); }
+  userNext(){ const w=this.state.userWizard; if(w.step>=3) return this.submitUser(); this.setState(s=>({userWizard:{...s.userWizard,step:s.userWizard.step+1}})); }
+  userBack(){ this.setState(s=>({userWizard:{...s.userWizard,step:Math.max(1,s.userWizard.step-1)}})); }
+  submitUser(){
+    const w=this.state.userWizard, org=this.orgById(w.orgId), id='nu'+this.state.seq;
+    const user={id,name:(w.name.trim()||'New user'),email:(w.email.trim()||'\u2014'),roleKey:w.role,orgId:w.orgId,status:'Invited'};
+    this.setState(s=>({users:[...s.users,user],seq:s.seq+1,userWizard:null,screen:'users',
+      toast:{kind:'success',msg:'Invitation sent to '+user.name+' as '+this.roleLabel(w.role)+' at '+(org?org.name:'Northgate Telecom')+'.'}}));
+  }
+
+  ic(d,o){ o=o||{}; const arr=Array.isArray(d)?d:[d]; return React.createElement('svg',{width:o.s||18,height:o.s||18,viewBox:'0 0 24 24',fill:'none',stroke:o.c||'currentColor',strokeWidth:o.w||2,strokeLinecap:'round',strokeLinejoin:'round'},arr.map((p,i)=>React.createElement('path',{key:i,d:p}))); }
+  lockEl(c){ return React.createElement('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:c||'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'},React.createElement('rect',{x:4,y:11,width:16,height:10,rx:2}),React.createElement('path',{d:'M8 11V7a4 4 0 0 1 8 0v4'})); }
+  markEl(owned){ if(owned) return this.ic('M20 6 9 17l-5-5',{s:13,c:'#357E3C',w:2.6}); return this.ic('M5 12h14',{s:13,c:'#C8C8C8',w:2.4}); }
+  cell(v){ return {yes:v==='y',partial:v==='p',no:v==='n'}; }
+
+  home(){ return this.isBt()?'btw':'northgate'; }
+  flatten(rootId,depth,out){ out=out||[]; depth=depth||0; const o=this.orgById(rootId); if(!o) return out; out.push({org:o,depth}); this.childrenOf(rootId).forEach(c=>this.flatten(c.id,depth+1,out)); return out; }
+
+  navItem(key,label){
+    const active=this.state.screen===key;
+    return {onSelect:()=>this.go(key), active,
+      style:'display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:11px;cursor:pointer;font-size:14.5px;font-weight:700;margin-bottom:3px;'+(active?'background:#F3EBFE;color:#5514B4':'background:transparent;color:#434343')};
+  }
+  personaBtn(key,cur){
+    const active=cur===key;
+    return {onSelect:()=>this.setPersona(key),
+      style:'border:0;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;'+(active?'background:#5514B4;color:#fff':'background:transparent;color:#6B6B6B')};
+  }
+
+  renderVals(){
+    const S=this.state, P=this.PERSONAS[S.persona], home=this.home(), admin=this.canAdmin();
+    const chipOwned='display:inline-flex;align-items:center;gap:6px;background:#F0F8EF;border:1px solid #BFE0BF;color:#1F5A26;border-radius:7px;padding:6px 11px;font-size:13px;font-weight:700';
+    const chipOff='display:inline-flex;align-items:center;gap:6px;background:#F7F7F7;border:1px solid #E3E3E3;color:#AAAAAA;border-radius:7px;padding:6px 11px;font-size:13px;font-weight:600';
+
+    // hierarchy nodes
+    const flat=this.flatten(home,0);
+    const mkNode=(row)=>{ const o=row.org; return {
+      onSelect:()=>this.selectOrg(o.id),
+      indent:(row.depth*22)+'px', connector:row.depth>0, dotStyle:this.dotStyle(o.typeKey),
+      weight:row.depth===0?700:600, name:o.name, badgeStyle:this.badgeStyle(o.typeKey),
+      typeLabel:this.TYPE_LABELS[o.typeKey], isYou:o.id===home, userLabel:this.userCountFor(o.id)+' users',
+      rowStyle:'display:flex;align-items:center;gap:8px;width:100%;padding:10px 10px;border:0;border-radius:10px;cursor:pointer;margin-bottom:2px;'+(o.id===S.selectedOrgId?'background:#F3EBFE':'background:transparent'),
+    }; };
+    const tree=flat.map(mkNode);
+
+    // selected org detail
+    const sel=this.orgById(S.selectedOrgId)||this.orgById(home);
+    const parent=sel.parentId?this.orgById(sel.parentId):null;
+    const mkChip=(key)=>{ const owned=sel.entitlements.includes(key); const e=this.ENT.find(x=>x.key===key); return {label:e.label,mark:this.markEl(owned),chipStyle:owned?chipOwned:chipOff}; };
+    const orgDetail={
+      name:sel.name, typeLabel:this.TYPE_LABELS[sel.typeKey], badgeStyle:this.badgeStyle(sel.typeKey),
+      parentLine: sel.id===home?'Your organisation':(parent?('Reports to '+parent.name):'Platform root'),
+      contact:sel.contact, userCount:this.userCountFor(sel.id), childCount:this.childrenOf(sel.id).length,
+      products:this.PRODUCT_KEYS.map(mkChip),
+      services:this.ENT.filter(e=>e.kind==='service').map(e=>mkChip(e.key)),
+      showEntEdit: admin && sel.id!=='btw' && sel.id!==home,
+      onEntEdit:()=>this.showToast('info','Entitlements are edited with the same inheritance-aware picker used when creating an organisation \u2014 '+sel.name+' can only hold what '+(parent?parent.name:'its parent')+' holds.'),
+    };
+
+    // users visible
+    const visibleUsers = this.isBt() ? S.users : S.users.filter(u=>{ const o=this.orgById(u.orgId); return o && (o.id===home || o.parentId===home); });
+    const statusMap={Active:['#1F5A26','#EAF6EA'],Invited:['#8A5A00','#FEF6DE'],Suspended:['#A0121B','#FDECEC']};
+    const userRows=visibleUsers.map(u=>{ const o=this.orgById(u.orgId); const sc=statusMap[u.status]||statusMap.Active; return {
+      initials:this.initials(u.name), name:u.name, email:u.email, roleName:this.roleLabel(u.roleKey), orgName:o?o.name:'\u2014',
+      avatarStyle:'width:36px;height:36px;border-radius:999px;background:#F3EBFE;color:#5514B4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0',
+      statusLabel:u.status, statusStyle:'display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;color:'+sc[0]+';background:'+sc[1],
+      statusDot:'width:6px;height:6px;border-radius:999px;background:currentColor',
+    }; });
+
+    // persona cards
+    const personaCards=['bt','reseller','user'].map(k=>{ const pp=this.PERSONAS[k]; const active=k===S.persona; return {
+      name:pp.name, desc:pp.desc, can:pp.can, active,
+      cardStyle:'background:#fff;border-radius:16px;padding:20px;border:'+(active?'2px solid #5514B4':'1px solid #E3E3E3'),
+      iconStyle:'width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;background:'+pp.accent,
+    }; });
+
+    // matrices
+    const profileMatrix={headers:this.PROFILE_HEADERS, rows:this.PROFILE_ROWS.map(r=>({label:r[0],cells:r.slice(1).map(v=>this.cell(v))}))};
+    const roleMatrix={headers:this.ROLE_HEADERS, rows:this.ROLE_ROWS.map(r=>({label:r[0],cells:r.slice(1).map(v=>this.cell(v))}))};
+
+    // KPIs
+    const totalOrgs=this.flatten(home,0).length-1;
+    const totalUsers=visibleUsers.length;
+    const kpis=[
+      {icon:this.ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:18,c:'#5514B4'}), value:String(totalOrgs), label:this.isBt()?'Reseller organisations':'Downstream organisations', sub:this.isBt()?'Across the platform':'Sub-resellers, child & dealers'},
+      {icon:this.ic(['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87'],{s:18,c:'#5514B4'}), value:String(totalUsers), label:'Users', sub:'In your network'},
+      {icon:this.ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18,c:'#5514B4'}), value:String(this.ROLES.length), label:'Assignable roles', sub:'Role-based access'},
+      {icon:this.ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:18,c:'#5514B4'}), value:String(this.ENT.length), label:'Entitlements', sub:'Products & services'},
+    ];
+
+    const createLabel=this.isBt()?'Create reseller':'Create sub-reseller';
+    const mkAction=(kind)=>{ const isOrg=kind==='org'; const label=isOrg?createLabel:'Invite user';
+      const hint=isOrg?(this.isBt()?'Delegate access to a new reseller':'Delegate access to a downstream org'):'Add a team member & assign a role';
+      const onClick=isOrg?()=>this.openOrgWizard():()=>this.openUserWizard();
+      return { label, hint, onClick,
+        iconBg:admin?'#F3EBFE':'#EDEDED', iconFg:admin?'#5514B4':'#AAAAAA',
+        trail:admin?this.ic('m9 18 6-6-6-6',{s:18,c:'#AAAAAA'}):this.lockEl('#AAAAAA'),
+        rowStyle:'display:flex;align-items:center;gap:12px;width:100%;border-radius:12px;padding:13px 14px;margin-bottom:10px;text-align:left;border:1px solid #E3E3E3;'+(admin?'background:#fff;cursor:pointer':'background:#F7F7F7;cursor:not-allowed'),
+        cta:'display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 18px;font-weight:700;font-size:14px;white-space:nowrap;'+(admin?'background:#5514B4;color:#fff;cursor:pointer':'background:#EDEDED;color:#AAAAAA;cursor:not-allowed'),
+        ctaIcon:admin?this.ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):this.lockEl('#AAAAAA'),
+      }; };
+
+    const banner={ name:P.name, desc:P.desc, can:P.can, cannot:P.cannot,
+      iconStyle:'width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;background:'+P.accent };
+    const identity={ name:P.person.name, meta:P.person.meta, avatar:P.person.avatar,
+      avatarStyle:'width:38px;height:38px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;color:#fff;background:'+P.accent };
+
+    const out={
+      nav:{overview:this.navItem('overview','Overview'),orgs:this.navItem('orgs','Organisations'),users:this.navItem('users','Users'),roles:this.navItem('roles','Roles')},
+      personaBtns:{bt:this.personaBtn('bt',S.persona),reseller:this.personaBtn('reseller',S.persona),user:this.personaBtn('user',S.persona)},
+      identity, banner,
+      screenEyebrow:P.crumb,
+      screenTitle:{overview:P.title,orgs:'Organisations',users:'Users',roles:'Roles & permissions'}[S.screen],
+      isOverview:S.screen==='overview', isOrgs:S.screen==='orgs', isUsers:S.screen==='users', isRoles:S.screen==='roles',
+      kpis, miniTree:tree, tree, orgDetail, userRows, personaCards, profileMatrix, roleMatrix,
+      createOrgBtn:mkAction('org'), inviteBtn:mkAction('user'),
+      dismissToast:()=>this.dismissToast(),
+      toastOpen:!!S.toast,
+      toast:S.toast?{ msg:S.toast.msg,
+        iconStyle:'width:34px;height:34px;border-radius:999px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(S.toast.kind==='success'?'#357E3C':S.toast.kind==='error'?'#DA020F':'#5514B4'),
+        icon:S.toast.kind==='success'?this.ic('M20 6 9 17l-5-5',{s:18,c:'#fff',w:2.6}):S.toast.kind==='error'?this.lockEl('#fff'):this.ic(['M12 16v-4','M12 8h.01'],{s:18,c:'#fff'}) }:null,
+    };
+    Object.assign(out,this.orgWizVals(),this.userWizVals());
+    return out;
+  }
+
+  orgWizVals(){
+    const w=this.state.orgWizard;
+    if(!w) return {orgWizardOpen:false};
+    const parent=this.wizardParent();
+    const typeLabel=this.TYPE_LABELS[w.type];
+    const rowFor=(e)=>{ const held=parent.entitlements.includes(e.key); const allowed=this.typeAllows(w.type,e.key); const locked=!held||!allowed; const checked=!!w.ent[e.key]&&!locked;
+      return { label:e.label, checked, locked, textColor:locked?'#AAAAAA':'#2A2A2A',
+        lockReason: !held?('Not held by '+parent.name):(!allowed?('N/A for '+typeLabel):''),
+        onToggle:()=>{ if(!locked) this.toggleEnt(e.key); },
+        rowStyle:'display:flex;align-items:center;gap:11px;width:100%;padding:12px 14px;border-radius:10px;text-align:left;border:1px solid '+(checked?'#5514B4':'#E3E3E3')+';'+(locked?'background:#F7F7F7;cursor:not-allowed':'background:#fff;cursor:pointer'),
+        boxStyle:'width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;'+(checked?'background:#5514B4;border:1px solid #5514B4':(locked?'background:#EDEDED;border:1px solid #E3E3E3':'background:#fff;border:1.5px solid #C8C8C8')),
+      }; };
+    const granted=this.ENT.filter(e=>w.ent[e.key]);
+    return {
+      orgWizardOpen:true,
+      orgWiz:{
+        close:()=>this.closeOrgWizard(), stop:(e)=>{e.stopPropagation();},
+        title:this.isBt()?'Create reseller organisation':'Create sub-reseller organisation',
+        step:w.step, stepLabel:['Details','Entitlements','Review'][w.step-1], progress:Math.round(w.step/3*100)+'%',
+        s1:w.step===1,s2:w.step===2,s3:w.step===3,
+        name:w.name, email:w.email, onName:(e)=>this.setOrgField('name',e.target.value), onEmail:(e)=>this.setOrgField('email',e.target.value),
+        typeLabel, parentName:parent.name,
+        types:this.childTypeKeys().map(tk=>{ const active=w.type===tk; return {label:this.TYPE_LABELS[tk],desc:this.TYPE_DESC[tk],active,onSelect:()=>this.setOrgType(tk),
+          style:'display:flex;align-items:flex-start;gap:11px;width:100%;padding:13px 14px;border-radius:11px;text-align:left;cursor:pointer;border:1px solid '+(active?'#5514B4':'#E3E3E3')+';background:'+(active?'#FAF6FF':'#fff'),
+          radio:'width:20px;height:20px;border-radius:999px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;'+(active?'background:#5514B4;border:1px solid #5514B4':'background:#fff;border:1.5px solid #C8C8C8')}; }),
+        productRows:this.ENT.filter(e=>e.kind==='product').map(rowFor),
+        serviceRows:this.ENT.filter(e=>e.kind==='service').map(rowFor),
+        grantCount:granted.length, noGrants:granted.length===0, summaryChips:granted.map(e=>e.label),
+        back:()=>this.orgBack(), backStyle:'background:#fff;border:1px solid #C8C8C8;border-radius:999px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;'+(w.step===1?'visibility:hidden':''),
+        next:()=>this.orgNext(), nextLabel:w.step===3?'Create organisation':'Continue',
+        nextStyle:'display:inline-flex;align-items:center;gap:8px;background:#5514B4;color:#fff;border:0;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer',
+      },
+    };
+  }
+
+  userWizVals(){
+    const w=this.state.userWizard;
+    if(!w) return {userWizardOpen:false};
+    const role=this.ROLES.find(r=>r.key===w.role)||this.ROLES[0];
+    const org=this.orgById(w.orgId);
+    return {
+      userWizardOpen:true,
+      userWiz:{
+        close:()=>this.closeUserWizard(), stop:(e)=>{e.stopPropagation();},
+        step:w.step, stepLabel:['Details','Role','Review'][w.step-1], progress:Math.round(w.step/3*100)+'%',
+        s1:w.step===1,s2:w.step===2,s3:w.step===3,
+        name:w.name||'', email:w.email||'', orgId:w.orgId,
+        onName:(e)=>this.setUserField('name',e.target.value), onEmail:(e)=>this.setUserField('email',e.target.value), onOrg:(e)=>this.setUserField('orgId',e.target.value),
+        orgOptions:this.userOrgOptions().map(o=>({id:o.id,label:o.name+' \u00b7 '+this.TYPE_LABELS[o.typeKey]})),
+        roleOptions:this.ROLES.map(r=>{ const active=w.role===r.key; return {name:r.label,desc:r.desc,active,onSelect:()=>this.setUserField('role',r.key),
+          style:'display:flex;align-items:flex-start;gap:11px;width:100%;padding:12px 13px;border-radius:11px;text-align:left;cursor:pointer;border:1px solid '+(active?'#5514B4':'#E3E3E3')+';background:'+(active?'#FAF6FF':'#fff'),
+          radio:'width:19px;height:19px;border-radius:999px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;'+(active?'background:#5514B4;border:1px solid #5514B4':'background:#fff;border:1.5px solid #C8C8C8')}; }),
+        roleName:role.label, previewPerms:role.grants,
+        name2:w.name, initials:this.initials(w.name||'New user'), email2:w.email, orgName:org?org.name:'\u2014',
+        avatarStyle:'width:52px;height:52px;border-radius:999px;background:#F3EBFE;color:#5514B4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0',
+        back:()=>this.userBack(), backStyle:'background:#fff;border:1px solid #C8C8C8;border-radius:999px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;'+(w.step===1?'visibility:hidden':''),
+        next:()=>this.userNext(), nextLabel:w.step===3?'Send invitation':'Continue',
+        nextStyle:'display:inline-flex;align-items:center;gap:8px;background:#5514B4;color:#fff;border:0;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer',
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>
