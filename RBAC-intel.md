@@ -489,3 +489,308 @@ Granular capabilities assigned per user in MyAdmin CUG:
 
 Business Zone has a clear **two-tier access delegation model**: BT Wholesale controls what a CP can do (via CUG/MyAdmin role assignment). The CP then controls what their end-customer admins can do (via the Config only vs Config & Reg toggle). This directly mirrors the RBAC hierarchy in Nexus — the prototype's BT Wholesale Admin → Reseller Admin → Standard User model maps cleanly to this legacy structure.
 - **WHC Product Demo / BZ Order Journey** — full new order walkthrough for DV4B parity exercise
+
+---
+
+## 16. User Management Experience Map — Detailed Journey (Hub As-Is)
+
+Source: Artifact `daa72772-50fb-403a-8876-6c0127169e6e` — "RBAC Experience Map — Nexus First Pass" (15 July 2026). Based on: Hub walkthrough Vijitha KM (24 Jun) · Deepa Packirisamy (15 Jul) · Paul Enright hierarchy session (8 Jun).
+
+This section captures the step-by-step detail per persona and phase that goes beyond the high-level summary in Section 8.
+
+---
+
+### Phase 1 — Onboarding
+
+**BT Wholesale Admin:**
+- Provisions new reseller account (tenant) in Hub backend
+- Establishes primary contact — this person becomes the first Company Admin with Admin User status
+- System: Hub / Partner Plus backend provisioning
+- **Gap:** Full onboarding process (CRF → establishment → training) lives separately from the portal — Deepa has a swim lane diagram of the end-to-end
+- **Gap:** How BT controls which products and capabilities are available to a reseller org (org-level vs user-level) — not yet defined
+- **Gap:** How the 4 org tiers (Direct / Child / Sub / Dealer) affect available permissions — subtraction logic not yet designed
+
+**Company Admin:**
+- Established as primary contact by BT during account onboarding
+- Receives Hub credentials, logs in for the first time
+- **Insight:** Primary contact = default Admin User. Multiple users can hold Admin User status on the same account, but only one is the primary contact — primary contact cannot self-remove
+
+**Open questions — Phase 1:**
+- What does the customer establishment journey look like in the strategic Nexus portal? Currently a 12-day, 23-system CRF process — scope for v1 not confirmed
+- Is the Company Admin set up by BT, or does the reseller self-register? Not documented.
+
+---
+
+### Phase 2 — Add a User
+
+**Company Admin:**
+- Navigation path: User icon (top right) → Account Management → Manage Users tab
+- Clicks "+ Add User" — right-side drawer panel slides in
+- Fields: First name · Last name · Company email (becomes login username) · Phone number (required for fault raising) · Profile type · Permission checkboxes
+- Clicks Save → registration email sent automatically to the new user's email
+- System: Hub · Account Management · `/s/hub/account-management`
+- **Insight:** Company email must be "registered with this account" and becomes the user's login username
+- **Pain point:** Test environment showed many duplicate and orphaned test users — no apparent guard against adding the same email twice
+
+**Regular User (receiving the invite):**
+- Receives registration email at the address entered by Company Admin
+- Clicks register link in email → taken to password set page
+- Sets own password → account becomes active
+- System: Registration email · Password set page · SAF (BT authentication layer)
+- **Insight:** User is in "Pending invite" state (info icon in list) until email registration is completed — visible to Company Admin throughout
+
+**Open questions — Phase 2:**
+- "Email must be registered with this account" — what does pre-registration mean for a brand new user with no existing Hub presence?
+- Full invite email design and password-set page UX not documented — registration flow for Nexus needs defining
+
+---
+
+### Phase 3 — Set Permissions
+
+**Company Admin:**
+- Selects user from list → clicks "Set permissions ›" in the detail panel (available at any time)
+- Sets permission checkboxes independently: Billing / Ordering / Raising faults / No permissions needed
+- Optional: enables "Service Now Tools" (nested under Raising faults) — grants unmoderated access to ServiceNow portal. Helper text explicitly warns of this.
+- **Insight:** Permissions can be changed at any time — not locked after initial setup
+- **Insight:** Admin Users: only "Set permissions" shown in detail panel (no Deactivate or Remove for self). Regular users: Set permissions + Deactivate + Remove all visible.
+
+**Regular User:**
+- Views own permissions as coloured chips in "Your profile" panel — Billing / Ordering / Raising faults displayed as tags
+- Read-only: users can see their own permissions but cannot change them
+- System: Hub · Your profile · `/s/your-profile`
+
+**Open questions — Phase 3:**
+- Permission model for Nexus — new design or inherit Hub's 4 checkboxes? No decision yet (Deepa, 15 Jul)
+- User roles not yet named or defined — Hub has only Admin User / Regular User. Is that sufficient for Nexus?
+- How org-type tier (Direct / Child / Sub / Dealer) restricts available permissions — the subtraction logic is the core RBAC design problem, not yet tackled
+
+---
+
+### Phase 4 — Day-to-Day Access
+
+**Company Admin:**
+- Monitors user list — search-and-detail panel layout (left column list, right detail panel)
+- Resends invite for users still showing as pending (info icon in user list)
+- System: Hub · Manage Users
+- **Pain point:** No bulk user management — all actions are one user at a time
+
+**Regular User:**
+- Logs into Hub → accesses My apps from user icon dropdown
+- Apps surfaced by permissions: WHC Business Portal · Reporting · Raise a fault · Mobile Manager · Learning · Events
+- Places orders (Ordering permission) · raises faults (Raising faults) · views billing (Billing)
+- System: Hub My apps · WHC Business Portal (VEL via SSO) · ServiceNow · Reporting
+- **Pain point:** VEL (WHC Business Portal) accessed via SSO from Hub only — resellers lost direct VEL access ~2 years ago and must route through Hub each session
+- **Gap:** Whether My apps visibility is driven by user permissions or by products enabled at org level — not confirmed
+- **Gap:** RL2C access for Direct and Child Resellers — confirmed unknown (Paul Enright capability table)
+- **Gap:** Group CLI access for Direct and Child Resellers — confirmed unknown
+- **Gap:** FMS and Empirix access rules for lower tiers — Empirix shows end-customer usage data; scope of access per tier not confirmed
+
+---
+
+### Phase 5 — User Lifecycle
+
+**BT Wholesale Admin:**
+- Required to action primary contact changes on an account — not self-service for resellers
+- **Gap:** Primary contact change process not documented — who initiates, what's the SLA?
+
+**Company Admin:**
+- **Deactivate:** Reversible. User moves to deactivated users page (`/s/deactivated-users`). Reactivate link appears there.
+- **Remove:** Permanent disassociation from account. To re-add: must contact account manager — not self-service.
+- **Pain point:** Remove is a self-service irreversible action — the confirmation modal warns of this, but the asymmetry (easy to remove, hard to undo) is a significant design risk worth addressing in Nexus
+- **Insight:** Cannot deactivate or remove own account via UI — those action links are hidden for self
+
+**Regular User:**
+- Deactivated: loses access immediately. Remains in system under deactivated users — can be reactivated by Company Admin.
+- Removed: disassociated from tenant entirely. Orders, invoices, audit logs remain on the account — data is not deleted.
+- **Insight:** Account = tenant. Removing a user severs only the association — historical transactions and audit trail are preserved against the account
+
+**Open questions — Phase 5:**
+- Primary contact change process — who initiates, what's the SLA, is there a self-serve path in Nexus?
+- Should Remove remain non-self-service in Nexus? The current "contact account manager to re-add" model is a clear friction point worth redesigning — could Nexus offer a 30-day soft-delete / restore window instead?
+
+---
+
+## 17. Product Requirements Document (PRD)
+
+**Source:** `/Documents/BT Nexus/PRD/Nexus_Product_Requirements_Document.pdf` — 65 pages, "General" classification. No version or date stamped (placeholders `<date>` and `<issue>` unfilled — draft status confirmed).
+
+**Last read into intel:** 2026-07-23
+
+---
+
+### 17.1 Programme Summary
+
+> "Project Nexus will build a unified digital portal via an API-first platform for BT Wholesale partners, providing a single, coherent way to onboard, buy, manage and support strategic products."
+
+**Success metrics (PRD-defined):**
+- NPS: +12 → +33 (+20 points)
+- 90% of strategic product adds within 24 months of launch
+- 40% faster time-to-market for new products
+- 20% cost-to-serve reduction
+- 99.9% portal and API uptime
+
+**API-first principle (verbatim):** "No business capability exists in the UI without it being driven by an API. Any API could be externalised at any time. We will use the same APIs as our customers."
+
+---
+
+### 17.2 In-Scope User Personas (PRD table)
+
+| Persona | Org | Primary need |
+|---|---|---|
+| Reseller Admin | Wholesale Partner | Manage users/roles, onboard sub-resellers, full portal access |
+| Reseller User | Wholesale Partner | Place/track orders, manage services, raise faults, diagnostics |
+| Sub-Reseller Admin | Sub-Reseller | Manage own users, delegated admin, no commercial data (pricing/billing) |
+| Sub-Reseller User | Sub-Reseller | Orders (if enabled), fault/appointment tracking, limited visibility |
+| Internal BT Service Admin | BT Internal | Customer onboarding, account management, create Reseller Admin users |
+| Internal BT User (AM/Support) | BT Internal | View/monitor orders and faults; assisted journeys via same portal APIs |
+| API Consumer (Partner Dev) | Wholesale Partner | System-to-system API integration; sandbox + production |
+
+**Key design note:** Sub-Reseller Admin explicitly has no commercial data access (pricing, billing) — this must be enforced via RBAC, not just hidden in UI.
+
+---
+
+### 17.3 Organisation Hierarchy (PRD model)
+
+PRD describes a 3-tier hierarchy explicitly:
+```
+BT Wholesale
+└── Reseller (Organisation)
+    ├── Users
+    ├── Products
+    ├── Orders / Services
+    └── Sub-Reseller (Organisation)
+        ├── Users
+        ├── Products
+        └── Orders / Services
+```
+
+**Key PRD rules for hierarchy:**
+- Sub-reseller inherits constraints from parent reseller (product eligibility, governance policies)
+- Sub-reseller cannot exceed parent permissions
+- Sub-reseller admin access restricted to own org and downstream only
+- Parent reseller can have configurable visibility/control over sub-reseller
+- Billing: parent billed by default; independent billing is configurable
+- BT Internal users cannot register or onboard a new organisation — only manage existing ones
+
+---
+
+### 17.4 Identity & Authentication (PRD Section 9)
+
+**SSO is the single authentication model** — partner, sub-reseller, and BT internal users all sign in once and access all authorised portals, journeys, and APIs without re-logging.
+
+**Salesforce RBAC** confirmed as the chosen identity platform (see project memory — decided 2026-07-21). PRD notes: "Wholesale identity is NOT finalised — This impacts access, integrations, and user experience across everything. (MFA and wholesale identity strategy)" — this is an **open blocker** explicitly called out in the PRD.
+
+---
+
+### 17.5 RBAC Model (PRD Sections 10–12)
+
+**Three-layer RBAC model:**
+1. **Permission Sets** — granular capabilities selected from a predefined catalogue (e.g. Order Create, Fault Raise, Billing View). Grouped by capability, versioned, auditable.
+2. **Roles** — named combinations of one or more permission sets. Roles cannot exceed organisational entitlement.
+3. **Users** — assigned one or more roles. Role changes take effect immediately/near-real-time with no re-authentication.
+
+**RBAC Enforcement rules (PRD):**
+- Enforced consistently across portal UI, APIs, and backend services
+- Same rules apply to assisted journeys (BT internal acting on behalf of partner) — internal users cannot bypass permissions
+- All role/permission changes are audit-logged: who, what, when, outcome
+- Unauthorised actions are blocked with a clear message
+
+**Permission catalogue examples (PRD):** Order Create, Fault Raise, Billing View — grouped by capability. Full catalogue not specified in PRD; to be defined in detailed design.
+
+**Open PRD question (verbatim):** "Do we need audit logs and access to them (screens or backend logs)?" — not yet resolved.
+
+---
+
+### 17.6 User Onboarding Flow (PRD Sections 4–8)
+
+**Reseller establishment (BT Admin-initiated):**
+- BT Admin creates organisation → unique org record created → downstream systems auto-provisioned (Identity, CUG, billing references)
+- Multiple admin users can be created per org
+- Admin roles can be scoped by: Product (DV4B, BBone) AND Journey (Order, Service Mgmt, Billing)
+- RBAC controls access to features, data, and journeys from day one
+
+**Sub-Reseller establishment (BT Admin-initiated):**
+- Sub-reseller linked to parent reseller; inherits parent constraints
+- Products/journeys enabled for sub-reseller must be equal to or subset of parent reseller's capabilities
+- This constraint enforced across UI, APIs, and backend validation
+
+**User self-serve onboarding (Reseller Admin-initiated):**
+- Admin sends invitation email with registration link (expiry + resend supported)
+- If user already exists in identity system, access linked (no duplicate identity created)
+- Admin can: update roles, force password reset, disable access, remove access
+- When access revoked: active sessions terminated AND API access revoked immediately
+
+**BT Internal Users:**
+- Authenticate via SSO
+- Must explicitly select an organisation context before acting
+- Access limited to organisations within their authorised scope
+- All actions audit-logged with actor type (BT internal), org context, assisted flag
+
+---
+
+### 17.7 Product Enablement (PRD)
+
+- BT Admin onboards strategic products (Broadband, Digital Voice) per org
+- Product onboarding validates: pricing model configured, commercial agreement in place, prerequisites met
+- Status tracked: Pending → In progress → Completed / Failed
+- On success: relevant journeys/APIs enabled, product visible in portal
+- API access is enabled based on product access AND role-based permissions (both must be true)
+- All product enablement changes are audit-logged
+- Sub-reseller product access must be equal to or a subset of parent reseller's enabled products — enforced everywhere
+
+---
+
+### 17.8 Supported Journeys (RBAC-relevant)
+
+RBAC enforcement is called out explicitly in these journey areas:
+
+| Journey | RBAC note |
+|---|---|
+| Organisation Hierarchy | Users can only view orgs within permitted hierarchy scope |
+| Equipment/CPE ordering | Enabled for Reseller and Child Reseller; disabled for Sub-Reseller and Dealer |
+| CPE remote operations | Governed by RBAC permissions |
+| Billing | Role-based access enforced for all billing data; no direct billing calculation in portal |
+| Service management | Modify permissions required; same APIs apply to assisted journeys |
+| Fault management | Assisted faults clearly marked; all actions audit-logged |
+| Inventory views | All restricted based on RBAC and hierarchy scope |
+| Briefings | RBAC-controlled briefing repository |
+
+**Final PRD note (verbatim, page 65):**
+> "All platform actions and data access are governed by role-based permissions. Access is restricted based on: User role, Organisation hierarchy (reseller, sub-reseller, customer), Product and journey entitlements. RBAC enforcement applies consistently across: Portal (UI), APIs, Backend services. Users can only perform actions and view data within their authorised scope."
+
+---
+
+### 17.9 Non-Functional Requirements (RBAC-adjacent)
+
+**Audit requirements:**
+- Full audit trail: who, what, when, outcome (including previous and new values)
+- Covers: orders, faults, billing interactions, API access, organisation/access changes
+- Assisted journey actions separately flagged (actor type, org context, assisted flag)
+- Audit records are immutable, searchable, filterable, accessible only to authorised roles
+
+**Security:**
+- All interactions comply with BT security guidelines
+- Rate limits per API and consumer
+- Data encrypted in transit and at rest
+- Sensitive data masked/redacted in logs
+
+---
+
+### 17.10 DV4B Scope (Product context for prototype)
+
+DV4B is Priority 1. Portal must support:
+- Licence tiers: Essential, Enhanced, Extra — selectable at company level
+- Hierarchy: Organisation → Site → User → Service
+- Bulk user/service upload via spreadsheet
+- Async order processing with status tracking
+- Number selection per site/location
+- CPE/equipment ordering → zero-touch provisioning
+- Lifecycle: add, modify, cease at org/site/user/service level
+- Policy controls: call restrictions, usage limits
+
+**Org types and equipment ordering (PRD table):**
+- Reseller: YES
+- Child Reseller: YES
+- Sub-Reseller: NO
+- Dealer: NO
+- Enforced via RBAC + organisation type (both UI hidden + backend validation)
