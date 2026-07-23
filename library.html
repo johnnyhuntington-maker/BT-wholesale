@@ -807,6 +807,7 @@
     });
     // Show/hide section labels based on whether they have any visible items
     document.querySelectorAll('.section-label').forEach(label => {
+      if (label.id === 'contrib-section-label') return;
       let sibling = label.nextElementSibling;
       let hasVisible = false;
       while (sibling && !sibling.classList.contains('section-label')) {
@@ -817,6 +818,11 @@
       }
       label.style.display = hasVisible ? '' : 'none';
     });
+    // Team contributions section only shows when All is selected
+    const cl = document.getElementById('contrib-section-label');
+    const li = document.getElementById('contrib-list');
+    if (cl) cl.style.display = type === 'All' ? '' : 'none';
+    if (li) li.style.display = type === 'All' ? '' : 'none';
   }
 
   /* ─── Copy helpers ─── */
@@ -1137,45 +1143,39 @@
   }
   async function confirmDelete(num) {
     const card = document.getElementById('contrib-' + num);
-    card.style.opacity = '0.5';
-    card.style.pointerEvents = 'none';
+    const paths = (card.dataset.paths || '').split(',').filter(Boolean);
+    /* optimistic removal — remove from DOM immediately */
+    card.remove();
+    if (!document.querySelector('.contrib-card')) {
+      document.getElementById('contrib-list').innerHTML =
+        '<div class="contrib-empty">No pending contributions yet — be the first to submit.</div>';
+    }
+    /* then clean up GitHub in the background */
     try {
-      /* delete any attached files from GitHub */
-      const paths = (card.dataset.paths || '').split(',').filter(Boolean);
       for (const path of paths) {
         const fileRes = await fetch(`${GH_BASE}/repos/${GH_REPO}/contents/${path}`, {
           headers: ghHeaders(true)
         });
         if (fileRes.ok) {
-          const fileData = await fileRes.json();
+          const { sha } = await fileRes.json();
           await fetch(`${GH_BASE}/repos/${GH_REPO}/contents/${path}`, {
             method: 'DELETE',
             headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: `Remove contribution file: ${path}`, sha: fileData.sha })
+            body: JSON.stringify({ message: `Remove contribution: ${path}`, sha })
           });
         }
       }
-      /* close the GitHub issue */
       const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/issues/${num}`, {
         method: 'PATCH',
         headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
         body: JSON.stringify({ state: 'closed' })
       });
       if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`GitHub ${res.status}: ${errText}`);
-      }
-      card.remove();
-      if (!document.querySelector('.contrib-card')) {
-        document.getElementById('contrib-list').innerHTML =
-          '<div class="contrib-empty">No pending contributions yet — be the first to submit.</div>';
+        const txt = await res.text();
+        console.error(`Could not close GitHub issue #${num}: ${res.status} ${txt}`);
       }
     } catch (err) {
-      console.error('Delete failed:', err);
-      card.style.opacity = '';
-      card.style.pointerEvents = '';
-      cancelDelete(num);
-      alert('Could not delete: ' + err.message);
+      console.error('GitHub cleanup failed:', err);
     }
   }
 
