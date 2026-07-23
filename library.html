@@ -399,6 +399,17 @@
   .contrib-loading, .contrib-empty {
     font-size: 13px; color: var(--ink-3); padding: 12px 4px; font-style: italic;
   }
+  .btn-danger {
+    background: #FEE2E2; color: #991B1B; border-color: #FECACA;
+  }
+  .btn-danger:hover { background: #FCA5A5; border-color: #F87171; color: #7F1D1D; }
+  .contrib-confirm {
+    margin-top: 10px; padding: 10px 12px;
+    background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .contrib-confirm-text { font-size: 12.5px; color: #7F1D1D; flex: 1; line-height: 1.4; }
+  .contrib-confirm-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
   .empty-note {
     font-size: 13px;
@@ -1009,28 +1020,73 @@
         const intel    = parseMultiField(issue.body || '', 'What I know');
         const preview  = intel.length > 120 ? intel.slice(0, 120) + '…' : intel;
         return `
-          <div class="contrib-card">
+          <div class="contrib-card" id="contrib-${issue.number}">
             <div class="contrib-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </div>
-            <div class="contrib-body">
+            <div class="contrib-body" style="flex:1;min-width:0;">
               <div class="contrib-top">
                 <span class="category-chip">${cat}</span>
               </div>
               <div class="contrib-title">${issue.title.replace(/^\[.*?\]\s*/, '')}</div>
               ${preview ? `<div class="item-desc" style="white-space:normal;margin-top:4px;">${preview}</div>` : ''}
               <div class="contrib-meta">Submitted by ${who}${date ? ' · ' + date : ''}</div>
+              <div class="contrib-confirm" id="confirm-${issue.number}" style="display:none;">
+                <span class="contrib-confirm-text">This will permanently remove the contribution from the review queue. Are you sure?</span>
+                <div class="contrib-confirm-actions">
+                  <button class="btn" onclick="cancelDelete(${issue.number})">Keep it</button>
+                  <button class="btn btn-danger" onclick="confirmDelete(${issue.number})">Yes, delete</button>
+                </div>
+              </div>
             </div>
-            <div class="contrib-actions">
+            <div class="contrib-actions" style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
               <a class="btn btn-open" href="${issue.html_url}" target="_blank">
                 Review
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </a>
+              <button class="btn" style="color:var(--ink-3);" onclick="promptDelete(${issue.number})" title="Delete contribution">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Delete
+              </button>
             </div>
           </div>`;
       }).join('');
     } catch (err) {
       list.innerHTML = '<div class="contrib-empty">Could not load contributions right now.</div>';
+    }
+  }
+
+  /* ─── Delete contribution ─── */
+  function promptDelete(num) {
+    document.getElementById('confirm-' + num).style.display = 'flex';
+    document.getElementById('contrib-' + num).style.borderColor = '#FECACA';
+  }
+  function cancelDelete(num) {
+    document.getElementById('confirm-' + num).style.display = 'none';
+    document.getElementById('contrib-' + num).style.borderColor = '';
+  }
+  async function confirmDelete(num) {
+    const card = document.getElementById('contrib-' + num);
+    card.style.opacity = '0.5';
+    card.style.pointerEvents = 'none';
+    try {
+      const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/issues/${num}`, {
+        method: 'PATCH',
+        headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: 'closed' })
+      });
+      if (!res.ok) throw new Error(res.status);
+      card.remove();
+      /* show empty state if no cards left */
+      if (!document.querySelector('.contrib-card')) {
+        document.getElementById('contrib-list').innerHTML =
+          '<div class="contrib-empty">No pending contributions yet — be the first to submit.</div>';
+      }
+    } catch (err) {
+      card.style.opacity = '';
+      card.style.pointerEvents = '';
+      cancelDelete(num);
+      alert('Could not delete. Please try again.');
     }
   }
 
