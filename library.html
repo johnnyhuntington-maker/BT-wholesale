@@ -327,6 +327,49 @@
   }
   .success-link:hover { border-color: var(--accent); }
 
+  /* File upload zone */
+  .file-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--ground);
+    position: relative;
+  }
+  .file-zone:hover, .file-zone.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .file-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .file-zone-icon { color: var(--ink-3); margin-bottom: 6px; }
+  .file-zone-label { font-size: 13px; color: var(--ink-2); font-weight: 600; }
+  .file-zone-sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+  .file-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .file-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; padding: 7px 10px;
+    font-size: 12px;
+  }
+  .file-item-name { flex: 1; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-item-size { color: var(--ink-3); flex-shrink: 0; }
+  .file-item-remove {
+    width: 20px; height: 20px; border-radius: 4px; border: none;
+    background: none; cursor: pointer; color: var(--ink-3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; padding: 0;
+    transition: color 0.1s;
+  }
+  .file-item-remove:hover { color: #dc2626; }
+  .file-item-status { font-size: 10.5px; color: var(--ink-3); flex-shrink: 0; }
+  .file-item-status.uploading { color: var(--accent); }
+  .file-item-status.done { color: #166534; }
+  .file-item-status.error { color: #dc2626; }
+
   /* Contribution cards */
   .contrib-card {
     background: var(--surface);
@@ -649,7 +692,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="field-name">Your name</label>
-            <input class="form-input" id="field-name" type="text" placeholder="e.g. Vanmathi K" required />
+            <input class="form-input" id="field-name" type="text" placeholder="e.g. John Smith" required />
           </div>
           <div class="form-group">
             <label class="form-label" for="field-category">Category</label>
@@ -667,17 +710,24 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="field-intel">What you know <span>(be as specific as possible)</span></label>
-          <textarea class="form-textarea" id="field-intel" placeholder="Describe what you know or have heard — decisions made, constraints, facts from meetings, etc." required></textarea>
+          <label class="form-label" for="field-intel">Description <span>(be as specific as possible)</span></label>
+          <textarea class="form-textarea" id="field-intel" placeholder="Add a description of your latest intel." required></textarea>
         </div>
         <div class="form-group">
           <label class="form-label" for="field-source">Source <span>(where did you learn this?)</span></label>
           <input class="form-input" id="field-source" type="text" placeholder="e.g. Slack conversation with Neil, 22 Jul · Vanmathi's email · Sprint review" />
         </div>
         <div class="form-group">
-          <label class="form-label" for="field-docs">Supporting documents <span>(optional)</span></label>
-          <textarea class="form-textarea" id="field-docs" placeholder="Describe any files you want to attach. After submitting, you'll get a link to upload them directly to the review item." style="min-height:60px;"></textarea>
-          <div class="form-hint">Files are attached after submission via drag-and-drop on the GitHub review page.</div>
+          <label class="form-label">Attach files <span>(optional)</span></label>
+          <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <input type="file" id="file-input" multiple onchange="handleFileSelect(event)" style="display:none" />
+            <div class="file-zone-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="file-zone-label">Drop files here or click to browse</div>
+            <div class="file-zone-sub">PDFs, Word docs, images, spreadsheets — any format</div>
+          </div>
+          <div class="file-list" id="file-list"></div>
         </div>
       </form>
     </div>
@@ -751,6 +801,94 @@
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeContributeModal(); });
 
+  /* ─── File handling ─── */
+  let selectedFiles = [];
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('file-zone').classList.add('drag-over');
+  }
+  function handleDragLeave(e) {
+    document.getElementById('file-zone').classList.remove('drag-over');
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('file-zone').classList.remove('drag-over');
+    addFiles(Array.from(e.dataTransfer.files));
+  }
+  function handleFileSelect(e) {
+    addFiles(Array.from(e.target.files));
+    e.target.value = '';
+  }
+  function addFiles(files) {
+    files.forEach(f => {
+      if (!selectedFiles.find(x => x.name === f.name && x.size === f.size)) {
+        selectedFiles.push(f);
+      }
+    });
+    renderFileList();
+  }
+  function removeFile(idx) {
+    selectedFiles.splice(idx, 1);
+    renderFileList();
+  }
+  function fmtSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function renderFileList(statuses) {
+    const list = document.getElementById('file-list');
+    if (!selectedFiles.length) { list.innerHTML = ''; return; }
+    list.innerHTML = selectedFiles.map((f, i) => {
+      const st = statuses && statuses[i];
+      const statusHtml = st
+        ? `<span class="file-item-status ${st.cls}">${st.label}</span>`
+        : `<button class="file-item-remove" type="button" onclick="removeFile(${i})" aria-label="Remove">
+             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+           </button>`;
+      return `<div class="file-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ink-3)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="file-item-name">${f.name}</span>
+        <span class="file-item-size">${fmtSize(f.size)}</span>
+        ${statusHtml}
+      </div>`;
+    }).join('');
+  }
+
+  function fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result.split(',')[1]);
+      reader.onerror = rej;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadFile(file, ts, statusArr, idx) {
+    statusArr[idx] = { cls: 'uploading', label: 'Uploading…' };
+    renderFileList(statusArr);
+    const slug = `${ts}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const path = `contributions/${slug}`;
+    try {
+      const content = await fileToBase64(file);
+      const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `Add contribution file: ${file.name}`, content })
+      });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      statusArr[idx] = { cls: 'done', label: 'Uploaded' };
+      renderFileList(statusArr);
+      return data.content.html_url;
+    } catch (err) {
+      statusArr[idx] = { cls: 'error', label: 'Failed' };
+      renderFileList(statusArr);
+      return null;
+    }
+  }
+
   /* ─── Submit contribution ─── */
   async function submitContribution(e) {
     e.preventDefault();
@@ -758,9 +896,23 @@
     const category = document.getElementById('field-category').value;
     const intel    = document.getElementById('field-intel').value.trim();
     const source   = document.getElementById('field-source').value.trim();
-    const docs     = document.getElementById('field-docs').value.trim();
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
 
     const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const ts = Date.now();
+
+    /* Upload files first */
+    let fileLinks = [];
+    if (selectedFiles.length) {
+      submitBtn.textContent = 'Uploading files…';
+      const statuses = selectedFiles.map(() => null);
+      const urls = await Promise.all(selectedFiles.map((f, i) => uploadFile(f, ts, statuses, i)));
+      fileLinks = urls.filter(Boolean);
+    }
+
     const summary = intel.length > 60 ? intel.slice(0, 60) + '…' : intel;
     const title = `[${category}] ${summary}`;
 
@@ -769,17 +921,15 @@
       `**Submitted by:** ${name}`,
       `**Date:** ${today}`,
       '',
-      '**What I know:**',
+      '**Description:**',
       intel,
       '',
       source ? `**Source:**\n${source}` : null,
       '',
-      docs ? `**Supporting documents:**\n${docs}` : null,
+      fileLinks.length ? `**Attached files:**\n${fileLinks.map(u => `- [${u.split('/').pop()}](${u})`).join('\n')}` : null,
     ].filter(l => l !== null).join('\n');
 
-    const submitBtn = document.getElementById('submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting…';
+    submitBtn.textContent = 'Creating review item…';
 
     try {
       const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/issues`, {
@@ -820,6 +970,8 @@
   function resetForm() {
     const f = document.getElementById('contrib-form');
     if (f) f.reset();
+    selectedFiles = [];
+    renderFileList();
     const submitBtn = document.getElementById('submit-btn');
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit contribution'; }
   }
