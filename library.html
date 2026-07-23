@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BT Nexus RBAC — Project Library</title>
+<style>
+  :root {
+    --ground: #F5F4F9;
+    --surface: #FFFFFF;
+    --ink: #1A1525;
+    --ink-2: #6B6080;
+    --ink-3: #9B93B0;
+    --accent: #5514B4;
+    --accent-soft: #EDE6FA;
+    --border: #E2DDF0;
+    --border-hover: #C4B8E8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #120E1C; --surface: #1E1830; --ink: #EEE9FA;
+      --ink-2: #9B93B0; --ink-3: #5E5675;
+      --accent: #9B6DFF; --accent-soft: #2A1F4A;
+      --border: #2E2844; --border-hover: #4A3D6E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #120E1C; --surface: #1E1830; --ink: #EEE9FA;
+    --ink-2: #9B93B0; --ink-3: #5E5675;
+    --accent: #9B6DFF; --accent-soft: #2A1F4A;
+    --border: #2E2844; --border-hover: #4A3D6E;
+  }
+  :root[data-theme="light"] {
+    --ground: #F5F4F9; --surface: #FFFFFF; --ink: #1A1525;
+    --ink-2: #6B6080; --ink-3: #9B93B0;
+    --accent: #5514B4; --accent-soft: #EDE6FA;
+    --border: #E2DDF0; --border-hover: #C4B8E8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+  }
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo svg { display: block; }
+  .header-text { display: flex; flex-direction: column; gap: 2px; }
+  .header-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    font-weight: normal;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  main {
+    flex: 1;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 4px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .item:hover { border-color: var(--border-hover); }
+
+  .item-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+
+  .item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .item-top { display: flex; align-items: center; gap: 8px; }
+  .item-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-type {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .item-desc {
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--ground);
+    color: var(--ink-2);
+    text-decoration: none;
+    font-family: inherit;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--border-hover); color: var(--ink); }
+  .btn-open {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-open:hover { background: #4410A0; border-color: #4410A0; color: #fff; }
+
+  .copy-btn.copied {
+    color: #166534;
+    border-color: #BBF7D0;
+    background: #DCFCE7;
+  }
+
+  .empty-note {
+    font-size: 13px;
+    color: var(--ink-3);
+    padding: 16px 4px;
+    font-style: italic;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 16px 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 16px; }
+    main { padding: 20px 16px 48px; }
+    .item { flex-wrap: wrap; }
+    .item-actions { width: 100%; justify-content: flex-end; }
+    .item-desc { white-space: normal; }
+    .item-title { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title">BT Nexus RBAC — Project Library</div>
+      <div class="header-sub">Design deliverables for the BA and wider team</div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <div class="section-label">Prototype</div>
+
+  <div class="item">
+    <div class="item-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+      </svg>
+    </div>
+    <div class="item-body">
+      <div class="item-top">
+        <span class="item-title">RBAC Prototype</span>
+        <span class="item-type">Prototype</span>
+      </div>
+      <div class="item-desc">Interactive flows — org hierarchy, role management, permission sets, user onboarding</div>
+    </div>
+    <div class="item-actions">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/wholesale.html" onclick="copyLink(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy link
+      </button>
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/wholesale.html" target="_blank">
+        Open
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:24px">Documents</div>
+
+  <div class="item">
+    <div class="item-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </div>
+    <div class="item-body">
+      <div class="item-top">
+        <span class="item-title">Strategic RBAC — User Stories</span>
+        <span class="item-type">User Stories</span>
+      </div>
+      <div class="item-desc">42 stories across 7 epics, filterable by MoSCoW priority and persona. For BA handover.</div>
+    </div>
+    <div class="item-actions">
+      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/0dd2b64b-e349-4ebc-bf15-9083503d2cbc" onclick="copyLink(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy link
+      </button>
+      <a class="btn btn-open" href="https://claude.ai/code/artifact/0dd2b64b-e349-4ebc-bf15-9083503d2cbc" target="_blank">
+        Open
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  BT Nexus · RBAC workstream · Internal design deliverables
+</footer>
+
+<script>
+  function copyLink(btn) {
+    const url = btn.dataset.url;
+    navigator.clipboard.writeText(url).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy link';
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

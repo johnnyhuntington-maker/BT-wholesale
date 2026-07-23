@@ -382,14 +382,37 @@ const TYPE_DESC={
   childReseller:'A reseller with selected restrictions — the broadest downstream role.',
   dealer:'Most restricted. Inherits specific services and your branding only.',
 };
+const PERMISSION_SETS=[
+  {key:'order.view',label:'Order View',group:'Orders',desc:'View orders, track status, and see order history.'},
+  {key:'order.create',label:'Order Create',group:'Orders',desc:'Place new product orders on behalf of the organisation.'},
+  {key:'order.modify',label:'Order Modify',group:'Orders',desc:'Amend or update existing in-flight orders.'},
+  {key:'order.cancel',label:'Order Cancel',group:'Orders',desc:'Cancel orders that have not yet been fulfilled.'},
+  {key:'fault.view',label:'Fault View',group:'Faults',desc:'View raised faults and track resolution status.'},
+  {key:'fault.raise',label:'Fault Raise',group:'Faults',desc:'Raise new fault tickets against active services.'},
+  {key:'fault.escalate',label:'Fault Escalate',group:'Faults',desc:'Escalate unresolved faults to BT support tiers.'},
+  {key:'billing.view',label:'Billing View',group:'Billing',desc:'View billing summaries, charges, and account balances.'},
+  {key:'billing.download',label:'Invoice Download',group:'Billing',desc:'Download invoices and billing documents.'},
+  {key:'billing.query',label:'Billing Query',group:'Billing',desc:'Raise and manage billing disputes through the portal.'},
+  {key:'users.invite',label:'User Invite',group:'Users & Orgs',desc:'Invite new users to the organisation by email.'},
+  {key:'users.manage',label:'User Manage',group:'Users & Orgs',desc:'Edit, deactivate, or remove existing users.'},
+  {key:'users.roles',label:'Role Assign',group:'Users & Orgs',desc:'Assign or change the role of any user in the org.'},
+  {key:'orgs.manage',label:'Org Manage',group:'Users & Orgs',desc:'Create and manage downstream organisations.'},
+  {key:'reporting.view',label:'Dashboard View',group:'Reporting',desc:'Access operational dashboards and summary metrics.'},
+  {key:'reporting.export',label:'Report Export',group:'Reporting',desc:'Export reports and data for external use.'},
+  {key:'api.access',label:'API Access',group:'API',desc:'Authenticate and make calls to the Nexus APIs.'},
+  {key:'api.keys',label:'API Key Manage',group:'API',desc:'Create, rotate, and revoke API keys for the org.'},
+  {key:'support.raise',label:'Support Ticket Raise',group:'Support',desc:'Raise support tickets with BT Wholesale.'},
+  {key:'support.view',label:'Support Ticket View',group:'Support',desc:'View open and historical support tickets.'},
+];
+const PSET_GROUPS=['Orders','Faults','Billing','Users & Orgs','Reporting','API','Support'];
 const ROLES=[
-  {key:'admin',label:'Administrator',desc:'Full control of the organisation, its users and entitlements.',grants:['Manage organisation settings','Create, edit & remove users','Assign & change roles','Manage product entitlements','Billing, invoices & reporting','Support & API key management']},
-  {key:'orderManager',label:'Order Manager',desc:'Places and manages product orders and faults.',grants:['View & place product orders','Modify & track orders','Raise & manage faults','Dashboard access']},
-  {key:'billingManager',label:'Billing Manager',desc:'Manages invoices and billing reports.',grants:['View & download invoices','Run billing reports','Reporting & exports','View orders (read-only)']},
-  {key:'support',label:'Support Agent',desc:'Handles faults and support tickets.',grants:['Raise, track & escalate tickets','Full fault management','View orders & products']},
-  {key:'reporting',label:'Reporting Analyst',desc:'Read-only access to dashboards and reports.',grants:['Dashboard access','Export reports','View billing reports']},
-  {key:'readonly',label:'Read-only User',desc:'Can view but never change anything.',grants:['View orders, products & invoices','View reports','No create, edit or delete']},
-  {key:'apiDev',label:'API Developer',desc:'Integrates via API and manages keys.',grants:['API & sandbox access','Manage API keys','View products & orders']},
+  {key:'admin',label:'Administrator',desc:'Full control of the organisation, its users and entitlements.',grants:['Manage organisation settings','Create, edit & remove users','Assign & change roles','Manage product entitlements','Billing, invoices & reporting','Support & API key management'],permSets:['order.view','order.create','order.modify','order.cancel','fault.view','fault.raise','fault.escalate','billing.view','billing.download','billing.query','users.invite','users.manage','users.roles','orgs.manage','reporting.view','reporting.export','api.access','api.keys','support.raise','support.view']},
+  {key:'orderManager',label:'Order Manager',desc:'Places and manages product orders and faults.',grants:['View & place product orders','Modify & track orders','Raise & manage faults','Dashboard access'],permSets:['order.view','order.create','order.modify','order.cancel','fault.view','fault.raise','reporting.view','support.view']},
+  {key:'billingManager',label:'Billing Manager',desc:'Manages invoices and billing reports.',grants:['View & download invoices','Run billing reports','Reporting & exports','View orders (read-only)'],permSets:['billing.view','billing.download','billing.query','reporting.view','reporting.export','order.view']},
+  {key:'support',label:'Support Agent',desc:'Handles faults and support tickets.',grants:['Raise, track & escalate tickets','Full fault management','View orders & products'],permSets:['fault.view','fault.raise','fault.escalate','support.raise','support.view','order.view']},
+  {key:'reporting',label:'Reporting Analyst',desc:'Read-only access to dashboards and reports.',grants:['Dashboard access','Export reports','View billing reports'],permSets:['reporting.view','reporting.export','billing.view','order.view','fault.view']},
+  {key:'readonly',label:'Read-only User',desc:'Can view but never change anything.',grants:['View orders, products & invoices','View reports','No create, edit or delete'],permSets:['order.view','fault.view','billing.view','reporting.view']},
+  {key:'apiDev',label:'API Developer',desc:'Integrates via API and manages keys.',grants:['API & sandbox access','Manage API keys','View products & orders'],permSets:['api.access','api.keys','order.view','reporting.view']},
 ];
 const ROLE_COL_MAP={admin:0,orderManager:1,billingManager:2,support:3,reporting:4,readonly:5,apiDev:6};
 const BT_ROLES=[
@@ -529,6 +552,7 @@ function App(){
   const [toast,setToast]=useState(null);
   const [selRole,setSelRole]=useState(null);
   const [rolesTab,setRolesTab]=useState('roleDirectory');
+  const [selPermSet,setSelPermSet]=useState(null);
   const [userDrawer,setUserDrawer]=useState(null);
   const [auditCat,setAuditCat]=useState('Organisation management');
   const [menuOpen,setMenuOpen]=useState(false);
@@ -1638,7 +1662,7 @@ function App(){
             usersTab==='roles'&&(()=>{
               const tabs=isBt
                 ?[{key:'roleDirectory',label:'Available roles'},{key:'resellerAdmins',label:'Reseller admins'},{key:'whoHasAccess',label:'Who has access?'}]
-                :[{key:'roleDirectory',label:'Available roles'},{key:'userRoles',label:"Your team's roles"},{key:'whoHasAccess',label:'Who has access?'}];
+                :[{key:'roleDirectory',label:'Available roles'},{key:'permSets',label:'Permission sets'},{key:'userRoles',label:"Your team's roles"},{key:'whoHasAccess',label:'Who has access?'}];
               const activeTab=rolesTab;
               const tabBtnSt=active=>({background:'none',border:'none',borderBottom:active?'2px solid #2A1C4A':'1px solid #C8C8C8',padding:'10px 16px 10px 12px',fontSize:'14px',fontWeight:active?700:400,color:active?'#2A1C4A':'#5514B4',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',marginBottom:'-1px'});
               const whoHasAccessPanel=isBt
@@ -1697,28 +1721,106 @@ function App(){
                   h('div',{style:{padding:'20px 24px 18px'}},
                     h('div',{style:{display:'flex',borderBottom:'1px solid #E3E3E3',gap:'8px'}},
                       tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
-                  activeTab==='roleDirectory'&&h('div',null,
-                    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',marginBottom:'16px'}},
-                      h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,flex:1}},isBt
-                        ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
-                        :'Each role controls exactly what a user can see and do in the platform. When you assign someone a role, they get access to everything it covers — no more, no less.'),
-                      !isBt&&h('button',{onClick:()=>showToast('info','Custom role creation is in development. You\'ll be able to define exactly what each custom role can see and do.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
-                        ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create custom role')),
-                    h('div',{style:{borderTop:'1px solid #E8E8E8'}},
-                      h('table',{style:{borderCollapse:'collapse',width:'100%'}},
-                        h('thead',null,h('tr',null,
-                          h('th',{style:{textAlign:'left',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343'}},'Role'),
-                          h('th',{style:{textAlign:'left',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343'}},'Description'),
-                          h('th',{style:{textAlign:'right',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343',whiteSpace:'nowrap'}},'Users assigned'))),
-                        h('tbody',null,(isBt?BT_ROLES:ROLES).map((r,i,arr)=>h('tr',{key:r.key,
-                          style:{cursor:'pointer'},
-                          onClick:()=>isBt?null:setSelRole(r.key),
-                          onMouseEnter:e=>{e.currentTarget.style.background='#FAF6FF';},
-                          onMouseLeave:e=>{e.currentTarget.style.background='';} },
-                          h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',fontWeight:700,fontSize:'14px',whiteSpace:'nowrap'}},r.label),
-                          h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',fontSize:'14px',color:'#6B6B6B',lineHeight:1.45}},r.desc),
-                          h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',textAlign:'right',fontSize:'14px',color:'#5514B4',fontWeight:700}},
-                            isBt?String(r.users):String(users.filter(u=>u.roleKey===r.key).length)))))))),
+                  activeTab==='roleDirectory'&&(selRole&&!isBt
+                    ?(()=>{
+                        const ro=ROLES.find(r=>r.key===selRole);
+                        const ruserList=users.filter(u=>u.roleKey===selRole);
+                        const roPsets=(ro.permSets||[]).map(pk=>PERMISSION_SETS.find(p=>p.key===pk)).filter(Boolean);
+                        const groupedPsets=PSET_GROUPS.map(g=>({group:g,sets:roPsets.filter(p=>p.group===g)})).filter(g=>g.sets.length>0);
+                        return h('div',{style:{padding:'20px 24px'}},
+                          h('button',{onClick:()=>setSelRole(null),style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:'none',padding:0,cursor:'pointer',fontFamily:'inherit',fontSize:'14px',color:'#5514B4',fontWeight:600,marginBottom:'20px'}},
+                            ic('M15 18l-6-6 6-6',{s:14,c:'#5514B4',w:2.5}),'Available roles'),
+                          h('div',{style:{display:'flex',gap:'16px',alignItems:'flex-start',marginBottom:'24px'}},
+                            h('div',{style:{width:'48px',height:'48px',borderRadius:'12px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                              ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:22,c:'#5514B4'})),
+                            h('div',null,
+                              h('div',{style:{fontSize:'20px',fontWeight:700,letterSpacing:'-0.01em'}},ro.label),
+                              h('div',{style:{fontSize:'14px',color:'#6B6B6B',marginTop:'4px',lineHeight:1.5}},ro.desc))),
+                          h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}},
+                            h('div',{style:{fontWeight:700,fontSize:'15px'}},
+                              'Permission sets ',h('span',{style:{fontWeight:400,color:'#808080',fontSize:'14px'}},'('+roPsets.length+')')),
+                            h('button',{onClick:()=>showToast('info','Permission set management is coming. You\'ll be able to add and remove sets from this role.'),style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:'1px solid #C4A0F0',borderRadius:'32px',padding:'7px 14px',fontSize:'13px',fontWeight:600,color:'#5514B4',cursor:'pointer',fontFamily:'inherit'}},
+                              ic('M12 5v14M5 12h14',{s:12,c:'#5514B4'}),'Add permission set')),
+                          h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'28px'}},
+                            groupedPsets.map((g,gi)=>h('div',{key:g.group,style:{borderBottom:gi<groupedPsets.length-1?'1px solid #F0F0F0':'none',padding:'14px 20px'}},
+                              h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',letterSpacing:'0.08em',textTransform:'uppercase',marginBottom:'10px'}},g.group),
+                              h('div',{style:{display:'flex',flexWrap:'wrap',gap:'8px'}},
+                                g.sets.map(ps=>h('span',{key:ps.key,style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#F3EBFE',border:'1px solid #C4A0F0',borderRadius:'999px',padding:'5px 12px',fontSize:'13px',fontWeight:600,color:'#5514B4'}},
+                                  ic('M20 6 9 17l-5-5',{s:11,c:'#7B3FD4',w:2.5}),ps.label)))))),
+                          h('div',{style:{fontWeight:700,fontSize:'15px',marginBottom:'12px'}},
+                            'Users with this role ',h('span',{style:{fontWeight:400,color:'#808080',fontSize:'14px'}},'('+ruserList.length+')')),
+                          ruserList.length===0
+                            ?h('div',{style:{fontSize:'14px',color:'#AAAAAA',padding:'12px 0'}},'No users are currently assigned this role.')
+                            :h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden'}},
+                                ruserList.map((u,i)=>{
+                                  const sc=statusMap[u.status]||statusMap.Active;
+                                  return h('div',{key:u.id,style:{display:'flex',alignItems:'center',gap:'12px',padding:'12px 16px',borderBottom:i<ruserList.length-1?'1px solid #F0F0F0':'none'}},
+                                    u.photo
+                                      ?h('img',{src:u.photo,style:{width:'32px',height:'32px',borderRadius:'999px',objectFit:'cover',flexShrink:0}})
+                                      :h('div',{style:{width:'32px',height:'32px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'13px',flexShrink:0}},initials(u.name)),
+                                    h('div',{style:{flex:1}},
+                                      h('div',{style:{fontWeight:600,fontSize:'14px'}},u.name),
+                                      h('div',{style:{fontSize:'12px',color:'#808080'}},u.email)),
+                                    h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',borderRadius:'999px',padding:'3px 9px',fontSize:'12px',fontWeight:700,color:sc[0],background:sc[1]}},
+                                      h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),u.status));
+                                })));
+                      })()
+                    :h('div',null,
+                        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',marginBottom:'16px'}},
+                          h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,flex:1}},isBt
+                            ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
+                            :'Each role controls what a user can see and do. Roles are built from permission sets — click any role to see how it\'s composed.'),
+                          !isBt&&h('button',{onClick:()=>showToast('info','Custom role creation is in development. You\'ll be able to build a role by selecting permission sets from the catalogue.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
+                            ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create custom role')),
+                        h('div',{style:{borderTop:'1px solid #E8E8E8'}},
+                          h('table',{style:{borderCollapse:'collapse',width:'100%'}},
+                            h('thead',null,h('tr',null,
+                              h('th',{style:{textAlign:'left',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343'}},'Role'),
+                              h('th',{style:{textAlign:'left',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343'}},'Description'),
+                              h('th',{style:{textAlign:'left',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343'}},'Permission sets'),
+                              h('th',{style:{textAlign:'right',padding:'12px 16px',fontSize:'12px',fontWeight:600,background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',color:'#434343',whiteSpace:'nowrap'}},'Users assigned'))),
+                            h('tbody',null,(isBt?BT_ROLES:ROLES).map((r,i,arr)=>h('tr',{key:r.key,
+                              style:{cursor:isBt?'default':'pointer'},
+                              onClick:()=>isBt?null:setSelRole(r.key),
+                              onMouseEnter:e=>{if(!isBt)e.currentTarget.style.background='#FAF6FF';},
+                              onMouseLeave:e=>{e.currentTarget.style.background='';} },
+                              h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',fontWeight:700,fontSize:'14px',whiteSpace:'nowrap'}},r.label),
+                              h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',fontSize:'14px',color:'#6B6B6B',lineHeight:1.45}},r.desc),
+                              h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none'}},
+                                isBt?h('span',{style:{color:'#AAAAAA',fontSize:'13px'}},'—')
+                                  :h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',background:'#F3EBFE',border:'1px solid #C4A0F0',borderRadius:'999px',padding:'3px 10px',fontSize:'12px',fontWeight:600,color:'#5514B4'}},
+                                      ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:11,c:'#7B3FD4'}),
+                                      String((r.permSets||[]).length)+' sets')),
+                              h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',textAlign:'right',fontSize:'14px',color:'#5514B4',fontWeight:700}},
+                                isBt?String(r.users):String(users.filter(u=>u.roleKey===r.key).length))))))))),
+                  activeTab==='permSets'&&!isBt&&h('div',{style:{padding:'20px 24px'}},
+                    h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}},
+                      h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,maxWidth:'600px'}},'Permission sets are the building blocks of roles. Each set represents a specific capability — administrators combine them into roles that match how people work.'),
+                      h('button',{onClick:()=>showToast('info','Permission set creation is in development. You\'ll be able to define new capabilities and add them to any role.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
+                        ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create permission set')),
+                    h('div',{style:{display:'flex',flexDirection:'column',gap:'24px'}},
+                      PSET_GROUPS.map(g=>{
+                        const gSets=PERMISSION_SETS.filter(p=>p.group===g);
+                        const rolesUsingGroup=ROLES.filter(r=>(r.permSets||[]).some(pk=>gSets.find(p=>p.key===pk)));
+                        if(gSets.length===0)return null;
+                        return h('div',{key:g},
+                          h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',letterSpacing:'0.08em',textTransform:'uppercase',marginBottom:'12px'}},g),
+                          h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
+                            gSets.map(ps=>{
+                              const psRoles=ROLES.filter(r=>(r.permSets||[]).includes(ps.key));
+                              return h('div',{key:ps.key,style:{border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 18px',display:'flex',alignItems:'center',gap:'16px',background:'#fff'}},
+                                h('div',{style:{width:'36px',height:'36px',borderRadius:'8px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                                  ic('M20 6 9 17l-5-5',{s:15,c:'#5514B4',w:2.5})),
+                                h('div',{style:{flex:1,minWidth:0}},
+                                  h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'2px'}},ps.label),
+                                  h('div',{style:{fontSize:'13px',color:'#6B6B6B'}},ps.desc)),
+                                h('div',{style:{flexShrink:0,textAlign:'right'}},
+                                  h('div',{style:{fontSize:'11px',color:'#808080',marginBottom:'5px',fontWeight:600}},psRoles.length===0?'Not used in any role':psRoles.length===1?'Used in 1 role':'Used in '+psRoles.length+' roles'),
+                                  h('div',{style:{display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'flex-end'}},
+                                    psRoles.slice(0,3).map(r=>h('span',{key:r.key,style:{display:'inline-block',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'999px',padding:'2px 8px',fontSize:'11px',fontWeight:600,color:'#434343'}},r.label)),
+                                    psRoles.length>3&&h('span',{style:{display:'inline-block',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'999px',padding:'2px 8px',fontSize:'11px',fontWeight:600,color:'#808080'}},'+'+String(psRoles.length-3)+' more'))));
+                            })));
+                      }))),
                   (activeTab==='userRoles'||activeTab==='resellerAdmins')&&(isBt
                     ?h('div',null,
                         h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:'0 24px 16px'}},'These are the named administrators across your reseller network. Each reseller needs an active administrator before their users and downstream organisations can be managed.'),
@@ -2083,4 +2185,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
       else { window.addEventListener('load',function(){ setTimeout(reveal,600); }); }
     })();
   </script>
+<div style="border-top:1px solid #E2DDF0;padding:14px 32px;display:flex;align-items:center;justify-content:center;background:#F5F4F9;">
+  <a href="library.html" style="font-size:12px;color:#9B93B0;text-decoration:none;font-family:system-ui,-apple-system,sans-serif;display:inline-flex;align-items:center;gap:6px;transition:color 0.15s;" onmouseover="this.style.color='#5514B4'" onmouseout="this.style.color='#9B93B0'">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    BT Nexus RBAC · Project Library
+  </a>
+</div>
 </body></html>
