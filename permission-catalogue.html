@@ -1,0 +1,392 @@
+<title>Nexus Permission Set Catalogue</title>
+<style>
+:root {
+  --purple:       #5514B4;
+  --purple-deep:  #3D1070;
+  --purple-light: #EDE8FA;
+  --ground:       #F3F1F9;
+  --surface:      #FFFFFF;
+  --ink:          #1A1023;
+  --ink-2:        #4B4460;
+  --ink-3:        #8B82A8;
+  --border:       #DDD8EE;
+  --tick:         #166534;
+  --tick-bg:      #DCFCE7;
+  --cross:        #C9C6D4;
+  --g-orders:     #5514B4;
+  --g-faults:     #C41F1F;
+  --g-billing:    #065F46;
+  --g-users:      #1D4ED8;
+  --g-reporting:  #92400E;
+  --g-api:        #0E4B5C;
+  --g-support:    #6D28D9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:#0F0B1A; --surface:#1A1530; --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+    --border:#2C2848; --purple-light:#2A1854; --tick:#86EFAC; --tick-bg:#052E16; --cross:#3A3458;
+  }
+}
+:root[data-theme="dark"] { --ground:#0F0B1A; --surface:#1A1530; --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270; --border:#2C2848; --purple-light:#2A1854; --tick:#86EFAC; --tick-bg:#052E16; --cross:#3A3458; }
+:root[data-theme="light"] { --ground:#F3F1F9; --surface:#FFFFFF; --ink:#1A1023; --ink-2:#4B4460; --ink-3:#8B82A8; --border:#DDD8EE; --purple-light:#EDE8FA; --tick:#166534; --tick-bg:#DCFCE7; --cross:#C9C6D4; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--ground); color: var(--ink); font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 13px; padding-bottom: 48px; }
+
+.page-header { background: var(--purple-deep); padding: 22px 32px 18px; margin-bottom: 28px; }
+.header-eye { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 5px; }
+.header-title { font-family: Georgia,serif; font-size: 20px; color: #fff; font-weight: normal; }
+.header-sub { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 4px; }
+
+.content { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+/* legend */
+.legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; font-size: 11.5px; color: var(--ink-2); }
+.leg-item { display: flex; align-items: center; gap: 6px; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+/* role headers */
+.role-headers { display: grid; grid-template-columns: 1fr repeat(7, 36px); gap: 0; margin-bottom: 4px; align-items: end; }
+.rh-spacer { }
+.rh { font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); height: 80px; padding-bottom: 4px; }
+
+/* group */
+.group { margin-bottom: 20px; }
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  margin-bottom: 1px;
+}
+.group-head-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .6; }
+
+.pset-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  display: grid;
+  grid-template-columns: 1fr repeat(7, 36px);
+  align-items: center;
+  padding: 0;
+}
+.pset-row:last-child { border-radius: 0 0 6px 6px; }
+.pset-info { padding: 8px 12px; }
+.pset-label { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.pset-desc { font-size: 11px; color: var(--ink-3); line-height: 1.35; margin-top: 1px; }
+.pset-key { font-size: 9.5px; font-family: ui-monospace, monospace; color: var(--purple); margin-top: 2px; }
+.cell { text-align: center; padding: 4px 0; }
+.pip {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 700;
+}
+.pip-yes { background: var(--tick-bg); color: var(--tick); }
+.pip-no  { background: transparent; color: var(--cross); font-size: 13px; }
+
+/* group colors */
+.g-orders   .group-head { background: #F4F0FC; color: var(--g-orders); }
+.g-faults   .group-head { background: #FEF2F2; color: var(--g-faults); }
+.g-billing  .group-head { background: #ECFDF5; color: var(--g-billing); }
+.g-users    .group-head { background: #EFF6FF; color: var(--g-users); }
+.g-reporting .group-head { background: #FFFBEB; color: var(--g-reporting); }
+.g-api      .group-head { background: #ECFEFF; color: var(--g-api); }
+.g-support  .group-head { background: #F5F3FF; color: var(--g-support); }
+
+@media (prefers-color-scheme: dark) {
+  .g-orders   .group-head { background: #1A0A3A; }
+  .g-faults   .group-head { background: #2A0808; }
+  .g-billing  .group-head { background: #042214; }
+  .g-users    .group-head { background: #0A1830; }
+  .g-reporting .group-head { background: #1C1408; }
+  .g-api      .group-head { background: #071820; }
+  .g-support  .group-head { background: #150A2A; }
+}
+:root[data-theme="dark"] .g-orders   .group-head { background: #1A0A3A; }
+:root[data-theme="dark"] .g-faults   .group-head { background: #2A0808; }
+:root[data-theme="dark"] .g-billing  .group-head { background: #042214; }
+:root[data-theme="dark"] .g-users    .group-head { background: #0A1830; }
+:root[data-theme="dark"] .g-reporting .group-head { background: #1C1408; }
+:root[data-theme="dark"] .g-api      .group-head { background: #071820; }
+:root[data-theme="dark"] .g-support  .group-head { background: #150A2A; }
+
+footer { max-width: 900px; margin: 28px auto 0; padding: 14px 24px 0; border-top: 1px solid var(--border); font-size: 11px; color: var(--ink-3); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+footer a { color: var(--ink-3); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+footer a:hover { color: var(--purple); }
+</style>
+
+<div class="page-header">
+  <div class="header-eye">BT Wholesale · Nexus Programme · RBAC Workstream</div>
+  <div class="header-title">Permission Set Catalogue</div>
+  <div class="header-sub">20 permission sets · 7 capability groups · Role coverage from prototype</div>
+</div>
+
+<div class="content">
+
+<div class="legend">
+  <span class="leg-item"><span class="pip pip-yes" style="font-size:10px;line-height:18px">✓</span> Role has this permission set</span>
+  <span class="leg-item"><span class="pip pip-no">·</span> Role does not have this set</span>
+</div>
+
+<div class="role-headers">
+  <div class="rh-spacer"></div>
+  <div class="rh">Admin</div>
+  <div class="rh">Order Mgr</div>
+  <div class="rh">Billing Mgr</div>
+  <div class="rh">Support</div>
+  <div class="rh">Reporting</div>
+  <div class="rh">Read-only</div>
+  <div class="rh">API Dev</div>
+</div>
+
+<!-- ORDERS -->
+<div class="group g-orders">
+  <div class="group-head"><span class="group-head-dot"></span>Orders</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Order View</div><div class="pset-desc">View orders, track status, and see order history.</div><div class="pset-key">order.view</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Order Create</div><div class="pset-desc">Place new product orders on behalf of the organisation.</div><div class="pset-key">order.create</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Order Modify</div><div class="pset-desc">Amend or update existing in-flight orders.</div><div class="pset-key">order.modify</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Order Cancel</div><div class="pset-desc">Cancel orders that have not yet been fulfilled.</div><div class="pset-key">order.cancel</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+<!-- FAULTS -->
+<div class="group g-faults">
+  <div class="group-head"><span class="group-head-dot"></span>Faults</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Fault View</div><div class="pset-desc">View raised faults and track resolution status.</div><div class="pset-key">fault.view</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Fault Raise</div><div class="pset-desc">Raise new fault tickets against active services.</div><div class="pset-key">fault.raise</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Fault Escalate</div><div class="pset-desc">Escalate unresolved faults to BT support tiers.</div><div class="pset-key">fault.escalate</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+<!-- BILLING -->
+<div class="group g-billing">
+  <div class="group-head"><span class="group-head-dot"></span>Billing</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Billing View</div><div class="pset-desc">View billing summaries, charges, and account balances.</div><div class="pset-key">billing.view</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Invoice Download</div><div class="pset-desc">Download invoices and billing documents.</div><div class="pset-key">billing.download</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Billing Query</div><div class="pset-desc">Raise and manage billing disputes through the portal.</div><div class="pset-key">billing.query</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+<!-- USERS & ORGS -->
+<div class="group g-users">
+  <div class="group-head"><span class="group-head-dot"></span>Users &amp; Orgs</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">User Invite</div><div class="pset-desc">Invite new users to the organisation by email.</div><div class="pset-key">users.invite</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">User Manage</div><div class="pset-desc">Edit, deactivate, or remove existing users.</div><div class="pset-key">users.manage</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Role Assign</div><div class="pset-desc">Assign or change the role of any user in the org.</div><div class="pset-key">users.roles</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Org Manage</div><div class="pset-desc">Create and manage downstream organisations.</div><div class="pset-key">orgs.manage</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+<!-- REPORTING -->
+<div class="group g-reporting">
+  <div class="group-head"><span class="group-head-dot"></span>Reporting</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Dashboard View</div><div class="pset-desc">Access operational dashboards and summary metrics.</div><div class="pset-key">reporting.view</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Report Export</div><div class="pset-desc">Export reports and data for external use.</div><div class="pset-key">reporting.export</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+<!-- API -->
+<div class="group g-api">
+  <div class="group-head"><span class="group-head-dot"></span>API</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">API Access</div><div class="pset-desc">Authenticate and make calls to the Nexus APIs.</div><div class="pset-key">api.access</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">API Key Manage</div><div class="pset-desc">Create, rotate, and revoke API keys for the org.</div><div class="pset-key">api.keys</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+  </div>
+</div>
+
+<!-- SUPPORT -->
+<div class="group g-support">
+  <div class="group-head"><span class="group-head-dot"></span>Support</div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Support Ticket Raise</div><div class="pset-desc">Raise support tickets with BT Wholesale.</div><div class="pset-key">support.raise</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+  <div class="pset-row">
+    <div class="pset-info"><div class="pset-label">Support Ticket View</div><div class="pset-desc">View open and historical support tickets.</div><div class="pset-key">support.view</div></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-yes">✓</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+    <div class="cell"><span class="pip pip-no">·</span></div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <span>BT Nexus · RBAC Workstream · 20 sets · Source: prototype app.js (current as of 23 Jul 2026)</span>
+  <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    Project Library
+  </a>
+</footer>

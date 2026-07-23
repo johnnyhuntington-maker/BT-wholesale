@@ -1,0 +1,930 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>BT Nexus RBAC — Intelligence Reference</title>
+<style>
+:root {
+  --purple:        #5514B4;
+  --purple-deep:   #3D1070;
+  --purple-light:  #EDE8FA;
+  --purple-mid:    #7C3AED;
+  --amber:         #92400E;
+  --amber-bg:      #FEF3C7;
+  --amber-border:  #FCD34D;
+  --green:         #166534;
+  --green-bg:      #DCFCE7;
+  --green-border:  #86EFAC;
+  --coral:         #9B1C1C;
+  --coral-bg:      #FEE2E2;
+  --coral-border:  #FCA5A5;
+  --teal:          #0E7490;
+  --teal-bg:       #CFFAFE;
+  --teal-border:   #67E8F9;
+  --ground:        #F3F1F9;
+  --surface:       #FFFFFF;
+  --nav-bg:        #1E1535;
+  --nav-text:      rgba(255,255,255,0.55);
+  --nav-active:    #FFFFFF;
+  --nav-hover:     rgba(255,255,255,0.8);
+  --ink:           #1A1023;
+  --ink-2:         #4B4460;
+  --ink-3:         #8B82A8;
+  --border:        #DDD8EE;
+  --th-bg:         #F3F1F9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --purple:       #9B6DFF;
+    --purple-deep:  #C4B0FF;
+    --purple-light: #2A1854;
+    --amber:        #FCD34D;
+    --amber-bg:     #2A1C08;
+    --amber-border: #92400E;
+    --green:        #86EFAC;
+    --green-bg:     #052E16;
+    --green-border: #166534;
+    --coral:        #FCA5A5;
+    --coral-bg:     #2A0A0A;
+    --coral-border: #9B1C1C;
+    --teal:         #67E8F9;
+    --teal-bg:      #0A2328;
+    --teal-border:  #0E7490;
+    --ground:       #0F0B1A;
+    --surface:      #1A1530;
+    --nav-bg:       #0A0715;
+    --ink:          #EDE8FA;
+    --ink-2:        #9B93B0;
+    --ink-3:        #5C5270;
+    --border:       #2C2848;
+    --th-bg:        #1A1530;
+  }
+}
+:root[data-theme="light"] {
+  --purple:#5514B4; --purple-deep:#3D1070; --purple-light:#EDE8FA;
+  --amber:#92400E; --amber-bg:#FEF3C7; --amber-border:#FCD34D;
+  --green:#166534; --green-bg:#DCFCE7; --green-border:#86EFAC;
+  --coral:#9B1C1C; --coral-bg:#FEE2E2; --coral-border:#FCA5A5;
+  --teal:#0E7490; --teal-bg:#CFFAFE; --teal-border:#67E8F9;
+  --ground:#F3F1F9; --surface:#FFFFFF; --nav-bg:#1E1535;
+  --ink:#1A1023; --ink-2:#4B4460; --ink-3:#8B82A8;
+  --border:#DDD8EE; --th-bg:#F3F1F9;
+}
+:root[data-theme="dark"] {
+  --purple:#9B6DFF; --purple-deep:#C4B0FF; --purple-light:#2A1854;
+  --amber:#FCD34D; --amber-bg:#2A1C08; --amber-border:#92400E;
+  --green:#86EFAC; --green-bg:#052E16; --green-border:#166534;
+  --coral:#FCA5A5; --coral-bg:#2A0A0A; --coral-border:#9B1C1C;
+  --teal:#67E8F9; --teal-bg:#0A2328; --teal-border:#0E7490;
+  --ground:#0F0B1A; --surface:#1A1530; --nav-bg:#0A0715;
+  --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+  --border:#2C2848; --th-bg:#1A1530;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── LEFT NAV ──────────────────────────────── */
+nav {
+  width: 192px;
+  flex-shrink: 0;
+  background: var(--nav-bg);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.nav-brand {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 8px;
+}
+.nav-brand-title {
+  font-family: Georgia, serif;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.3;
+}
+.nav-brand-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 12px 16px 4px;
+}
+nav a {
+  display: block;
+  padding: 5px 16px;
+  font-size: 12px;
+  color: var(--nav-text);
+  text-decoration: none;
+  line-height: 1.35;
+  transition: color 0.12s;
+  border-left: 2px solid transparent;
+}
+nav a:hover { color: var(--nav-hover); }
+nav a.active {
+  color: var(--nav-active);
+  border-left-color: var(--purple);
+  background: rgba(255,255,255,0.04);
+}
+.nav-lib {
+  margin-top: auto;
+  padding: 12px 16px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.nav-lib a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  padding: 0;
+  border: none;
+  background: none;
+}
+.nav-lib a:hover { color: rgba(255,255,255,0.7); }
+
+/* ── MAIN CONTENT ───────────────────────────── */
+main {
+  flex: 1;
+  min-width: 0;
+  padding: 0 40px 80px;
+  max-width: 800px;
+}
+
+/* SNAPSHOT HEADER */
+.snapshot-header {
+  background: var(--purple-deep);
+  margin: 0 -40px;
+  padding: 28px 40px 22px;
+  margin-bottom: 32px;
+}
+.snapshot-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 6px;
+}
+.snapshot-title {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  color: #fff;
+  font-weight: normal;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.snapshot-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.snapshot-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+}
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.chip-snapshot { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+.chip-blocker  { background: var(--coral-bg); color: var(--coral); }
+.chip-open     { background: var(--amber-bg); color: var(--amber); }
+.chip-resolved { background: var(--green-bg); color: var(--green); }
+.chip-source   { background: var(--teal-bg); color: var(--teal); }
+
+/* ── SECTIONS ───────────────────────────────── */
+section {
+  margin-bottom: 48px;
+  scroll-margin-top: 24px;
+}
+.section-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 4px;
+}
+h2 {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: normal;
+  color: var(--ink);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.25;
+}
+h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 20px 0 8px;
+  letter-spacing: 0.01em;
+}
+
+p { margin-bottom: 10px; color: var(--ink-2); }
+p:last-child { margin-bottom: 0; }
+
+ul, ol {
+  padding-left: 20px;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+li { margin-bottom: 3px; }
+
+strong { color: var(--ink); font-weight: 600; }
+
+/* ── CALLOUTS ────────────────────────────────── */
+.callout {
+  border-left: 3px solid;
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.callout-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  display: block;
+}
+.callout-open   { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+.callout-open   .callout-label { color: var(--amber); }
+.callout-open   p, .callout-open li { color: var(--amber); }
+.callout-resolved { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.callout-resolved .callout-label { color: var(--green); }
+.callout-resolved p, .callout-resolved li { color: var(--green); }
+.callout-blocker { background: var(--coral-bg); border-color: var(--coral-border); }
+.callout-blocker .callout-label { color: var(--coral); }
+.callout-blocker p, .callout-blocker li { color: var(--coral); }
+.callout-decision { background: var(--purple-light); border-color: var(--purple); }
+.callout-decision .callout-label { color: var(--purple); }
+.callout-decision p, .callout-decision li { color: var(--ink-2); }
+.callout-source { background: var(--teal-bg); border-color: var(--teal-border); }
+.callout-source .callout-label { color: var(--teal); }
+.callout-source p { color: var(--teal); }
+
+/* ── TABLES ──────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; margin: 12px 0; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12.5px;
+}
+th {
+  background: var(--th-bg);
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-align: left;
+  padding: 7px 12px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-2);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+.tc { text-align: center; }
+.tick  { color: #166534; font-weight: 700; }
+.part  { color: #92400E; }
+.cross { color: #9B1C1C; }
+
+/* person table */
+.person-name { font-weight: 600; color: var(--ink); }
+.person-role { font-size: 11.5px; color: var(--ink-3); }
+
+/* role key chip */
+.role-key {
+  display: inline-block;
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+  background: var(--purple-light);
+  color: var(--purple);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* open questions list */
+.oq-list { list-style: none; padding: 0; }
+.oq-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+.oq-list li:last-child { border-bottom: none; }
+.oq-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.oq-open    { background: var(--amber-bg); color: var(--amber); }
+.oq-blocker { background: var(--coral-bg); color: var(--coral); }
+.oq-resolved { background: var(--green-bg); color: var(--green); }
+
+/* ── FOOTER ─────────────────────────────────── */
+footer {
+  padding: 20px 40px;
+  margin: 0 -40px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+footer a { color: var(--ink-3); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+footer a:hover { color: var(--purple); }
+
+/* ── MOBILE ─────────────────────────────────── */
+@media (max-width: 700px) {
+  body { flex-direction: column; }
+  nav {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 12px;
+    gap: 4px;
+  }
+  .nav-brand, .nav-section-label, .nav-lib { display: none; }
+  nav a { padding: 5px 10px; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; font-size: 11.5px; }
+  nav a.active { border-bottom-color: var(--purple); border-left-color: transparent; }
+  main { padding: 0 16px 60px; }
+  .snapshot-header { margin: 0 -16px; padding: 20px 16px 16px; }
+}
+</style>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-brand">
+    <div class="nav-brand-title">BT Nexus RBAC<br>Intel Reference</div>
+    <div class="nav-brand-sub">Snapshot · 23 Jul 2026</div>
+  </div>
+
+  <div class="nav-section-label">Programme</div>
+  <a href="#overview">Platform overview</a>
+  <a href="#hierarchy">Org hierarchy</a>
+  <a href="#matrix">Capability matrix</a>
+
+  <div class="nav-section-label">Access model</div>
+  <a href="#roles">User roles</a>
+  <a href="#permissions">Permission matrix</a>
+  <a href="#personas">Personas</a>
+
+  <div class="nav-section-label">Context</div>
+  <a href="#entitlements">Product entitlements</a>
+  <a href="#asis">As-is Hub model</a>
+  <a href="#prd">PRD — key decisions</a>
+  <a href="#decisions">Design decisions</a>
+
+  <div class="nav-section-label">Reference</div>
+  <a href="#people">Key people</a>
+  <a href="#openqs">Open questions</a>
+  <a href="#sources">Sources</a>
+
+  <div class="nav-lib">
+    <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+      Project Library
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+<div class="snapshot-header">
+  <div class="snapshot-eyebrow">BT Wholesale · Nexus Programme · RBAC Workstream</div>
+  <div class="snapshot-title">Intelligence Reference</div>
+  <div class="snapshot-meta">
+    <span class="snapshot-date">Snapshot: 23 Jul 2026</span>
+    <span class="status-chip chip-snapshot">Living document</span>
+    <span class="status-chip chip-blocker">1 blocker</span>
+    <span class="status-chip chip-open">6 open questions</span>
+    <span class="status-chip chip-resolved">3 resolved since 15 Jul</span>
+  </div>
+</div>
+
+<!-- 1. PLATFORM OVERVIEW -->
+<section id="overview">
+  <div class="section-num">01 · Programme</div>
+  <h2>Platform Overview</h2>
+  <p><strong>Project Nexus</strong> is a unified digital portal replacing BT Wholesale's fragmented legacy estate with a single self-serve portal for all partner tiers. The core RBAC model (permissions, roles, user management) is built once and shared across the entire portal.</p>
+  <h3>Legacy portals being replaced</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Portal</th><th>What it covers</th></tr></thead>
+    <tbody>
+      <tr><td><strong>My BT Wholesale / Business Zone</strong></td><td>Ordering and management for WHC, full product range</td></tr>
+      <tr><td><strong>VEL / Business Portal</strong></td><td>End-user and in-life management (SSO'd from BZ) — <em>out of scope for Nexus redesign; separate team</em></td></tr>
+      <tr><td><strong>Hub / Partner Plus</strong></td><td>Broadband One, WHC Express, Complete Switch; current user management model</td></tr>
+      <tr><td><strong>SAF</strong></td><td>Service Assurance / Fault Diagnostics</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Migration roadmap (John Daffern, 1 Jul 2026)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Product</th><th>Migrates to</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><strong>WHC / WHC Express</strong></td><td>DV4B</td><td><strong>Priority 1</strong> — order journey paused pending DV4B structure input</td></tr>
+      <tr><td><strong>DIA / Ethernet</strong></td><td>UK Fabric</td><td>Evaluating — legacy API stepping-stone approach</td></tr>
+      <tr><td><strong>L3 BB / L2 BB</strong></td><td>Strategic BB</td><td>Later — already on Hub, jump link only for now</td></tr>
+      <tr><td><strong>PDPL</strong></td><td>Retained as-is</td><td>Later</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Success metrics (PRD)</h3>
+  <ul>
+    <li>NPS: +12 → +33 (+20 points)</li>
+    <li>90% strategic product adoption within 24 months of launch</li>
+    <li>40% faster time-to-market for new products</li>
+    <li>20% cost-to-serve reduction · 99.9% portal and API uptime</li>
+  </ul>
+
+  <div class="callout callout-decision">
+    <span class="callout-label">API-first principle (PRD verbatim)</span>
+    <p>"No business capability exists in the UI without it being driven by an API. Any API could be externalised at any time. We will use the same APIs as our customers."</p>
+  </div>
+</section>
+
+<!-- 2. ORG HIERARCHY -->
+<section id="hierarchy">
+  <div class="section-num">02 · Programme</div>
+  <h2>Organisation Hierarchy</h2>
+  <p>BT Wholesale only has a direct commercial relationship with Resellers (Direct/Super). All other tiers operate under their parent's contract.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Tier</th><th>Description</th><th>Key constraint</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Reseller</strong></td><td>Direct contract with BT Wholesale. Full downstream control.</td><td>None — max privilege</td></tr>
+      <tr><td><strong>Sub-Reseller</strong></td><td>No direct BT contract. Sells under parent's relationship.</td><td>No support tickets; no billing; no BZ access</td></tr>
+      <tr><td><strong>Child Reseller</strong></td><td>Broad downstream access with selected restrictions.</td><td>Cannot raise support tickets — must go via parent</td></tr>
+      <tr><td><strong>Dealer</strong></td><td>Most restricted. Inherits parent's branding only.</td><td>No user management; limited ordering; no portal login (TBC)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-decision">
+    <span class="callout-label">Design principle</span>
+    <p>Build for Direct Reseller at max privilege first, then subtract downward per tier. Never design for the most restricted first.</p>
+  </div>
+
+  <h3>Example org tree (used in prototype)</h3>
+  <ul>
+    <li><strong>Northgate Telecom</strong> (Reseller) — Metro Connect (Sub), Halo Networks (Child), Riverside Comms (Sub), Apex Telecom (Dealer)</li>
+    <li><strong>Beacon Wholesale Ltd</strong> (Reseller)</li>
+  </ul>
+</section>
+
+<!-- 3. CAPABILITY MATRIX -->
+<section id="matrix">
+  <div class="section-num">03 · Programme</div>
+  <h2>Org-Type Capability Matrix</h2>
+  <p style="margin-bottom:12px">Source: Paul Enright session (8 Jun 2026) + Zoya Azar Mural. Implemented in prototype.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th class="tc">Reseller</th>
+        <th class="tc">Sub-Reseller</th>
+        <th class="tc">Child Reseller</th>
+        <th class="tc">Dealer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Portal access</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>Place &amp; manage orders</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc part">partial</td></tr>
+      <tr><td>Manage own users</td><td class="tc tick">✓</td><td class="tc part">partial</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Create child organisations</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Choose exposed services</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc part">partial</td></tr>
+      <tr><td>Custom branding</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>Receive customer KCIs</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Business Zone access</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Hardware ordering</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>FMS / Empirix access</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Raise support tickets</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">partial</td><td class="tc cross">✗</td></tr>
+      <tr><td>View BT billing</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">partial</td><td class="tc cross">✗</td></tr>
+      <tr><td>Manage entitlements</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">partial</td><td class="tc cross">✗</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 4. USER ROLES -->
+<section id="roles">
+  <div class="section-num">04 · Access model</div>
+  <h2>User Roles</h2>
+
+  <h3>Reseller-side roles (7)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Key</th><th>Label</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><span class="role-key">admin</span></td><td><strong>Administrator</strong></td><td>Full control — org settings, users, roles, entitlements, billing, support, API keys</td></tr>
+      <tr><td><span class="role-key">orderManager</span></td><td><strong>Order Manager</strong></td><td>Places and manages product orders and faults</td></tr>
+      <tr><td><span class="role-key">billingManager</span></td><td><strong>Billing Manager</strong></td><td>Manages invoices and billing reports</td></tr>
+      <tr><td><span class="role-key">support</span></td><td><strong>Support Agent</strong></td><td>Handles faults and support tickets</td></tr>
+      <tr><td><span class="role-key">reporting</span></td><td><strong>Reporting Analyst</strong></td><td>Read-only dashboards and reports</td></tr>
+      <tr><td><span class="role-key">readonly</span></td><td><strong>Read-only User</strong></td><td>Can view but never change anything</td></tr>
+      <tr><td><span class="role-key">apiDev</span></td><td><strong>API Developer</strong></td><td>API/sandbox access and key management</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>BT Wholesale-side roles (5)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Key</th><th>Label</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><span class="role-key">btAdmin</span></td><td><strong>Platform Administrator</strong></td><td>Full platform config, reseller setup, network-wide access rules</td></tr>
+      <tr><td><span class="role-key">btAccountMgr</span></td><td><strong>Account Manager</strong></td><td>Manages reseller relationships, product entitlements, downstream org setup</td></tr>
+      <tr><td><span class="role-key">btBilling</span></td><td><strong>Billing Administrator</strong></td><td>Wholesale invoicing, billing reports, financial reconciliation</td></tr>
+      <tr><td><span class="role-key">btSupport</span></td><td><strong>Network Support</strong></td><td>Fault escalations and technical support from reseller orgs</td></tr>
+      <tr><td><span class="role-key">btAnalyst</span></td><td><strong>Reporting Analyst</strong></td><td>Read-only — platform-wide performance data, usage, network dashboards</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-open">
+    <span class="callout-label">Open</span>
+    <p>Deepa (product owner) confirmed as of July 2026 that roles are "not yet formally defined" on the product side. The prototype's 7 roles are ahead of product — gap may exist when PRD publishes formal role definitions.</p>
+  </div>
+</section>
+
+<!-- 5. PERMISSION MATRIX -->
+<section id="permissions">
+  <div class="section-num">05 · Access model</div>
+  <h2>Role–Permission Matrix</h2>
+  <p style="margin-bottom:12px">9 capability areas × 7 reseller roles. ✓ = full access · ~ = partial · ✗ = none</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Capability area</th>
+        <th class="tc">Admin</th>
+        <th class="tc">Order Mgr</th>
+        <th class="tc">Billing Mgr</th>
+        <th class="tc">Support</th>
+        <th class="tc">Reporting</th>
+        <th class="tc">Read-only</th>
+        <th class="tc">API Dev</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Organisation management</strong></td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>User administration</strong></td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>Product management</strong></td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td></tr>
+      <tr><td><strong>Operations &amp; orders</strong></td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc part">~</td></tr>
+      <tr><td><strong>Fault management</strong></td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">~</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>Billing &amp; invoices</strong></td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">~</td><td class="tc part">~</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>Reporting</strong></td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>Support tickets</strong></td><td class="tc tick">✓</td><td class="tc part">~</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">~</td><td class="tc cross">✗</td></tr>
+      <tr><td><strong>API access</strong></td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc cross">✗</td><td class="tc tick">✓</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin-top:8px; font-size:12px; color:var(--ink-3)">Organisation management and User administration are Admin-only. API access is Admin + API Developer only.</p>
+</section>
+
+<!-- 6. PERSONAS -->
+<section id="personas">
+  <div class="section-num">06 · Access model</div>
+  <h2>Personas</h2>
+
+  <h3>Full set — 8 personas (Jason Grant briefing)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Persona</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Reseller Admin</strong></td><td>Full downstream control — <em>prototype view: Sarah Whitfield, Northgate Telecom</em></td></tr>
+      <tr><td>2</td><td><strong>Reseller User</strong></td><td>Scoped to assigned role — <em>prototype view: James Okafor (Order Manager)</em></td></tr>
+      <tr><td>3</td><td><strong>Sub-Reseller Admin</strong></td><td>Restricted vs Reseller Admin — <em>not yet in prototype</em></td></tr>
+      <tr><td>4</td><td><strong>Sub-Reseller User</strong></td><td>Scoped to assigned role, limited visibility</td></tr>
+      <tr><td>5</td><td><strong>BT Internal Admin</strong></td><td>Platform-wide config — <em>prototype view: Alex Morgan</em></td></tr>
+      <tr><td>6</td><td><strong>BT Account Manager / Support</strong></td><td>Reseller relationship management</td></tr>
+      <tr><td>7</td><td><strong>API Supplier</strong></td><td>Supplies capability via API — API Portal track (Matthew Lindley)</td></tr>
+      <tr><td>8</td><td><strong>API Consumer / Partner Developer</strong></td><td>Builds on BT APIs — API Portal track</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>PRD in-scope personas (7)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Persona</th><th>Org</th><th>Primary need</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Reseller Admin</strong></td><td>Wholesale Partner</td><td>Manage users/roles, onboard sub-resellers, full portal access</td></tr>
+      <tr><td><strong>Reseller User</strong></td><td>Wholesale Partner</td><td>Place/track orders, manage services, raise faults, diagnostics</td></tr>
+      <tr><td><strong>Sub-Reseller Admin</strong></td><td>Sub-Reseller</td><td>Manage own users, delegated admin, <strong>no commercial data (pricing/billing)</strong></td></tr>
+      <tr><td><strong>Sub-Reseller User</strong></td><td>Sub-Reseller</td><td>Orders (if enabled), fault/appointment tracking, limited visibility</td></tr>
+      <tr><td><strong>Internal BT Service Admin</strong></td><td>BT Internal</td><td>Customer onboarding, account management, create Reseller Admin users</td></tr>
+      <tr><td><strong>Internal BT User (AM/Support)</strong></td><td>BT Internal</td><td>View/monitor orders and faults; assisted journeys via same portal APIs</td></tr>
+      <tr><td><strong>API Consumer (Partner Dev)</strong></td><td>Wholesale Partner</td><td>System-to-system API integration; sandbox + production</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout callout-decision">
+    <span class="callout-label">Design note</span>
+    <p>Sub-Reseller Admin must have no commercial data access (pricing, billing). PRD specifies this must be enforced via RBAC, not just hidden in UI — backend enforcement required.</p>
+  </div>
+</section>
+
+<!-- 7. PRODUCT ENTITLEMENTS -->
+<section id="entitlements">
+  <div class="section-num">07 · Context</div>
+  <h2>Product Entitlements</h2>
+  <p>What each org tier can access by default. These constrain which permission sets are surfaceable per org.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Entitlement</th><th class="tc">Reseller</th><th class="tc">Sub-Reseller</th><th class="tc">Child Reseller</th><th class="tc">Dealer</th></tr></thead>
+    <tbody>
+      <tr><td>Broadband</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>Digital Voice (DV4B)</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>Strategic Broadband</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>UK Fabric (Ethernet)</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+      <tr><td>Hardware ordering</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Customer KCIs</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Business Zone</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>FMS / Empirix</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc tick">✓</td><td class="tc cross">✗</td></tr>
+      <tr><td>Support tickets</td><td class="tc tick">✓</td><td class="tc cross">✗</td><td class="tc part">partial</td><td class="tc cross">✗</td></tr>
+      <tr><td>Custom branding</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td><td class="tc tick">✓</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 8. AS-IS HUB -->
+<section id="asis">
+  <div class="section-num">08 · Context</div>
+  <h2>As-Is Hub Model</h2>
+  <p>The current Hub / Partner Plus user management model is the baseline. Nexus replaces this with the 3-layer RBAC model.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Aspect</th><th>Hub (current)</th><th>Nexus (target)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Roles</strong></td><td>2: Admin User, Regular User</td><td>7 reseller roles + 5 BT roles</td></tr>
+      <tr><td><strong>Permissions</strong></td><td>4 checkboxes: Billing, Ordering, Raising faults, Service Now Tools</td><td>Permission sets from capability catalogue (20+ granular sets)</td></tr>
+      <tr><td><strong>Model</strong></td><td>Flat — permissions assigned per user directly</td><td>3-layer: Permission Sets → Roles → Users</td></tr>
+      <tr><td><strong>Identity</strong></td><td>SAF (BT authentication layer)</td><td>Salesforce RBAC (confirmed 21 Jul 2026)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout callout-source">
+    <span class="callout-label">Source</span>
+    <p>Hub Manage User walkthrough — Vijitha KM (24 Jun 2026). Experience Map artifact covers the as-is journey in full detail across 5 phases.</p>
+  </div>
+</section>
+
+<!-- 9. PRD KEY DECISIONS -->
+<section id="prd">
+  <div class="section-num">09 · Context</div>
+  <h2>PRD — Key Decisions</h2>
+  <p style="margin-bottom:12px">Source: <em>Nexus Product Requirements Document</em> (65pp, draft — no version/date stamped). Last read into intel: 23 Jul 2026.</p>
+
+  <div class="callout callout-resolved">
+    <span class="callout-label">Resolved 21 Jul 2026</span>
+    <p><strong>Identity platform:</strong> Salesforce RBAC confirmed. Strategic Identity ruled out (too slow). PRD explicitly flags: "Wholesale identity is NOT finalised" — this was the open blocker; Salesforce decision closes it pending Vanmathi confirmation.</p>
+  </div>
+
+  <div class="callout callout-resolved">
+    <span class="callout-label">Resolved — PRD defines</span>
+    <p><strong>RBAC model:</strong> 3-layer — (1) Permission Sets from a granular catalogue grouped by capability, (2) Roles as named combinations of permission sets, (3) Users assigned one or more roles. Role changes take effect immediately. All changes audit-logged.</p>
+  </div>
+
+  <h3>RBAC enforcement rules (PRD)</h3>
+  <ul>
+    <li>Enforced consistently across portal UI, APIs, and backend services</li>
+    <li>BT internal users acting on behalf of a partner cannot bypass partner permissions</li>
+    <li>All role/permission changes audit-logged: who, what, when, outcome</li>
+    <li>Unauthorised actions blocked with a clear message — no silent failure</li>
+  </ul>
+
+  <h3>Hierarchy rules (PRD)</h3>
+  <ul>
+    <li>Sub-reseller inherits constraints from parent — cannot exceed parent permissions</li>
+    <li>Products/journeys enabled for sub-reseller must be ≤ parent reseller's capabilities</li>
+    <li>Constraint enforced across UI, APIs, and backend validation — not UI-only</li>
+    <li>BT Internal users cannot register or onboard new organisations — only manage existing</li>
+  </ul>
+
+  <div class="callout callout-blocker">
+    <span class="callout-label">Blocker (PRD, open)</span>
+    <p>PRD explicitly states: "Wholesale identity is NOT finalised — This impacts access, integrations, and user experience across everything." Salesforce decision (21 Jul) addresses the platform choice; detailed integration design is still outstanding.</p>
+  </div>
+
+  <h3>User onboarding flow (PRD)</h3>
+  <ul>
+    <li>BT Admin creates organisation → downstream systems auto-provisioned (Identity, CUG, billing references)</li>
+    <li>Admin sends invitation email with registration link — expiry and resend supported</li>
+    <li>If user already exists in identity system, access is linked — no duplicate identity created</li>
+    <li>When access revoked: active sessions terminated AND API access revoked immediately</li>
+  </ul>
+
+  <div class="callout callout-open">
+    <span class="callout-label">Open (PRD)</span>
+    <p>"Do we need audit logs and access to them (screens or backend logs)?" — not yet resolved. NFRs confirm audit trail is required; the design question is whether it's surfaced as a UI screen.</p>
+  </div>
+</section>
+
+<!-- 10. DESIGN DECISIONS -->
+<section id="decisions">
+  <div class="section-num">10 · Context</div>
+  <h2>Design Decisions &amp; Constraints</h2>
+  <ol>
+    <li><strong>Design for Direct Reseller first</strong> — North Star at max privilege, subtract downward for Child/Sub/Dealer.</li>
+    <li><strong>Child Reseller = Direct Reseller minus support tickets</strong> — this is the primary differentiator between the two tiers.</li>
+    <li><strong>PRD is source of truth</strong> — Mural notes and session recordings may be stale or pre-product.</li>
+    <li><strong>Customer establishment is out of scope</strong> for the strategic portal (Service Designer territory).</li>
+    <li><strong>VEL redesign is a separate team</strong> — Nexus enables SSO access to VEL but does not replace it.</li>
+    <li><strong>Sub-Reseller Admin billing exclusion is an RBAC enforcement requirement</strong>, not a UI-only hide.</li>
+  </ol>
+  <div class="callout callout-open">
+    <span class="callout-label">Open design decision</span>
+    <p>Are roles BT-fixed or reseller-configurable? The prototype currently treats roles as a fixed set. This is a key product question that affects the entire RBAC model — resolution needed before detailed design.</p>
+  </div>
+  <div class="callout callout-open">
+    <span class="callout-label">Open design decision</span>
+    <p>Does Dealer need portal login at all, or are they just an entitlement recipient? May simplify the hierarchy significantly if Dealer is off-portal.</p>
+  </div>
+</section>
+
+<!-- 11. KEY PEOPLE -->
+<section id="people">
+  <div class="section-num">11 · Reference</div>
+  <h2>Key People</h2>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Person</th><th>Role</th><th>Relevance to RBAC</th></tr></thead>
+    <tbody>
+      <tr><td><span class="person-name">Neil Ballinger</span><br><span class="person-role">UX Lead / Line manager</span></td><td></td><td>Built original RBAC prototype; owns Experience Map in Figma; sets design direction</td></tr>
+      <tr><td><span class="person-name">Deepa Packirisamy</span><br><span class="person-role">Service Designer / Portal product owner</span></td><td></td><td>As-is journey mapping, CRF swim lane; confirmed roles "not yet formally defined" (Jul 2026)</td></tr>
+      <tr><td><span class="person-name">Zoya Azar</span><br><span class="person-role">Designer (NCB R)</span></td><td></td><td>Owns RBAC wireframes, login screens, dashboard; built Mural intelligence maps</td></tr>
+      <tr><td><span class="person-name">Gail Ash</span><br><span class="person-role">Product — Customer Hierarchy &amp; Org Model</span></td><td></td><td>Defines org hierarchy and rules across all products — key authority on tier constraints</td></tr>
+      <tr><td><span class="person-name">Saurabh Upadhyay</span><br><span class="person-role">Technical / Architecture lead</span></td><td></td><td>Owns technical RBAC implementation</td></tr>
+      <tr><td><span class="person-name">Jason Grant</span><br><span class="person-role">Service Designer (new, Jul 2026)</span></td><td></td><td>Separate swim lane from Product Design; remit TBD</td></tr>
+      <tr><td><span class="person-name">Matthew Lindley</span><br><span class="person-role">API experience product owner</span></td><td></td><td>API portal track — personas 7 &amp; 8</td></tr>
+      <tr><td><span class="person-name">John Daffern</span><br><span class="person-role">Cluster lead</span></td><td></td><td>Migration roadmap; DV4B = Priority 1</td></tr>
+      <tr><td><span class="person-name">Rebecca Cornwell</span><br><span class="person-role">Programme lead (new)</span></td><td></td><td>Being introduced to wider stakeholders from 20 Jul 2026</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 12. OPEN QUESTIONS -->
+<section id="openqs">
+  <div class="section-num">12 · Reference</div>
+  <h2>Open Questions</h2>
+  <ul class="oq-list">
+    <li>
+      <span class="oq-badge oq-blocker">Blocker</span>
+      Wholesale identity integration — Salesforce RBAC chosen (21 Jul), detailed integration design outstanding. PRD calls this out as impacting "access, integrations, and UX across everything."
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      Are roles BT-fixed or reseller-configurable? Fundamental to whether the prototype's 7-role set is a ceiling or a default.
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      RL2C and Group CLI access rules for Direct/Child Resellers — confirmed unknown (Paul Enright capability table).
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      Does Dealer require portal login, or are they purely an entitlement recipient?
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      Audit log as a UI screen — required by NFRs but design surface not yet decided.
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      Per-tier role differentiation — does "Administrator" mean different things for Direct vs Child Reseller? Subtraction logic is the core design problem not yet tackled.
+    </li>
+    <li>
+      <span class="oq-badge oq-open">Open</span>
+      Should Remove user remain non-self-service in Nexus? A 30-day soft-delete/restore window could resolve the current "contact account manager to re-add" friction point.
+    </li>
+    <li>
+      <span class="oq-badge oq-resolved">Resolved 21 Jul</span>
+      Identity platform — Salesforce RBAC confirmed; Strategic Identity ruled out.
+    </li>
+    <li>
+      <span class="oq-badge oq-resolved">Resolved — PRD</span>
+      Permission model — 3-layer (Permission Sets → Roles → Users) defined in PRD. Hub's 4-checkbox model is AS-IS only.
+    </li>
+    <li>
+      <span class="oq-badge oq-resolved">Resolved</span>
+      User roles not yet named — now drafted in prototype (7 reseller + 5 BT roles). Pending formal product sign-off.
+    </li>
+  </ul>
+</section>
+
+<!-- 13. SOURCES -->
+<section id="sources">
+  <div class="section-num">13 · Reference</div>
+  <h2>Sources</h2>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Source</th><th>Date</th><th>What it covers</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Paul Enright Mural session</strong></td><td>8 Jun 2026</td><td>Org-type capability table — basis for Section 3</td></tr>
+      <tr><td><strong>Nigel Walton (Wholesale Voice Consultant)</strong></td><td>26 May 2026</td><td>BZ new order walkthrough — as-is L2C journey</td></tr>
+      <tr><td><strong>Paul Enright (in-life / CPE)</strong></td><td>11 Jun 2026</td><td>As-is in-life modify flow; CPE pain points</td></tr>
+      <tr><td><strong>Vijitha KM — Hub walkthrough</strong></td><td>24 Jun 2026</td><td>Hub Manage User invite flow and user management</td></tr>
+      <tr><td><strong>Mohammed Zubairulla — CRF process</strong></td><td>26 Jun 2026</td><td>WHC establishment — 12-day, 23-system, 11-tab CRF</td></tr>
+      <tr><td><strong>WHC Customer Establishment meeting</strong></td><td>7 Jul 2026</td><td>BZ/WHC onboarding across 15+ manual systems</td></tr>
+      <tr><td><strong>Jason Grant new starter briefing</strong></td><td>14 Jul 2026</td><td>Compiled overview: platform, 8 personas, ordering, VEL nav, CRF, migration roadmap</td></tr>
+      <tr><td><strong>Deepa Packirisamy</strong></td><td>15 Jul 2026</td><td>Roles "not yet formally defined"; Hub permission model confirmation</td></tr>
+      <tr><td><strong>Zoya Azar — Teams session</strong></td><td>13 Jul 2026</td><td>VEL nav structure, hierarchy analogies, in-life modify, SSO route, design priorities</td></tr>
+      <tr><td><strong>BT NaaS Wholesale Archetype Exploration</strong></td><td>Jun 2026</td><td>STL Partners commissioned research; Infrastructure-led vs Customer-led archetypes; 7 NaaS attributes</td></tr>
+      <tr><td><strong>WHC Business Zone Ordering Guide</strong></td><td>Feb 2023 (v27.0)</td><td>Internal guide for legacy BZ portal — 4-role hierarchy, CUG permission model, admin delegation toggle</td></tr>
+      <tr><td><strong>Nexus PRD</strong></td><td>Draft (undated)</td><td>65pp. RBAC model, personas, hierarchy rules, identity platform, onboarding flows, NFRs, DV4B scope</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>BT Nexus · RBAC workstream · Snapshot 23 Jul 2026 — update each session as new intel arrives</span>
+  <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    Project Library
+  </a>
+</footer>
+
+<script>
+// Active nav tracking
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
+function setActive() {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 60) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', setActive, { passive: true });
+setActive();
+</script>
+
+</body></html>

@@ -1,0 +1,327 @@
+<title>Nexus RBAC — Persona Cards</title>
+<style>
+:root {
+  --purple:       #5514B4;
+  --purple-deep:  #3D1070;
+  --purple-light: #EDE8FA;
+  --ground:       #F3F1F9;
+  --surface:      #FFFFFF;
+  --ink:          #1A1023;
+  --ink-2:        #4B4460;
+  --ink-3:        #8B82A8;
+  --border:       #DDD8EE;
+  --green:        #166534;
+  --green-bg:     #DCFCE7;
+  --coral:        #9B1C1C;
+  --coral-bg:     #FEE2E2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:#0F0B1A; --surface:#1A1530; --ink:#EDE8FA; --ink-2:#9B93B0;
+    --ink-3:#5C5270; --border:#2C2848; --purple-light:#2A1854;
+    --green-bg:#052E16; --coral-bg:#2A0A0A;
+  }
+}
+:root[data-theme="dark"] { --ground:#0F0B1A; --surface:#1A1530; --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270; --border:#2C2848; --purple-light:#2A1854; --green-bg:#052E16; --coral-bg:#2A0A0A; }
+:root[data-theme="light"] { --ground:#F3F1F9; --surface:#FFFFFF; --ink:#1A1023; --ink-2:#4B4460; --ink-3:#8B82A8; --border:#DDD8EE; --purple-light:#EDE8FA; --green-bg:#DCFCE7; --coral-bg:#FEE2E2; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--ground); color: var(--ink); font-family: system-ui,-apple-system,'Segoe UI',sans-serif; font-size: 13px; padding-bottom: 48px; }
+
+.page-header { background: var(--purple-deep); padding: 22px 32px 18px; margin-bottom: 28px; }
+.header-eye { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 5px; }
+.header-title { font-family: Georgia,serif; font-size: 20px; color: #fff; font-weight: normal; }
+.header-sub { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 4px; }
+
+.content { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+.group-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: 24px 0 10px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 8px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-head {
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.card-name { font-size: 13.5px; font-weight: 700; line-height: 1.2; }
+.card-meta { font-size: 11px; opacity: .65; margin-top: 2px; line-height: 1.3; }
+.card-body { padding: 0 16px 14px; }
+.card-desc { font-size: 12px; color: var(--ink-2); line-height: 1.5; margin-bottom: 10px; }
+.list-label { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.list-label-can { color: var(--green); }
+.list-label-cant { color: var(--coral); }
+ul.cans, ul.cants { list-style: none; padding: 0; }
+ul.cans li, ul.cants li { font-size: 11.5px; line-height: 1.4; padding: 2px 0; display: flex; align-items: baseline; gap: 6px; }
+ul.cans li::before { content: "✓"; color: var(--green); font-weight: 700; font-size: 11px; flex-shrink: 0; }
+ul.cants li::before { content: "✗"; color: var(--coral); font-weight: 700; font-size: 11px; flex-shrink: 0; }
+.proto-tag { display: inline-block; font-size: 10px; background: var(--purple-light); color: var(--purple); padding: 2px 6px; border-radius: 3px; margin-top: 8px; }
+
+/* BT internal group */
+.card-bt   .card-head { background: #1E1535; color: #fff; }
+.card-bt   .avatar    { background: rgba(255,255,255,.15); color: #fff; }
+/* Reseller group */
+.card-res  .card-head { background: #5514B4; color: #fff; }
+.card-res  .avatar    { background: rgba(255,255,255,.2); color: #fff; }
+/* Sub-reseller group */
+.card-sub  .card-head { background: #EDE8FA; color: #3D1070; }
+.card-sub  .avatar    { background: rgba(85,20,180,.15); color: #5514B4; }
+/* API group */
+.card-api  .card-head { background: #0E4B5C; color: #fff; }
+.card-api  .avatar    { background: rgba(255,255,255,.15); color: #fff; }
+
+footer { max-width: 900px; margin: 28px auto 0; padding: 14px 24px 0; border-top: 1px solid var(--border); font-size: 11px; color: var(--ink-3); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+footer a { color: var(--ink-3); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+footer a:hover { color: var(--purple); }
+
+@media (max-width: 600px) { .content { padding: 0 14px; } .cards { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page-header">
+  <div class="header-eye">BT Wholesale · Nexus Programme · RBAC Workstream</div>
+  <div class="header-title">Persona Cards</div>
+  <div class="header-sub">8 personas across 4 org contexts · Source: Jason Grant briefing (14 Jul 2026) + PRD</div>
+</div>
+
+<div class="content">
+
+<div class="group-label">BT Wholesale — internal</div>
+<div class="cards">
+
+  <div class="card card-bt">
+    <div class="card-head">
+      <div class="avatar">AM</div>
+      <div>
+        <div class="card-name">BT Internal Admin</div>
+        <div class="card-meta">Platform Administrator · BT Wholesale</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Governs the entire reseller network. Sets up reseller orgs, assigns entitlements, and defines platform-wide access rules.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Create and manage reseller organisations</li>
+        <li>Assign products and entitlements to resellers</li>
+        <li>Set up reseller administrators</li>
+        <li>Define platform-wide access rules</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Carry out a reseller's day-to-day order management</li>
+        <li>Register or onboard a new organisation directly</li>
+      </ul>
+      <span class="proto-tag">Prototype: Alex Morgan</span>
+    </div>
+  </div>
+
+  <div class="card card-bt">
+    <div class="card-head">
+      <div class="avatar">CA</div>
+      <div>
+        <div class="card-name">BT Account Manager / Support</div>
+        <div class="card-meta">Account Manager · BT Wholesale</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Manages BT Wholesale's relationships with reseller partners. Views entitlements and assists onboarding — but platform settings are for the Platform Admin.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>View and manage reseller organisation profiles</li>
+        <li>Support reseller onboarding and account setup</li>
+        <li>Review entitlements across the reseller network</li>
+        <li>Assist resellers with user and role queries</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Create new reseller organisations</li>
+        <li>Change platform-wide access rules</li>
+      </ul>
+      <span class="proto-tag">Prototype: Claire Ashton</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-label">Reseller — direct BT contract</div>
+<div class="cards">
+
+  <div class="card card-res">
+    <div class="card-head">
+      <div class="avatar">SW</div>
+      <div>
+        <div class="card-name">Reseller Admin</div>
+        <div class="card-meta">Administrator · Northgate Telecom</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Runs the reseller account. Manages users, builds the downstream network, and controls what sub-orgs can access.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Create sub-reseller, child reseller &amp; dealer orgs</li>
+        <li>Invite team members and assign roles</li>
+        <li>Control what downstream orgs can access</li>
+        <li>Full billing, ordering, support and API access</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Access products not granted by BT Wholesale</li>
+        <li>Change BT platform-level settings</li>
+      </ul>
+      <span class="proto-tag">Prototype: Sarah Whitfield</span>
+    </div>
+  </div>
+
+  <div class="card card-res">
+    <div class="card-head">
+      <div class="avatar">JO</div>
+      <div>
+        <div class="card-name">Reseller User</div>
+        <div class="card-meta">Scoped to assigned role · Northgate Telecom</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Staff member at a reseller. Accesses only what their assigned role permits — no user management or org-level control.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Access portal tools scoped to their role</li>
+        <li>Place orders / raise faults / view reports (role-dependent)</li>
+        <li>View own permissions in their profile</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Create or manage organisations</li>
+        <li>Invite or manage other users</li>
+        <li>Change their own role or permissions</li>
+      </ul>
+      <span class="proto-tag">Prototype: James Okafor (Order Manager)</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-label">Sub-reseller — no direct BT contract</div>
+<div class="cards">
+
+  <div class="card card-sub">
+    <div class="card-head">
+      <div class="avatar">MW</div>
+      <div>
+        <div class="card-name">Sub-Reseller Admin</div>
+        <div class="card-meta">Administrator · Metro Connect</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Runs the sub-reseller account under Northgate Telecom. Manages team and places orders, but restricted from billing, support and hardware.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Invite team members and assign roles</li>
+        <li>Place and manage orders</li>
+        <li>Choose which services to expose to users</li>
+        <li>Receive customer KCIs</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Create child organisations</li>
+        <li>Access billing or commercial data (PRD: RBAC-enforced)</li>
+        <li>Raise support tickets with BT</li>
+        <li>Hardware ordering, Business Zone, FMS/Empirix</li>
+      </ul>
+      <span class="proto-tag">Prototype: Marcus Webb</span>
+    </div>
+  </div>
+
+  <div class="card card-sub">
+    <div class="card-head">
+      <div class="avatar">SR</div>
+      <div>
+        <div class="card-name">Sub-Reseller User</div>
+        <div class="card-meta">Scoped to assigned role · Metro Connect</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Staff at a sub-reseller. Same pattern as Reseller User but within the reduced capability envelope of the sub-reseller org.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Access tools scoped to their role (if enabled by sub-reseller admin)</li>
+        <li>Place orders where permitted</li>
+        <li>Track faults and appointments</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Access anything the sub-reseller org doesn't have</li>
+        <li>Manage users, orgs or billing</li>
+      </ul>
+      <span class="proto-tag">Not yet in prototype</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-label">API portal — developer track</div>
+<div class="cards">
+
+  <div class="card card-api">
+    <div class="card-head">
+      <div class="avatar">AS</div>
+      <div>
+        <div class="card-name">API Supplier</div>
+        <div class="card-meta">Supplies capability via API · External</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Provides services or capability that BT Wholesale exposes through the API platform. A producer, not a consumer of the portal.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Publish API capabilities to the BT Wholesale platform</li>
+        <li>Manage their own product API specs</li>
+      </ul>
+      <span class="proto-tag">Not yet in prototype · Matthew Lindley owns</span>
+    </div>
+  </div>
+
+  <div class="card card-api">
+    <div class="card-head">
+      <div class="avatar">PD</div>
+      <div>
+        <div class="card-name">API Consumer / Partner Developer</div>
+        <div class="card-meta">Builds on BT APIs · Wholesale Partner</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">A developer at a wholesale partner who integrates BT Wholesale services directly into their own systems via API. Needs sandbox and production API access.</div>
+      <div class="list-label list-label-can">Can</div>
+      <ul class="cans">
+        <li>Authenticate and call Nexus APIs</li>
+        <li>Access sandbox environment for testing</li>
+        <li>Create and manage API keys for their org</li>
+        <li>View product and order data via API</li>
+      </ul>
+      <div class="list-label list-label-cant" style="margin-top:8px">Cannot</div>
+      <ul class="cants">
+        <li>Manage users or org settings</li>
+        <li>Access billing or support journeys (unless role permits)</li>
+      </ul>
+      <span class="proto-tag">Prototype role: API Developer</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span>BT Nexus · RBAC Workstream · Sources: Jason Grant briefing (14 Jul 2026), PRD, prototype</span>
+  <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    Project Library
+  </a>
+</footer>

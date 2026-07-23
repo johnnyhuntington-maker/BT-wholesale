@@ -1,0 +1,521 @@
+<title>RBAC Experience Map — Nexus First Pass</title>
+<style>
+:root {
+  --purple-deep:    #3D1070;
+  --purple-mid:     #5514B4;
+  --purple-light:   #EDE8FA;
+  --teal:           #008FA3;
+  --teal-light:     #DFF4F7;
+  --amber:          #B45309;
+  --amber-light:    #FEF3C7;
+  --coral:          #C41F1F;
+  --coral-light:    #FEE2E2;
+  --violet:         #6D28D9;
+  --violet-light:   #EDE9FE;
+  --green:          #166534;
+  --green-light:    #DCFCE7;
+  --green-border:   #BBF7D0;
+  --ground:         #EEEDF4;
+  --surface:        #FFFFFF;
+  --lane-1:         #F4F1FC;
+  --lane-2:         #EEF2FF;
+  --lane-3:         #ECF8FA;
+  --lane-gaps:      #FFFBEB;
+  --text-primary:   #1A1023;
+  --text-secondary: #5C5270;
+  --text-inverse:   #FFFFFF;
+  --border:         #D4D0E8;
+  --card-shadow:    0 1px 3px rgba(61,16,112,0.10), 0 0 0 1px rgba(61,16,112,0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --purple-light:   #2A1854;
+    --teal-light:     #093038;
+    --amber-light:    #2A1C08;
+    --coral-light:    #2A0A0A;
+    --violet-light:   #1C1040;
+    --green-light:    #052E16;
+    --green-border:   #14532D;
+    --ground:         #110E1C;
+    --surface:        #1C1830;
+    --lane-1:         #1A1434;
+    --lane-2:         #121830;
+    --lane-3:         #0E1C22;
+    --lane-gaps:      #1C1808;
+    --text-primary:   #EDE8FA;
+    --text-secondary: #9088B0;
+    --border:         #2C2848;
+    --card-shadow:    0 1px 4px rgba(0,0,0,0.4);
+  }
+}
+:root[data-theme="light"] {
+  --purple-light:#EDE8FA; --teal-light:#DFF4F7; --amber-light:#FEF3C7;
+  --coral-light:#FEE2E2; --violet-light:#EDE9FE;
+  --green-light:#DCFCE7; --green-border:#BBF7D0;
+  --ground:#EEEDF4; --surface:#FFFFFF; --lane-1:#F4F1FC; --lane-2:#EEF2FF; --lane-3:#ECF8FA;
+  --lane-gaps:#FFFBEB; --text-primary:#1A1023; --text-secondary:#5C5270;
+  --border:#D4D0E8; --card-shadow:0 1px 3px rgba(61,16,112,0.10),0 0 0 1px rgba(61,16,112,0.06);
+}
+:root[data-theme="dark"] {
+  --purple-light:#2A1854; --teal-light:#093038; --amber-light:#2A1C08;
+  --coral-light:#2A0A0A; --violet-light:#1C1040;
+  --green-light:#052E16; --green-border:#14532D;
+  --ground:#110E1C; --surface:#1C1830; --lane-1:#1A1434; --lane-2:#121830; --lane-3:#0E1C22;
+  --lane-gaps:#1C1808; --text-primary:#EDE8FA; --text-secondary:#9088B0;
+  --border:#2C2848; --card-shadow:0 1px 4px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--ground);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* ── MAP HEADER ─────────────────────────────── */
+.map-header {
+  background: var(--purple-deep);
+  padding: 20px 24px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.header-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 5px;
+}
+.map-header h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: normal;
+  color: #fff;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.header-meta {
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+.legend-pip {
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.pip-action  { background: #fff; outline: 1px solid rgba(255,255,255,0.3); }
+.pip-touch   { background: var(--teal); }
+.pip-pain    { background: var(--coral); }
+.pip-gap     { background: var(--amber); }
+.pip-insight { background: var(--violet); }
+
+/* ── UPDATES STRIP ──────────────────────────── */
+.updates-strip {
+  background: var(--green-light);
+  border-bottom: 1px solid var(--green-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.updates-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.updates-items {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.update-item {
+  font-size: 11px;
+  color: var(--green);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.update-item::before {
+  content: "✓";
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── SCROLL WRAPPER ─────────────────────────── */
+.map-scroll {
+  overflow: auto;
+  max-height: calc(100vh - 130px);
+  padding-bottom: 20px;
+}
+
+/* ── TABLE ──────────────────────────────────── */
+.xmap {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+.xmap thead tr th {
+  background: var(--purple-mid);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  text-align: left;
+  vertical-align: bottom;
+  padding: 12px 14px 10px;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  min-width: 248px;
+}
+.xmap thead tr th.corner {
+  background: var(--purple-deep);
+  min-width: 148px;
+  position: sticky;
+  top: 0; left: 0;
+  z-index: 5;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.phase-num {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(255,255,255,0.22);
+  letter-spacing: -0.03em;
+  margin-bottom: 2px;
+}
+.phase-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+/* Lane label cells */
+.lane-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--purple-deep);
+  color: #fff;
+  padding: 14px;
+  vertical-align: top;
+  min-width: 148px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.lane-label-name {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+.lane-label-sub {
+  display: block;
+  font-size: 9px;
+  font-weight: 400;
+  opacity: 0.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* Lane body rows */
+.row-bt-admin td.lc  { background: var(--lane-1); }
+.row-co-admin td.lc  { background: var(--lane-2); }
+.row-reg-user td.lc  { background: var(--lane-3); }
+.row-gaps     td.lc  { background: var(--lane-gaps); }
+.row-gaps .lane-label { background: #7C2D12; }
+
+td.lc {
+  padding: 10px;
+  vertical-align: top;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── CARDS ──────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  box-shadow: var(--card-shadow);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+.card:last-child { margin-bottom: 0; }
+.card-lbl {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.c-action  { border-left-color: var(--purple-mid); }
+.c-action  .card-lbl { color: var(--purple-mid); }
+.c-touch   { background: var(--teal-light); border-left-color: var(--teal); }
+.c-touch   .card-lbl { color: var(--teal); }
+.c-pain    { background: var(--coral-light); border-left-color: var(--coral); }
+.c-pain    .card-lbl { color: var(--coral); }
+.c-gap     { background: var(--amber-light); border-left-color: var(--amber); }
+.c-gap     .card-lbl { color: var(--amber); }
+.c-insight { background: var(--violet-light); border-left-color: var(--violet); }
+.c-insight .card-lbl { color: var(--violet); }
+.c-resolved { background: var(--green-light); border-left-color: var(--green); }
+.c-resolved .card-lbl { color: var(--green); }
+.c-empty {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 11px;
+  padding: 4px 2px;
+}
+
+/* ── FOOTER ─────────────────────────────────── */
+.map-footer {
+  padding: 12px 20px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.lib-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.lib-link:hover { color: var(--purple-mid); }
+</style>
+
+<!-- HEADER -->
+<div class="map-header">
+  <div>
+    <div class="header-eyebrow">BT Wholesale &middot; Nexus Programme &middot; RBAC Design</div>
+    <h1>User Management Experience Map</h1>
+    <div class="header-meta">First pass &middot; 15 July 2026 &middot; Sources: Hub walkthrough with Vijitha KM (24 Jun) &middot; Deepa Packirisamy clarification (15 Jul) &middot; Paul Enright hierarchy session (8 Jun)</div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-pip pip-action"></span>Action / step</div>
+    <div class="legend-item"><span class="legend-pip pip-touch"></span>System / touchpoint</div>
+    <div class="legend-item"><span class="legend-pip pip-pain"></span>Pain point</div>
+    <div class="legend-item"><span class="legend-pip pip-gap"></span>Gap / unknown</div>
+    <div class="legend-item"><span class="legend-pip pip-insight"></span>Insight</div>
+  </div>
+</div>
+
+<!-- UPDATES STRIP -->
+<div class="updates-strip">
+  <span class="updates-label">Updated 21 Jul</span>
+  <div class="updates-items">
+    <span class="update-item"><strong>Identity platform confirmed:</strong> Salesforce RBAC — Strategic Identity ruled out (too slow)</span>
+    <span class="update-item"><strong>Permission model defined:</strong> 3-layer — Permission Sets → Roles → Users (per PRD)</span>
+    <span class="update-item"><strong>Named roles drafted:</strong> Administrator, Order Manager, Billing Manager, Support Agent, Reporting Analyst, Read-only User, API Developer</span>
+  </div>
+</div>
+
+<!-- EXPERIENCE MAP -->
+<div class="map-scroll">
+<table class="xmap">
+<thead>
+  <tr>
+    <th class="corner"></th>
+    <th><span class="phase-num">1</span><span class="phase-name">Onboarding</span></th>
+    <th><span class="phase-num">2</span><span class="phase-name">Add a User</span></th>
+    <th><span class="phase-num">3</span><span class="phase-name">Set Permissions</span></th>
+    <th><span class="phase-num">4</span><span class="phase-name">Day-to-Day Access</span></th>
+    <th><span class="phase-num">5</span><span class="phase-name">User Lifecycle</span></th>
+  </tr>
+</thead>
+<tbody>
+
+<!-- BT WHOLESALE ADMIN -->
+<tr class="row-bt-admin">
+  <td class="lane-label">
+    <span class="lane-label-name">BT Wholesale Admin</span>
+    <span class="lane-label-sub">Portal operator</span>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Provisions new reseller account (tenant) in Hub</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Establishes primary contact &mdash; becomes the first Company Admin with Admin User status</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Hub / Partner Plus backend provisioning</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Full onboarding process (CRF &rarr; establishment &rarr; training) lives separately &mdash; Deepa has a swim lane diagram of the end-to-end</div>
+  </td>
+  <td class="lc">
+    <div class="c-empty">Not involved in day-to-day user creation &mdash; delegated entirely to Company Admin</div>
+  </td>
+  <td class="lc">
+    <div class="card c-gap"><span class="card-lbl">Gap</span>How BT controls which products and capabilities are available to a reseller org (org-level vs user-level) &mdash; not yet defined</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>How the 4 org tiers (Direct / Child / Sub / Dealer) affect available permissions &mdash; subtraction logic not yet designed</div>
+  </td>
+  <td class="lc">
+    <div class="c-empty">No ongoing involvement in an individual reseller's user activity</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Required to action primary contact changes on an account &mdash; not self-service for resellers</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Process for primary contact change not documented &mdash; who initiates, what's the SLA?</div>
+  </td>
+</tr>
+
+<!-- COMPANY ADMIN -->
+<tr class="row-co-admin">
+  <td class="lane-label">
+    <span class="lane-label-name">Company Admin</span>
+    <span class="lane-label-sub">Reseller &mdash; Admin User</span>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Established as primary contact by BT during account onboarding</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Receives Hub credentials, logs in for the first time</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Primary contact = default Admin User. Multiple users can hold Admin User status on the same account, but only one is the primary contact &mdash; primary contact cannot be self-removed</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Navigates: User icon (top right) &rarr; Account Management &rarr; Manage Users tab</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Clicks "+ Add User" &mdash; right-side drawer panel slides in</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Fills in: First name &middot; Last name &middot; Company email (becomes username) &middot; Phone number (required for fault raising) &middot; Profile type &middot; Permission checkboxes</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Clicks Save &mdash; registration email sent automatically to the new user's email address</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Hub &middot; Account Management &middot; /s/hub/account-management</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Company email must be "registered with this account" &mdash; it also becomes the user's login username</div>
+    <div class="card c-pain"><span class="card-lbl">Pain point</span>Test environment showed many duplicate and orphaned test users in the list &mdash; no apparent guard against adding the same email twice</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Selects user from list &rarr; clicks "Set permissions ›" in the detail panel at any time</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Sets permission checkboxes independently: Billing / Ordering / Raising faults / No permissions needed</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Optional: enables "Service Now Tools" (nested under Raising faults) &mdash; grants unmoderated access to ServiceNow portal. Helper text warns of this explicitly.</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Permissions can be changed at any time &mdash; not locked after initial setup</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Admin Users: only "Set permissions" shown in detail panel (no deactivate or remove for self). Regular users: Set permissions + Deactivate + Remove all visible.</div>
+    <div class="card c-resolved"><span class="card-lbl">Resolved 21 Jul</span>Permission model for Nexus now defined: 3-layer (Permission Sets → Roles → Users). Hub's 4-checkbox model is not carried forward — Nexus roles compose permission sets from a capability catalogue.</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Monitors user list &mdash; views profile, permissions, and status per user from a search-and-detail panel layout</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Resends invite for users still showing as pending (info icon in user list)</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Hub &middot; Manage Users &middot; left-column user list + right-side detail panel</div>
+    <div class="card c-pain"><span class="card-lbl">Pain point</span>No bulk user management &mdash; all actions are one user at a time</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Deactivate user &mdash; reversible. User moves to deactivated users page (/s/deactivated-users). Reactivate link appears there.</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Remove user &mdash; permanent from account. To re-add: must contact account manager. Not self-service.</div>
+    <div class="card c-pain"><span class="card-lbl">Pain point</span>Remove is a self-service irreversible action &mdash; the confirmation modal warns of this, but the asymmetry (easy to remove, hard to undo) is a significant design risk</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Cannot deactivate or remove own account via UI &mdash; those action links are hidden for self</div>
+  </td>
+</tr>
+
+<!-- REGULAR USER -->
+<tr class="row-reg-user">
+  <td class="lane-label">
+    <span class="lane-label-name">Regular User</span>
+    <span class="lane-label-sub">Reseller staff</span>
+  </td>
+  <td class="lc">
+    <div class="c-empty">Not yet in system during initial account onboarding</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Receives registration email at the address entered by Company Admin</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Clicks register link in email &rarr; taken to password set page</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Sets own password &mdash; account becomes active</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Registration email &middot; Password set page &middot; SAF (BT authentication layer)</div>
+    <div class="card c-resolved"><span class="card-lbl">Resolved 21 Jul</span>Identity platform confirmed as Salesforce RBAC. SAF (current BT auth layer) is being replaced. Strategic Identity option ruled out as too slow.</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>User is in "pending invite" state (info icon in list) until email registration is completed &mdash; visible to Company Admin throughout</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Views own permissions as coloured chips in "Your profile" panel &mdash; Billing / Ordering / Raising faults displayed as tags</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Read-only: users can see their own permissions but cannot change them &mdash; only Company Admin can modify</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Hub &middot; Your profile panel &middot; /s/your-profile</div>
+    <div class="card c-resolved"><span class="card-lbl">Resolved 21 Jul</span>Named Nexus roles drafted: Administrator, Order Manager, Billing Manager, Support Agent, Reporting Analyst, Read-only User, API Developer. Each composed from permission sets across 7 capability groups.</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Logs into Hub, accesses My apps from user icon dropdown</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Apps surfaced based on permissions: WHC Business Portal &middot; Reporting &middot; Raise a fault &middot; Mobile Manager &middot; Learning &middot; Events</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Places orders (Ordering permission) &middot; raises faults (Raising faults) &middot; views billing (Billing) per what Company Admin has enabled</div>
+    <div class="card c-touch"><span class="card-lbl">System</span>Hub My apps &middot; WHC Business Portal (VEL via SSO) &middot; ServiceNow &middot; Reporting</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Whether My apps visibility is driven by user permissions or by products enabled on the account at org level &mdash; not confirmed</div>
+    <div class="card c-pain"><span class="card-lbl">Pain point</span>VEL (WHC Business Portal) accessed via SSO from Hub only &mdash; resellers lost direct VEL access ~2 years ago and must route through Hub each session</div>
+  </td>
+  <td class="lc">
+    <div class="card c-action"><span class="card-lbl">Action</span>Deactivated: loses access immediately. Remains in system under deactivated users &mdash; can be reactivated by Company Admin.</div>
+    <div class="card c-action"><span class="card-lbl">Action</span>Removed: disassociated from tenant entirely. Orders, invoices, audit logs remain on the account &mdash; data is not deleted.</div>
+    <div class="card c-insight"><span class="card-lbl">Insight</span>Account = tenant. Removing a user severs only the association &mdash; historical transactions and audit trail are preserved against the account</div>
+  </td>
+</tr>
+
+<!-- GAPS ROW -->
+<tr class="row-gaps">
+  <td class="lane-label">
+    <span class="lane-label-name">Open Questions</span>
+    <span class="lane-label-sub">To be defined</span>
+  </td>
+  <td class="lc">
+    <div class="card c-gap"><span class="card-lbl">Gap</span>What does the customer establishment journey look like in the strategic Nexus portal? Currently a 12-day, 23-system CRF process &mdash; scope for v1 not confirmed. Deepa has the swim lane diagram.</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Is the Company Admin set up by BT, or does the reseller self-register? The current Hub onboarding process for this is not documented.</div>
+  </td>
+  <td class="lc">
+    <div class="card c-gap"><span class="card-lbl">Gap</span>"Email must be registered with this account" &mdash; what does pre-registration mean for a brand new user with no existing Hub presence?</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Full invite email design and password-set page UX not documented &mdash; registration flow for Nexus needs defining</div>
+  </td>
+  <td class="lc">
+    <div class="card c-resolved"><span class="card-lbl">Resolved 21 Jul</span>Permission model for Nexus is the 3-layer PRD model. Hub's 4 checkboxes are the AS-IS baseline only.</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>How org-type tier (Direct / Child / Sub / Dealer) restricts available permissions &mdash; the subtraction logic is the core RBAC design problem, not yet tackled</div>
+  </td>
+  <td class="lc">
+    <div class="card c-gap"><span class="card-lbl">Gap</span>RL2C access for Direct and Child Resellers &mdash; confirmed unknown in Paul Enright's capability table</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Group CLI access for Direct and Child Resellers &mdash; confirmed unknown</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>FMS and Empirix access rules for lower tiers &mdash; Empirix shows end-customer usage data; scope of access per tier not fully confirmed</div>
+  </td>
+  <td class="lc">
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Primary contact change process &mdash; who initiates, what's the SLA, is there a self-serve path in Nexus?</div>
+    <div class="card c-gap"><span class="card-lbl">Gap</span>Should Remove user remain non-self-service in Nexus? The current "contact account manager to re-add" model is a clear friction point worth redesigning</div>
+  </td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<div class="map-footer">
+  <span>Sources: Hub walkthrough &middot; Vijitha KM (24 Jun 2026) &middot; Deepa Packirisamy (15 Jul 2026) &middot; Paul Enright hierarchy session (8 Jun 2026) &middot; Zoya Azar Mural overview (3 &amp; 13 Jul 2026)</span>
+  <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank" class="lib-link">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    Project Library
+  </a>
+</div>

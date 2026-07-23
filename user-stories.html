@@ -1,0 +1,1096 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+
+<title>Strategic RBAC — User Stories</title>
+<style>
+  :root {
+    --ground: #F5F4F9;
+    --surface: #FFFFFF;
+    --ink: #1A1525;
+    --ink-2: #6B6080;
+    --ink-3: #9B93B0;
+    --accent: #5514B4;
+    --accent-soft: #EDE6FA;
+    --border: #E2DDF0;
+    --border-strong: #C4B8E8;
+
+    --must-bg: #DCFCE7; --must-fg: #166534; --must-border: #BBF7D0;
+    --should-bg: #DBEAFE; --should-fg: #1D4ED8; --should-border: #BFDBFE;
+    --could-bg: #FEF3C7; --could-fg: #92400E; --could-border: #FDE68A;
+    --wont-bg: #F3F4F6; --wont-fg: #4B5563; --wont-border: #E5E7EB;
+
+    --persona-bg: #F0ECF8; --persona-fg: #5514B4;
+
+    --epic-1: #5514B4; --epic-2: #0369A1; --epic-3: #0F766E;
+    --epic-4: #B45309; --epic-5: #7C3AED; --epic-6: #9D174D; --epic-7: #1E3A5F;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #120E1C; --surface: #1E1830; --ink: #EEE9FA;
+      --ink-2: #9B93B0; --ink-3: #5E5675;
+      --accent: #9B6DFF; --accent-soft: #2A1F4A;
+      --border: #2E2844; --border-strong: #4A3D6E;
+      --must-bg: #052E16; --must-fg: #4ADE80; --must-border: #14532D;
+      --should-bg: #0C1A3E; --should-fg: #60A5FA; --should-border: #1E3A6E;
+      --could-bg: #2D1A00; --could-fg: #FCD34D; --could-border: #5C3200;
+      --wont-bg: #1F2937; --wont-fg: #9CA3AF; --wont-border: #374151;
+      --persona-bg: #2A1F4A; --persona-fg: #C4A0F0;
+    }
+  }
+
+  :root[data-theme="light"] {
+    --ground: #F5F4F9; --surface: #FFFFFF; --ink: #1A1525;
+    --ink-2: #6B6080; --ink-3: #9B93B0;
+    --accent: #5514B4; --accent-soft: #EDE6FA;
+    --border: #E2DDF0; --border-strong: #C4B8E8;
+    --must-bg: #DCFCE7; --must-fg: #166534; --must-border: #BBF7D0;
+    --should-bg: #DBEAFE; --should-fg: #1D4ED8; --should-border: #BFDBFE;
+    --could-bg: #FEF3C7; --could-fg: #92400E; --could-border: #FDE68A;
+    --wont-bg: #F3F4F6; --wont-fg: #4B5563; --wont-border: #E5E7EB;
+    --persona-bg: #F0ECF8; --persona-fg: #5514B4;
+  }
+  :root[data-theme="dark"] {
+    --ground: #120E1C; --surface: #1E1830; --ink: #EEE9FA;
+    --ink-2: #9B93B0; --ink-3: #5E5675;
+    --accent: #9B6DFF; --accent-soft: #2A1F4A;
+    --border: #2E2844; --border-strong: #4A3D6E;
+    --must-bg: #052E16; --must-fg: #4ADE80; --must-border: #14532D;
+    --should-bg: #0C1A3E; --should-fg: #60A5FA; --should-border: #1E3A6E;
+    --could-bg: #2D1A00; --could-fg: #FCD34D; --could-border: #5C3200;
+    --wont-bg: #1F2937; --wont-fg: #9CA3AF; --wont-border: #374151;
+    --persona-bg: #2A1F4A; --persona-fg: #C4A0F0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 24px;
+  }
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .page-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    font-weight: normal;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    line-height: 1.2;
+  }
+  .page-title span {
+    color: var(--accent);
+  }
+  .page-meta {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    text-align: right;
+  }
+  .page-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+  }
+  .filter-bar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .filter-chips {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .chip.active { opacity: 1; }
+  .chip:not(.active) { opacity: 0.45; }
+  .chip-must { background: var(--must-bg); color: var(--must-fg); border-color: var(--must-border); }
+  .chip-should { background: var(--should-bg); color: var(--should-fg); border-color: var(--should-border); }
+  .chip-could { background: var(--could-bg); color: var(--could-fg); border-color: var(--could-border); }
+  .chip-persona { background: var(--persona-bg); color: var(--persona-fg); }
+  .chip-persona.active { border-color: var(--accent); }
+
+  .filter-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .story-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .story-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* MAIN CONTENT */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* EPIC SECTION */
+  .epic {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .epic[data-empty="true"] { display: none; }
+
+  .epic-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-left: 14px;
+    border-left: 3px solid var(--epic-color, var(--accent));
+  }
+  .epic-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    font-weight: normal;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .epic-count {
+    font-size: 12px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* STORY CARD */
+  .story-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .story-card:hover { border-color: var(--border-strong); }
+  .story-card[data-hidden="true"] { display: none; }
+
+  .story-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .moscow-badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+  .moscow-badge.must { background: var(--must-bg); color: var(--must-fg); border-color: var(--must-border); }
+  .moscow-badge.should { background: var(--should-bg); color: var(--should-fg); border-color: var(--should-border); }
+  .moscow-badge.could { background: var(--could-bg); color: var(--could-fg); border-color: var(--could-border); }
+
+  .story-id {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  .story-text {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .story-text .as-a { color: var(--ink-2); }
+  .story-text .so-that { color: var(--ink-2); }
+
+  .story-bottom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .persona-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--persona-bg);
+    color: var(--persona-fg);
+  }
+
+  .story-note {
+    font-size: 11.5px;
+    color: var(--ink-2);
+    background: var(--ground);
+    border-radius: 6px;
+    padding: 8px 10px;
+    line-height: 1.5;
+    border-left: 2px solid var(--border-strong);
+  }
+
+  /* LEGEND */
+  .legend {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .legend-section { display: flex; flex-direction: column; gap: 8px; }
+  .legend-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .legend-items { display: flex; gap: 8px; flex-wrap: wrap; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 680px) {
+    .story-grid { grid-template-columns: 1fr; }
+    .page-header { padding: 20px 16px; }
+    .filter-bar { padding: 10px 16px; }
+    .main { padding: 20px 16px 48px; }
+    .page-meta { text-align: left; }
+  }
+</style>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">BT Nexus — <span>Strategic RBAC</span><br>User Stories</div>
+    </div>
+    <div class="page-meta">
+      <strong>Platform:</strong> Salesforce RBAC (confirmed)<br>
+      <strong>Model:</strong> Permission Sets → Roles → Users<br>
+      <strong>Status:</strong> Draft for BA review · July 2026
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-bar-inner">
+    <div class="filter-group">
+      <span class="filter-label">Priority</span>
+      <div class="filter-chips" id="moscow-filters">
+        <button class="chip chip-must active" data-filter="moscow" data-value="must">Must</button>
+        <button class="chip chip-should active" data-filter="moscow" data-value="should">Should</button>
+        <button class="chip chip-could active" data-filter="moscow" data-value="could">Could</button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">Persona</span>
+      <div class="filter-chips" id="persona-filters">
+        <button class="chip chip-persona active" data-filter="persona" data-value="bt-admin">BT Admin</button>
+        <button class="chip chip-persona active" data-filter="persona" data-value="org-admin">Org Admin</button>
+        <button class="chip chip-persona active" data-filter="persona" data-value="end-user">End User</button>
+        <button class="chip chip-persona active" data-filter="persona" data-value="api-dev">API Developer</button>
+      </div>
+    </div>
+    <span class="story-count"><strong id="visible-count">42</strong> of 42 stories</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="legend">
+    <div class="legend-section">
+      <div class="legend-title">Priority (MoSCoW)</div>
+      <div class="legend-items">
+        <div class="legend-item"><div class="legend-dot" style="background:#166534"></div> Must — core RBAC functionality, required for launch</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1D4ED8"></div> Should — important but not launch-blocking</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#92400E"></div> Could — valuable if capacity allows</div>
+      </div>
+    </div>
+    <div class="legend-section">
+      <div class="legend-title">Context</div>
+      <div class="legend-items">
+        <div class="legend-item"><div class="legend-dot" style="background:#5514B4"></div> Identity platform: Salesforce RBAC. Org hierarchy: BT → Reseller → Sub-reseller → Customer. Permission sets form roles; roles are assigned to users.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EPIC 1 -->
+  <div class="epic" data-epic="1" style="--epic-color: #5514B4">
+    <div class="epic-header">
+      <div class="epic-title">Organisation Hierarchy &amp; Access Scoping</div>
+      <div class="epic-count" id="epic-1-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-01</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to define the organisation hierarchy (Reseller → Sub-reseller → Customer) <span class="so-that">so that </span>access and data are scoped to the correct tier automatically.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-02</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>reseller admin</strong>, I want to see only the organisations and users within my own hierarchy <span class="so-that">so that </span>I cannot view or affect data belonging to other resellers.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-03</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to view and navigate the full organisation tree <span class="so-that">so that </span>I can provide support to any organisation in the network without logging into each one separately.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-04</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>sub-reseller admin</strong>, I want to manage only my own downstream customers <span class="so-that">so that </span>my administrative scope is contained to my part of the network.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-05</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to assign an organisation type at provisioning time <span class="so-that">so that </span>the correct permission boundaries are applied from day one, without manual configuration after the fact.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-06</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>reseller admin</strong>, I want a summary view of role coverage and access gaps across my downstream orgs <span class="so-that">so that </span>I can proactively identify risks without drilling into each organisation individually.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 2 -->
+  <div class="epic" data-epic="2" style="--epic-color: #0369A1">
+    <div class="epic-header">
+      <div class="epic-title">Role Management</div>
+      <div class="epic-count" id="epic-2-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-07</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to assign an existing role to a user <span class="so-that">so that </span>they gain the correct access for their responsibilities without me having to configure permissions from scratch.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-08</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to view all roles available in my organisation and what each one covers <span class="so-that">so that </span>I can make informed assignment decisions.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-09</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to create a custom role by selecting permission sets from the catalogue <span class="so-that">so that </span>I can match access to how my team actually works rather than fitting people into standard roles.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+        <div class="story-note">Depends on Salesforce RBAC supporting custom permission set composition. Confirm with Vanmathi.</div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-10</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to edit the permission sets included in an existing role <span class="so-that">so that </span>I can adjust access without rebuilding roles from scratch when responsibilities shift.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-11</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to define a library of standard roles <span class="so-that">so that </span>resellers have sensible, named defaults to start from rather than composing access from scratch.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-12</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to clone an existing role as the starting point for a new one <span class="so-that">so that </span>I don't have to select permission sets from scratch when creating a role that's a variation of an existing one.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-13</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to deactivate a role so that it can no longer be assigned, <span class="so-that">without </span>losing historical records of who held it and when.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 3 -->
+  <div class="epic" data-epic="3" style="--epic-color: #0F766E">
+    <div class="epic-header">
+      <div class="epic-title">Permission Sets</div>
+      <div class="epic-count" id="epic-3-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-14</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to define and maintain a catalogue of permission sets grouped by capability area (Orders, Faults, Billing, Users &amp; Orgs, Reporting, API, Support) <span class="so-that">so that </span>roles can be composed granularly from named, documented capabilities.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-15</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to view the full permission set catalogue with plain-English descriptions <span class="so-that">so that </span>I understand exactly what each set grants before adding it to a role.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-16</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to add a permission set to a role <span class="so-that">so that </span>I can extend what that role can do without creating an entirely new role.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-17</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to remove a permission set from a role <span class="so-that">so that </span>I can reduce access when a team member's responsibilities change.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="end-user">
+        <div class="story-top">
+          <span class="story-id">RBAC-18</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>user</strong>, I want to see which permission sets my assigned role includes <span class="so-that">so that </span>I understand what I can and cannot access before attempting to use a feature.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">End User</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-19</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to restrict which permission sets are available per organisation type <span class="so-that">so that </span>resellers cannot grant capabilities that BT has not enabled for their tier.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 4 -->
+  <div class="epic" data-epic="4" style="--epic-color: #B45309">
+    <div class="epic-header">
+      <div class="epic-title">User Onboarding &amp; Invitation</div>
+      <div class="epic-count" id="epic-4-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-20</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to invite a new user by email address <span class="so-that">so that </span>they can join my organisation and gain platform access without me having to raise a request with BT.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-21</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to assign a role at the point of invitation <span class="so-that">so that </span>the user has the correct access from their very first login, not after a separate step.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="end-user">
+        <div class="story-top">
+          <span class="story-id">RBAC-22</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>invited user</strong>, I want to receive a secure, time-limited email invitation <span class="so-that">so that </span>I can set up my account safely and the link cannot be used by anyone else.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">End User</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="end-user">
+        <div class="story-top">
+          <span class="story-id">RBAC-23</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>new user</strong>, I want to complete identity verification during onboarding via Salesforce Identity <span class="so-that">so that </span>my account meets BT Wholesale's security and compliance requirements before I gain access.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">End User</span>
+        </div>
+        <div class="story-note">Identity platform confirmed as Salesforce RBAC (July 2026). Strategic Identity ruled out. Vanmathi to confirm exact verification flow.</div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-24</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to see the status of all outstanding invitations (pending, accepted, expired) <span class="so-that">so that </span>I can chase or resend without losing track of who still needs to onboard.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-25</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to cancel a pending invitation <span class="so-that">so that </span>I can prevent access immediately if circumstances change before the user has accepted.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 5 -->
+  <div class="epic" data-epic="5" style="--epic-color: #7C3AED">
+    <div class="epic-header">
+      <div class="epic-title">User Management</div>
+      <div class="epic-count" id="epic-5-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-26</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to view all users in my organisation with their current role and status <span class="so-that">so that </span>I have a clear picture of who has access to what at any point in time.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-27</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to change a user's role <span class="so-that">so that </span>their access accurately reflects their current responsibilities when their job changes.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-28</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to deactivate a user <span class="so-that">so that </span>they immediately and completely lose platform access — for example when someone leaves the organisation.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-29</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to reactivate a deactivated user without re-inviting them <span class="so-that">so that </span>I can restore access efficiently if someone returns or was deactivated in error.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-30</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to filter and search users by name, role, or status <span class="so-that">so that </span>I can find the right person quickly in organisations with large user lists.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-31</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to change the role for multiple users at once <span class="so-that">so that </span>I can handle team restructures without updating each person individually.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="end-user">
+        <div class="story-top">
+          <span class="story-id">RBAC-32</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>user</strong>, I want to request a role change through the portal <span class="so-that">so that </span>my admin can review and approve it without an out-of-band email or phone call.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">End User</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 6 -->
+  <div class="epic" data-epic="6" style="--epic-color: #9D174D">
+    <div class="epic-header">
+      <div class="epic-title">API Access &amp; Product Entitlements</div>
+      <div class="epic-count" id="epic-6-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-33</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to define which products and journeys are enabled per organisation <span class="so-that">so that </span>product entitlements are enforced at the RBAC layer, not just hidden in the UI.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="must" data-personas="api-dev">
+        <div class="story-top">
+          <span class="story-id">RBAC-34</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>API developer</strong>, I want to generate an API key that inherits my role's permission scope <span class="so-that">so that </span>my integration cannot access data or actions beyond what my role allows.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">API Developer</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-35</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to create, rotate, and revoke API keys on behalf of developers in my organisation <span class="so-that">so that </span>I maintain oversight of API access and can act quickly if a key is compromised.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-36</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to see which products and journeys are enabled for my organisation <span class="so-that">so that </span>I understand what capabilities my users can access before assigning roles.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-37</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want RBAC enforcement to apply consistently across the portal UI, API, and backend services <span class="so-that">so that </span>there is no path — technical or otherwise — to bypass a permission restriction.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+        <div class="story-note">Listed as a PRD NFR. Surfaced here because it has significant implementation implications across all layers.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EPIC 7 -->
+  <div class="epic" data-epic="7" style="--epic-color: #1E3A5F">
+    <div class="epic-header">
+      <div class="epic-title">Audit &amp; Compliance</div>
+      <div class="epic-count" id="epic-7-count"></div>
+    </div>
+    <div class="story-grid">
+
+      <div class="story-card" data-moscow="must" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-38</span>
+          <span class="moscow-badge must">Must</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want a tamper-evident audit log of all role assignments, changes, and revocations <span class="so-that">so that </span>I can investigate access incidents and demonstrate compliance.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-39</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to view a log of invitation and onboarding activity in my organisation <span class="so-that">so that </span>I have a record of who joined, when they were invited, and who approved their access.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="org-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-40</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As an </span><strong>org admin</strong>, I want to see a full role history for any user in my organisation <span class="so-that">so that </span>I can understand how their access has changed over time during an access review.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">Org Admin</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="should" data-personas="end-user">
+        <div class="story-top">
+          <span class="story-id">RBAC-41</span>
+          <span class="moscow-badge should">Should</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>user</strong>, I want to receive a notification when my role is changed <span class="so-that">so that </span>I'm always aware of changes to what I can access, and can flag anything that seems wrong.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">End User</span>
+        </div>
+      </div>
+
+      <div class="story-card" data-moscow="could" data-personas="bt-admin">
+        <div class="story-top">
+          <span class="story-id">RBAC-42</span>
+          <span class="moscow-badge could">Could</span>
+        </div>
+        <div class="story-text">
+          <span class="as-a">As a </span><strong>BT Wholesale admin</strong>, I want to export audit logs in a structured format <span class="so-that">so that </span>they can be ingested by external compliance or SIEM tooling without manual processing.
+        </div>
+        <div class="story-bottom">
+          <span class="persona-tag">BT Admin</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const activeMoscow = new Set(['must', 'should', 'could']);
+  const activePersonas = new Set(['bt-admin', 'org-admin', 'end-user', 'api-dev']);
+  const totalStories = 42;
+
+  function personaLabel(v) {
+    return { 'bt-admin': 'BT Admin', 'org-admin': 'Org Admin', 'end-user': 'End User', 'api-dev': 'API Developer' }[v] || v;
+  }
+
+  function applyFilters() {
+    const cards = document.querySelectorAll('.story-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const moscow = card.dataset.moscow;
+      const personas = card.dataset.personas.split(' ');
+      const show = activeMoscow.has(moscow) && personas.some(p => activePersonas.has(p));
+      card.dataset.hidden = show ? 'false' : 'true';
+      if (show) visible++;
+    });
+
+    document.getElementById('visible-count').textContent = visible;
+
+    // Update epic visibility and counts
+    for (let i = 1; i <= 7; i++) {
+      const epic = document.querySelector('.epic[data-epic="' + i + '"]');
+      const visibleInEpic = epic.querySelectorAll('.story-card:not([data-hidden="true"])').length;
+      const totalInEpic = epic.querySelectorAll('.story-card').length;
+      const countEl = document.getElementById('epic-' + i + '-count');
+      countEl.textContent = visibleInEpic + ' of ' + totalInEpic;
+      epic.dataset.empty = visibleInEpic === 0 ? 'true' : 'false';
+    }
+  }
+
+  document.querySelectorAll('.chip[data-filter]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const filter = chip.dataset.filter;
+      const value = chip.dataset.value;
+
+      if (filter === 'moscow') {
+        if (activeMoscow.has(value) && activeMoscow.size > 1) {
+          activeMoscow.delete(value);
+          chip.classList.remove('active');
+        } else {
+          activeMoscow.add(value);
+          chip.classList.add('active');
+        }
+      } else if (filter === 'persona') {
+        if (activePersonas.has(value) && activePersonas.size > 1) {
+          activePersonas.delete(value);
+          chip.classList.remove('active');
+        } else {
+          activePersonas.add(value);
+          chip.classList.add('active');
+        }
+      }
+
+      applyFilters();
+    });
+  });
+
+  // Init counts
+  applyFilters();
+</script>
+
+<div style="border-top:1px solid var(--border);padding:16px 32px;text-align:center;margin-top:8px;">
+  <a href="https://johnnyhuntington-maker.github.io/BT-wholesale/library.html" target="_blank" style="font-size:12px;color:var(--ink-3);text-decoration:none;font-family:system-ui,-apple-system,sans-serif;display:inline-flex;align-items:center;gap:6px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+    BT Nexus RBAC · Project Library
+  </a>
+</div>
+
+</body></html>

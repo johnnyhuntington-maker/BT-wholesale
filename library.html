@@ -138,7 +138,7 @@
     border-radius: 12px;
     padding: 18px 20px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
     transition: border-color 0.15s;
     text-decoration: none;
@@ -228,24 +228,23 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 18px 20px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 24px;
   }
   .share-panel-title {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
     margin-bottom: 3px;
   }
   .share-panel-url {
-    font-size: 11.5px;
-    color: var(--ink-3);
-    font-family: ui-monospace, monospace;
-    word-break: break-all;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    line-height: 1.45;
   }
   .share-copy-btn { flex-shrink: 0; }
   .share-copy-btn.copied {
@@ -482,9 +481,12 @@
 <main id="main">
 
   <div class="share-panel">
+    <div class="item-icon" style="flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </div>
     <div class="share-panel-left">
       <div class="share-panel-title">Bookmark this page</div>
-      <div class="share-panel-url" style="font-family:inherit;font-size:12.5px;">Copy the link and save it — you'll always have quick access to the full library without needing to hunt for individual items.</div>
+      <div class="share-panel-url">Copy the link and save it — you'll always have quick access to the full library without needing to hunt for individual items.</div>
     </div>
     <button class="btn share-copy-btn" onclick="copyLibLink(this)" style="flex-shrink:0;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -537,11 +539,11 @@
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/f83bc128-086d-4fda-8596-a23621a4b91e" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/org-hierarchy.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/f83bc128-086d-4fda-8596-a23621a4b91e" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/org-hierarchy.html" target="_blank">
         Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
     </div>
@@ -562,11 +564,11 @@
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/496e7edf-67bd-4d20-8539-3f1aaad6fa73" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/persona-cards.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/496e7edf-67bd-4d20-8539-3f1aaad6fa73" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/persona-cards.html" target="_blank">
         Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
     </div>
@@ -587,11 +589,11 @@
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/789c3208-19f4-409c-ae3c-278535caf679" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/permission-catalogue.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/789c3208-19f4-409c-ae3c-278535caf679" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/permission-catalogue.html" target="_blank">
         Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
     </div>
@@ -612,11 +614,11 @@
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/83d399bd-a815-43df-a285-d7356cc1b9f7" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/decision-log.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/83d399bd-a815-43df-a285-d7356cc1b9f7" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/decision-log.html" target="_blank">
         Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
     </div>
@@ -632,18 +634,18 @@
     </div>
     <div class="item-body">
       <div class="item-top">
-        <span class="item-title">RBAC Intelligence Reference</span>
+        <span class="item-title">Nexus Intelligence Reference</span>
         <span class="item-type">Intel Doc</span>
       </div>
       <div class="item-desc">Living snapshot: org hierarchy, roles, permissions, personas, PRD decisions, open questions and sources.</div>
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/183a8706-418f-4d09-86b8-9c587730033d" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/intel-reference.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/183a8706-418f-4d09-86b8-9c587730033d" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/intel-reference.html" target="_blank">
         Open
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
@@ -665,11 +667,11 @@
       <div class="item-date">Last updated 21 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/daa72772-50fb-403a-8876-6c0127169e6e" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/experience-map.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/daa72772-50fb-403a-8876-6c0127169e6e" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/experience-map.html" target="_blank">
         Open
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
@@ -691,11 +693,11 @@
       <div class="item-date">Last updated 23 Jul 2026</div>
     </div>
     <div class="item-actions">
-      <button class="btn copy-btn" data-url="https://claude.ai/code/artifact/0dd2b64b-e349-4ebc-bf15-9083503d2cbc" onclick="copyLink(this)">
+      <button class="btn copy-btn" data-url="https://johnnyhuntington-maker.github.io/BT-wholesale/user-stories.html" onclick="copyLink(this)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy link
       </button>
-      <a class="btn btn-open" href="https://claude.ai/code/artifact/0dd2b64b-e349-4ebc-bf15-9083503d2cbc" target="_blank">
+      <a class="btn btn-open" href="https://johnnyhuntington-maker.github.io/BT-wholesale/user-stories.html" target="_blank">
         Open
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </a>
