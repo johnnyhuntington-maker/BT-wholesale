@@ -720,12 +720,13 @@
         <div class="form-group">
           <label class="form-label">Attach files <span>(optional)</span></label>
           <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <input type="file" id="file-input" multiple onchange="handleFileSelect(event)" style="display:none" />
+            <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.docx,.xlsx,.pptx,.csv,.txt,.md" onchange="handleFileSelect(event)" style="display:none" />
             <div class="file-zone-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <div class="file-zone-label">Drop files here or click to browse</div>
-            <div class="file-zone-sub">PDF, Word, Excel, PowerPoint, Figma (.fig), JPEG, PNG — any format up to 25 MB</div>
+            <div class="file-zone-sub">PDF · JPEG · PNG · Word · Excel · PowerPoint · CSV — up to 25 MB per file</div>
+            <div class="file-zone-sub" style="margin-top:4px;font-size:10.5px;">Figma or Mural? Export as PDF or PNG first, then upload here</div>
           </div>
           <div class="file-list" id="file-list"></div>
         </div>
