@@ -656,14 +656,14 @@ function App(){
 
   const AUDIT_LOG=[
     {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller'},
-    {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: Broadband added',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt'},
+    {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: Broadband added',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt',assisted:true,assistedOrg:'Metro Connect'},
     {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller'},
-    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Sub-Reseller) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt'},
+    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Sub-Reseller) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
     {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User)',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller'},
     {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller'},
-    {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt'},
+    {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
     {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Dealer) under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller'},
-    {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom primary contact changed',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt'},
+    {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom primary contact changed',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
     {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller'},
   ];
   const AUDIT_CATEGORIES=['All categories','User administration','Organisation management','Product management','Billing','API access'];
@@ -815,9 +815,9 @@ function App(){
                       h('div',{style:{fontSize:'12px',fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',color:'#808080',marginBottom:'2px'}},'Your role'),
                       h('div',{style:{fontSize:'16px',fontWeight:700,color:'#2A2A2A'}},myRole.label),
                       h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},'Since '+me.roleDate))),
-                  h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
-                    myRole.grants.map((g,i)=>h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'center',fontSize:'14px',color:'#2A2A2A'}},
-                      ic('M20 6 9 17l-5-5',{s:13,c:'#357E3C',w:2.4}),g)))),
+                  h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}},
+                    myRole.grants.map((g,i)=>h('span',{key:i,style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#E6F4E5',border:'1px solid #A3D9A1',color:'#036C01',borderRadius:'999px',padding:'4px 10px',fontSize:'12px',fontWeight:600}},
+                      ic('M20 6 9 17l-5-5',{s:10,c:'#357E3C',w:2.4}),g)))),
                 h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'24px'}},
                   h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}},
                     h('span',{style:{width:'40px',height:'40px',borderRadius:'10px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
@@ -1253,7 +1253,7 @@ function App(){
                             h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
                             h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
                         :h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
-                            (()=>{const tOrg=orgById(userWiz.orgId);const isSub=tOrg&&tOrg.typeKey==='subReseller';return ROLES.filter(r=>r.key!=='admin').map(r=>{const blocked=isSub&&r.key==='billingManager';const active=userWiz.role===r.key;return blocked?h('div',{key:r.key,style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#FAFAFA',opacity:0.7}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#C8C8C8'}),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#C8C8C8'}},r.label),h('span',{style:{display:'block',fontSize:'11px',color:'#C8C8C8',lineHeight:1.35,marginTop:'2px'}},'Not available — Sub-Reseller orgs are blocked from billing access (PRD §17.2)'))):h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));})})())),
+                            (()=>{const tOrg=orgById(userWiz.orgId);const isSub=tOrg&&tOrg.typeKey==='subReseller';return ROLES.filter(r=>r.key!=='admin').map(r=>{const blocked=isSub&&(r.key==='billingManager'||r.key==='support');const active=userWiz.role===r.key;return blocked?h('div',{key:r.key,style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#FAFAFA',opacity:0.7}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#C8C8C8'}),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#C8C8C8'}},r.label),h('span',{style:{display:'block',fontSize:'11px',color:'#C8C8C8',lineHeight:1.35,marginTop:'2px'}},'Not available — Sub-Reseller orgs cannot access billing or raise support tickets (PRD §17.2)'))):h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));})})())),
                     h('div',null,
                       h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Permissions granted'),
                       h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px'}},
@@ -1297,10 +1297,23 @@ function App(){
                   return true;
                 })
               :flat;
+            const ENT_PROV={'northgate':{'strategicBroadband':'Pending','ukFabric':'Failed'},'metro':{'broadband':'Pending','digitalVoice':'Active'},'beacon':{'digitalVoice':'Pending'}};
             function EntRow({entKey}){
               const e=ENT.find(x=>x.key===entKey);
+              const provStatus=(ENT_PROV[dSel.id]||{})[entKey];
+              const provColors={'Active':['#036C01','#E6F4E5','#A3D9A1'],'Pending':['#7C4A00','#FEF3E2','#F5CBA7'],'Failed':['#A0121B','#FEF5F5','#FAD4D4']};
               const owned=dSel.entitlements.includes(entKey);
               const parentHas=dParent?dParent.entitlements.includes(entKey):true;
+              const hwBlocked=(dSel.typeKey==='subReseller'||dSel.typeKey==='dealer')&&entKey==='hardware';
+              if(hwBlocked) return h('tr',null,
+                h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff'}},
+                  h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                    ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:14,c:'#CCCCCC'}),
+                    h('span',{style:{fontSize:'14px',color:'#AAAAAA'}},e.label))),
+                h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff',textAlign:'right'}},
+                  h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'3px'}},
+                    h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#808080',fontWeight:600,background:'#F0F0F0',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #D0D0D0'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#AAAAAA',display:'inline-block'}}),'Not available'),
+                    h('span',{style:{fontSize:'10px',color:'#AAAAAA',textAlign:'right'}},dSel.typeKey==='subReseller'?'Sub-Resellers cannot order hardware (PRD §17.10)':'Dealers cannot order hardware (PRD §17.10)'))));
               return h('tr',null,
                 h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff'}},
                   h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
@@ -1311,9 +1324,11 @@ function App(){
                         :h('span',{style:{width:14,height:14,display:'flex',alignItems:'center',justifyContent:'center'}},ic('M5 12h14',{s:14,c:'#E0E0E0',w:2})),
                     h('span',{style:{fontSize:'14px',fontWeight:owned?600:400,color:!parentHas?'#CCCCCC':owned?'#1A1A1A':'#808080'}},e.label))),
                 h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff',textAlign:'right',whiteSpace:'nowrap'}},
-                  parentHas&&owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#036C01',fontWeight:600,background:'#E6F4E5',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #A3D9A1'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#036C01',display:'inline-block'}}),'Granted'),
-                  parentHas&&!owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#FDF0C4',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #E8D870'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#D97706',display:'inline-block'}}),'Available'),
-                  !parentHas&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#F0F0F0',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #D0D0D0'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#CCCCCC',display:'inline-block'}}),'Not in parent')));
+                  h('div',{style:{display:'inline-flex',flexDirection:'column',alignItems:'flex-end',gap:'4px'}},
+                    parentHas&&owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#036C01',fontWeight:600,background:'#E6F4E5',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #A3D9A1'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#036C01',display:'inline-block'}}),'Granted'),
+                    parentHas&&!owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#FDF0C4',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #E8D870'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#D97706',display:'inline-block'}}),'Available'),
+                    !parentHas&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#F0F0F0',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #D0D0D0'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#CCCCCC',display:'inline-block'}}),'Not in parent'),
+                    provStatus&&(()=>{const[fc,bg,bd]=provColors[provStatus]||['#444','#F5F5F5','#D0D0D0'];return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11px',color:fc,fontWeight:700,background:bg,padding:'2px 8px',borderRadius:'1000px',border:'1px solid '+bd}},h('span',{style:{width:'5px',height:'5px',borderRadius:'50%',background:fc,display:'inline-block'}}),provStatus);})())));
             }
             return h('div',{style:{maxWidth:'1120px',display:'flex',height:'calc(100vh - 140px)',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',background:'#fff'}},
               // LEFT PANEL — org tree
@@ -1664,25 +1679,35 @@ function App(){
                             'Confirm role change')));
                     })(),
                     // Actions
-                    canAdmin&&h('div',{style:{borderTop:'1px solid #F0F0F0',paddingTop:'18px'}},
-                      h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Actions'),
-                      h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
-                        du.status==='Invited'&&h('button',{
-                          onClick:()=>showToast('success','Invitation resent to '+du.name+'.'),
-                          style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
-                          ic('M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3 18a2 2 0 0 1-2-2.18V13a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v.92',{s:14,c:'#434343'}),'Resend invite email'),
-                        (du.status==='Active'||du.status==='Invited')&&h('button',{
-                          onClick:()=>setDeactivateConfirm(du.id),
-                          style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #F8E0C0',borderRadius:'12px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#8A5A00',textAlign:'left'}},
-                          ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:14,c:'#8A5A00'}),'Deactivate user'),
-                        du.status==='Inactive'&&h('button',{
-                          onClick:()=>{setUsers(us=>us.map(u=>u.id===du.id?{...u,status:'Active'}:u));showToast('success',du.name+' has been reactivated.');},
-                          style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #A3D9A1',borderRadius:'12px',background:'#E6F4E5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#036C01',textAlign:'left'}},
-                          ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C'}),'Reactivate user'),
-                        h('button',{
-                          onClick:()=>setRemoveConfirm(du.id),
-                          style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #FAD4D4',borderRadius:'8px',background:'#FEF5F5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#A0121B',textAlign:'left'}},
-                          ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:14,c:'#A0121B'}),'Remove user'))))
+                    canAdmin&&(()=>{
+                      const selfId=persona==='reseller'?'u1':persona==='subReseller'?'u3':null;
+                      const isSelf=selfId&&du.id===selfId;
+                      return h('div',{style:{borderTop:'1px solid #F0F0F0',paddingTop:'18px'}},
+                        h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Actions'),
+                        isSelf&&h('div',{style:{display:'flex',alignItems:'center',gap:'8px',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'10px',padding:'10px 12px',marginBottom:'8px',fontSize:'13px',color:'#808080'}},
+                          ic('M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',{s:14,c:'#AAAAAA'}),'You cannot deactivate or remove your own account.'),
+                        h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
+                          du.status==='Invited'&&h('button',{
+                            onClick:()=>showToast('success','Invitation resent to '+du.name+'.'),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
+                            ic('M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3 18a2 2 0 0 1-2-2.18V13a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v.92',{s:14,c:'#434343'}),'Resend invite email'),
+                          (du.status==='Active'||du.status==='Invited')&&h('button',{
+                            onClick:()=>showToast('success','Password reset email sent to '+du.name+'.'),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
+                            ic('M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3M8 12h8',{s:14,c:'#434343'}),'Reset password'),
+                          !isSelf&&(du.status==='Active'||du.status==='Invited')&&h('button',{
+                            onClick:()=>setDeactivateConfirm(du.id),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #F8E0C0',borderRadius:'12px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#8A5A00',textAlign:'left'}},
+                            ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:14,c:'#8A5A00'}),'Deactivate user'),
+                          !isSelf&&du.status==='Inactive'&&h('button',{
+                            onClick:()=>{setUsers(us=>us.map(u=>u.id===du.id?{...u,status:'Active'}:u));showToast('success',du.name+' has been reactivated.');},
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #A3D9A1',borderRadius:'12px',background:'#E6F4E5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#036C01',textAlign:'left'}},
+                            ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C'}),'Reactivate user'),
+                          !isSelf&&h('button',{
+                            onClick:()=>setRemoveConfirm(du.id),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #FAD4D4',borderRadius:'8px',background:'#FEF5F5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#A0121B',textAlign:'left'}},
+                            ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:14,c:'#A0121B'}),'Remove user')))
+                    })())
                 :h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'12px',padding:'40px'}},
                     h('div',{style:{width:'52px',height:'52px',borderRadius:'14px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'4px'}},
                       ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'],{s:24,c:'#5514B4'})),
@@ -1720,7 +1745,8 @@ function App(){
                             h('div',{style:{fontWeight:600,fontSize:'13px'}},r.who),
                             h('div',{style:{fontSize:'11px',color:'#808080',marginTop:'2px'}},r.whoRole),
                             h('div',{style:{fontSize:'11px',color:'#808080'}},r.org),
-                            h('span',{style:{display:'inline-block',marginTop:'4px',background:r.actorType==='bt'?'#E8F0FE':'#F3EBFE',color:r.actorType==='bt'?'#1A56DB':'#5514B4',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},r.actorType==='bt'?'BT Internal':'Reseller')),
+                            h('span',{style:{display:'inline-block',marginTop:'4px',background:r.actorType==='bt'?'#E8F0FE':'#F3EBFE',color:r.actorType==='bt'?'#1A56DB':'#5514B4',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},r.actorType==='bt'?'BT Internal':'Reseller'),
+                            r.assisted&&h('span',{style:{display:'inline-block',marginTop:'4px',marginLeft:'4px',background:'#FEF3E2',color:'#92400E',border:'1px solid #F5CBA7',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},ic('M13 2 3 14h9l-1 8 10-12h-9l1-8',{s:9,c:'#92400E',w:2.5}),' Assisted · '+r.assistedOrg)),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
                             h('div',{style:{fontWeight:600}},r.action),
                             h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},r.detail)),
@@ -1972,7 +1998,7 @@ function App(){
                           h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
                           h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
                       :h('div',{style:{display:'flex',flexDirection:'column',gap:'8px',maxHeight:'280px',overflowY:'auto',paddingRight:'4px'}},
-                          (()=>{const tOrg=orgById(userWiz.orgId);const isSub=tOrg&&tOrg.typeKey==='subReseller';return ROLES.filter(r=>r.key!=='admin').map(r=>{const blocked=isSub&&r.key==='billingManager';const active=userWiz.role===r.key;return blocked?h('div',{key:r.key,style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#FAFAFA',opacity:0.7}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#C8C8C8'}),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#C8C8C8'}},r.label),h('span',{style:{display:'block',fontSize:'11px',color:'#C8C8C8',lineHeight:1.35,marginTop:'2px'}},'Not available — Sub-Reseller orgs are blocked from billing access (PRD §17.2)'))):h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));})})())),
+                          (()=>{const tOrg=orgById(userWiz.orgId);const isSub=tOrg&&tOrg.typeKey==='subReseller';return ROLES.filter(r=>r.key!=='admin').map(r=>{const blocked=isSub&&(r.key==='billingManager'||r.key==='support');const active=userWiz.role===r.key;return blocked?h('div',{key:r.key,style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#FAFAFA',opacity:0.7}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#C8C8C8'}),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#C8C8C8'}},r.label),h('span',{style:{display:'block',fontSize:'11px',color:'#C8C8C8',lineHeight:1.35,marginTop:'2px'}},'Not available — Sub-Reseller orgs cannot access billing or raise support tickets (PRD §17.2)'))):h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));})})())),
                   h('div',null,
                     h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Permissions granted'),
                     h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px',maxHeight:'280px',overflowY:'auto'}},
