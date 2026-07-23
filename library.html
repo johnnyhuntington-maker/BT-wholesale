@@ -230,6 +230,133 @@
     background: #DCFCE7;
   }
 
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #4410A0; border-color: #4410A0; color: #fff; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%; max-width: 520px;
+    max-height: 90vh;
+    display: flex; flex-direction: column;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.18s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+  .modal-header {
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .modal-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .modal-close {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); background: none; cursor: pointer;
+    color: var(--ink-2); flex-shrink: 0;
+    transition: border-color 0.1s, color 0.1s;
+  }
+  .modal-close:hover { border-color: var(--border-hover); color: var(--ink); }
+  .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px; justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  /* Form */
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .form-label span { color: var(--ink-3); font-weight: 400; }
+  .form-input, .form-select, .form-textarea {
+    background: var(--ground);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-size: 13px;
+    color: var(--ink);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+  .form-hint { font-size: 11px; color: var(--ink-3); line-height: 1.4; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Success state */
+  .success-state { text-align: center; padding: 8px 0 4px; }
+  .success-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #DCFCE7; color: #166534;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .success-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .success-body { font-size: 13px; color: var(--ink-2); line-height: 1.5; margin-bottom: 16px; }
+  .success-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; font-weight: 600;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px;
+    transition: border-color 0.15s;
+  }
+  .success-link:hover { border-color: var(--accent); }
+
+  /* Contribution cards */
+  .contrib-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .contrib-card + .contrib-card { margin-top: 8px; }
+  .contrib-body { flex: 1; min-width: 0; }
+  .contrib-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .category-chip {
+    font-size: 10.5px; font-weight: 600;
+    padding: 2px 7px; border-radius: 4px;
+    background: var(--accent-soft); color: var(--accent);
+    white-space: nowrap;
+  }
+  .contrib-title { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .contrib-meta { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
+  .contrib-actions { flex-shrink: 0; padding-top: 1px; }
+  .contrib-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .contrib-loading, .contrib-empty {
+    font-size: 13px; color: var(--ink-3); padding: 12px 4px; font-style: italic;
+  }
+
   .empty-note {
     font-size: 13px;
     color: var(--ink-3);
@@ -278,10 +405,16 @@
       <div class="share-panel-title">Project Library</div>
       <div class="share-panel-url" id="lib-url">https://johnnyhuntington-maker.github.io/BT-wholesale/library.html</div>
     </div>
-    <button class="btn share-copy-btn" onclick="copyLibLink(this)">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      Copy link
-    </button>
+    <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+      <button class="btn share-copy-btn" onclick="copyLibLink(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy link
+      </button>
+      <button class="btn btn-primary" onclick="openContributeModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Contribute intel
+      </button>
+    </div>
   </div>
 
   <div class="section-label">Prototype</div>
@@ -494,35 +627,263 @@
     </div>
   </div>
 
+  <div class="section-label" id="contrib-section-label" style="margin-top:24px">Team contributions</div>
+  <div id="contrib-list"><div class="contrib-loading">Loading contributions…</div></div>
+
 </main>
+
+<!-- Contribute modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Contribute intel</div>
+        <div class="modal-sub">Your submission creates a GitHub issue for review before it's merged</div>
+      </div>
+      <button class="modal-close" onclick="closeContributeModal()" aria-label="Close">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <form id="contrib-form" onsubmit="submitContribution(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="field-name">Your name</label>
+            <input class="form-input" id="field-name" type="text" placeholder="e.g. Vanmathi K" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="field-category">Category</label>
+            <select class="form-select" id="field-category" required>
+              <option value="" disabled selected>Select…</option>
+              <option>Org Hierarchy</option>
+              <option>Roles &amp; Permissions</option>
+              <option>Personas</option>
+              <option>Identity &amp; Auth</option>
+              <option>Journeys &amp; Processes</option>
+              <option>Products &amp; Entitlements</option>
+              <option>Open Questions</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-intel">What you know <span>(be as specific as possible)</span></label>
+          <textarea class="form-textarea" id="field-intel" placeholder="Describe what you know or have heard — decisions made, constraints, facts from meetings, etc." required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-source">Source <span>(where did you learn this?)</span></label>
+          <input class="form-input" id="field-source" type="text" placeholder="e.g. Slack conversation with Neil, 22 Jul · Vanmathi's email · Sprint review" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-docs">Supporting documents <span>(optional)</span></label>
+          <textarea class="form-textarea" id="field-docs" placeholder="Describe any files you want to attach. After submitting, you'll get a link to upload them directly to the review item." style="min-height:60px;"></textarea>
+          <div class="form-hint">Files are attached after submission via drag-and-drop on the GitHub review page.</div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeContributeModal()">Cancel</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="document.getElementById('contrib-form').requestSubmit()">
+        Submit contribution
+      </button>
+    </div>
+  </div>
+</div>
 
 <footer>
   BT Nexus · RBAC workstream · Internal design deliverables
 </footer>
 
 <script>
+  /* ─── Copy helpers ─── */
+  const COPY_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const CHECK_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  function flashCopied(btn, restoreHtml) {
+    btn.classList.add('copied');
+    btn.innerHTML = CHECK_SVG + ' Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = restoreHtml; }, 2000);
+  }
   function copyLibLink(btn) {
-    const url = 'https://johnnyhuntington-maker.github.io/BT-wholesale/library.html';
-    navigator.clipboard.writeText(url).then(() => {
-      btn.classList.add('copied');
-      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy link';
-      }, 2000);
-    });
+    navigator.clipboard.writeText('https://johnnyhuntington-maker.github.io/BT-wholesale/library.html')
+      .then(() => flashCopied(btn, COPY_SVG + ' Copy link'));
   }
   function copyLink(btn) {
-    const url = btn.dataset.url;
-    navigator.clipboard.writeText(url).then(() => {
-      btn.classList.add('copied');
-      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy link';
-      }, 2000);
-    });
+    navigator.clipboard.writeText(btn.dataset.url)
+      .then(() => flashCopied(btn, COPY_SVG + ' Copy link'));
   }
+
+  /* ─── GitHub config ─── */
+  const GH_REPO  = 'johnnyhuntington-maker/BT-wholesale';
+  const GH_TOKEN = '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';
+  const GH_LABEL = 'intel-contribution';
+  const GH_BASE  = 'https://api.github.com';
+
+  function ghHeaders(write) {
+    const h = { 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+    if (write) h['Authorization'] = 'Bearer ' + GH_TOKEN;
+    return h;
+  }
+
+  /* Ensure label exists — silent if already there */
+  async function ensureLabel() {
+    try {
+      await fetch(`${GH_BASE}/repos/${GH_REPO}/labels`, {
+        method: 'POST',
+        headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: GH_LABEL, color: '7B61FF', description: 'Team intel contribution pending review' })
+      });
+    } catch (_) {}
+  }
+
+  /* ─── Modal ─── */
+  function openContributeModal() {
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('field-name').focus();
+  }
+  function closeContributeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeContributeModal();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeContributeModal(); });
+
+  /* ─── Submit contribution ─── */
+  async function submitContribution(e) {
+    e.preventDefault();
+    const name     = document.getElementById('field-name').value.trim();
+    const category = document.getElementById('field-category').value;
+    const intel    = document.getElementById('field-intel').value.trim();
+    const source   = document.getElementById('field-source').value.trim();
+    const docs     = document.getElementById('field-docs').value.trim();
+
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const summary = intel.length > 60 ? intel.slice(0, 60) + '…' : intel;
+    const title = `[${category}] ${summary}`;
+
+    const body = [
+      `**Category:** ${category}`,
+      `**Submitted by:** ${name}`,
+      `**Date:** ${today}`,
+      '',
+      '**What I know:**',
+      intel,
+      '',
+      source ? `**Source:**\n${source}` : null,
+      '',
+      docs ? `**Supporting documents:**\n${docs}` : null,
+    ].filter(l => l !== null).join('\n');
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/issues`, {
+        method: 'POST',
+        headers: { ...ghHeaders(true), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, body, labels: [GH_LABEL] })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const issue = await res.json();
+
+      /* Show success state */
+      document.getElementById('modal-body').innerHTML = `
+        <div class="success-state">
+          <div class="success-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="success-title">Contribution submitted</div>
+          <div class="success-body">
+            Thanks ${name}. Your intel has been added to the review queue.<br><br>
+            If you have files to attach, open the review link and drag them into the comment box.
+          </div>
+          <a class="success-link" href="${issue.html_url}" target="_blank">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open review item
+          </a>
+        </div>`;
+      document.getElementById('modal-footer').innerHTML = `
+        <button class="btn btn-primary" onclick="closeContributeModal();document.getElementById('modal-body').innerHTML='';resetForm();loadContributions()">Done</button>`;
+
+      loadContributions();
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit contribution';
+      alert('Submission failed. Please try again.\n\n' + err.message);
+    }
+  }
+
+  function resetForm() {
+    const f = document.getElementById('contrib-form');
+    if (f) f.reset();
+    const submitBtn = document.getElementById('submit-btn');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit contribution'; }
+  }
+
+  /* ─── Load contributions ─── */
+  function parseField(body, field) {
+    const re = new RegExp(`\\*\\*${field}:\\*\\*\\s*(.+)`);
+    const m = body.match(re);
+    return m ? m[1].trim() : '';
+  }
+  function parseMultiField(body, field) {
+    const re = new RegExp(`\\*\\*${field}:\\*\\*\\n([\\s\\S]*?)(?:\\n\\n|$)`);
+    const m = body.match(re);
+    return m ? m[1].trim() : '';
+  }
+
+  async function loadContributions() {
+    const list = document.getElementById('contrib-list');
+    list.innerHTML = '<div class="contrib-loading">Loading contributions…</div>';
+    try {
+      const res = await fetch(`${GH_BASE}/repos/${GH_REPO}/issues?labels=${encodeURIComponent(GH_LABEL)}&state=open&per_page=20`, {
+        headers: ghHeaders(false)
+      });
+      if (!res.ok) throw new Error(res.status);
+      const issues = await res.json();
+      if (!issues.length) {
+        list.innerHTML = '<div class="contrib-empty">No pending contributions yet — be the first to submit.</div>';
+        return;
+      }
+      list.innerHTML = issues.map(issue => {
+        const cat      = parseField(issue.body || '', 'Category') || 'General';
+        const who      = parseField(issue.body || '', 'Submitted by') || 'Team member';
+        const date     = parseField(issue.body || '', 'Date') || '';
+        const intel    = parseMultiField(issue.body || '', 'What I know');
+        const preview  = intel.length > 120 ? intel.slice(0, 120) + '…' : intel;
+        return `
+          <div class="contrib-card">
+            <div class="contrib-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="contrib-body">
+              <div class="contrib-top">
+                <span class="category-chip">${cat}</span>
+              </div>
+              <div class="contrib-title">${issue.title.replace(/^\[.*?\]\s*/, '')}</div>
+              ${preview ? `<div class="item-desc" style="white-space:normal;margin-top:4px;">${preview}</div>` : ''}
+              <div class="contrib-meta">Submitted by ${who}${date ? ' · ' + date : ''}</div>
+            </div>
+            <div class="contrib-actions">
+              <a class="btn btn-open" href="${issue.html_url}" target="_blank">
+                Review
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>`;
+      }).join('');
+    } catch (err) {
+      list.innerHTML = '<div class="contrib-empty">Could not load contributions right now.</div>';
+    }
+  }
+
+  /* ─── Init ─── */
+  ensureLabel();
+  loadContributions();
 </script>
 
 </body>
