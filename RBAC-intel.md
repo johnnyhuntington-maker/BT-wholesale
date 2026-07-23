@@ -1,7 +1,7 @@
 # BT Nexus RBAC — Intelligence Reference
 
 > Living document. Add new intel at the bottom of each section or create new sections as needed.
-> Last updated: 2026-07-20 (refreshed with NaaS archetype research, Jason briefing, Zoya transcript)
+> Last updated: 2026-07-23 (added prototype implementation log — all 7 RBAC gap features built and shipped)
 
 ---
 
@@ -794,3 +794,57 @@ DV4B is Priority 1. Portal must support:
 - Sub-Reseller: NO
 - Dealer: NO
 - Enforced via RBAC + organisation type (both UI hidden + backend validation)
+
+---
+
+## 18. Prototype Implementation Log
+
+**File:** `wholesale.html` — React 18 UMD single-file prototype served at `http://localhost:7654`  
+**Repo:** `https://github.com/johnnyhuntington-maker/BT-wholesale/` (GitHub Pages)  
+**Prototype views:** Reseller Admin (Sarah Whitfield / Northgate Telecom), BT Wholesale Admin (Alex Morgan), Standard User (James Okafor / Order Manager)
+
+---
+
+### 18.1 Features built by session
+
+#### Session: 2026-07-23 — RBAC gap analysis + 7-feature build
+
+Reviewed RBAC-intel against prototype, identified 7 gaps, built and shipped all in one session.
+
+| # | Feature | PRD / Source | Where in prototype |
+|---|---|---|---|
+| 1 | **Self-action prevention** | §16 Phase 5 (Hub as-is insight) | Users tab → own profile: Deactivate and Remove buttons hidden; replaced with "You cannot deactivate or remove your own account" notice |
+| 2 | **Force password reset** | §17.6 (Admin can force password reset) | Users tab → any Active or Invited user: "Reset password" action button added |
+| 3 | **Standard User permission chips** | §16 Phase 3 (Hub as-is: coloured chips in Your profile) | Standard User view → My profile panel: grants now render as green pill chips instead of a tick-list |
+| 4 | **Assisted flag in audit log** | §17.9 (assisted journey separately flagged with actor type, org context) | Audit log: BT Internal records that were assisted now show an amber "⚡ Assisted · OrgName" badge alongside the BT Internal chip |
+| 5 | **Hardware ordering blocked for Sub-Reseller and Dealer** | §17.10 + §3 Org-type capability matrix | Org detail panel → Entitlements table: hardware row replaced with greyed-out "Not available" state with PRD §17.10 reference |
+| 6 | **Entitlement provisioning status chips** | §17.7 (status tracked: Pending → In progress → Completed / Failed) | Org detail panel → Entitlements table: Active / Pending / Failed coloured pill chips shown per entitlement where status is set |
+| 7 | **Support Agent role blocked for Sub-Reseller** | §17.2 (Sub-Reseller: no commercial data, no support tickets) + §3 | Invite user wizard (both Reseller Admin and BT Admin flows): Support Agent role greyed out for Sub-Reseller orgs, matching the existing Billing Manager block |
+
+#### Earlier sessions (pre-2026-07-23)
+
+Core prototype built across earlier sessions. Key features already in place before the gap analysis:
+
+- 5-tier org hierarchy: BT Wholesale → Reseller → Sub-Reseller / Child Reseller → Dealer
+- 3-persona Switch View: Reseller Admin / BT Wholesale Admin / Standard User
+- Org detail panel with entitlements table (`typeAllows()` gating by org type)
+- Invite user wizard with role selection and billing block for Sub-Resellers
+- Audit log with immutable badge and actor type chips (BT Internal / Reseller)
+- User list with status chips, role assignment, deactivate / reactivate / remove actions
+- Dashboard with network stats, org tree, and alert banner
+
+---
+
+### 18.2 Open prototype gaps (not yet built)
+
+These are known gaps identified but not yet implemented — either blocked on open questions or out of scope for current sprint:
+
+| Gap | Reason not built |
+|---|---|
+| Permission catalogue UI (full list of granular capabilities) | PRD says "to be defined in detailed design" — no canonical list yet |
+| Custom role creation (reseller-configurable roles) | Open question: BT-fixed vs reseller-configurable not resolved (§12 open question) |
+| Org establishment flow (BT Admin creates new reseller) | Service Designer territory; BT Internal cannot self-register new orgs per PRD |
+| SSO / identity screens (login, MFA) | PRD flags identity as an open blocker — Salesforce RBAC chosen but not designed |
+| API Portal persona (API Consumer / Partner Developer) | Separate workstream; Matthew Lindley product owner |
+| Primary contact change flow | Process not documented; SLA unknown (§16 Phase 5 open question) |
+| Bulk user management | Known pain point (§16 Phase 4) but not in current sprint scope |

@@ -216,6 +216,20 @@ function CellMark({v}){
   return h('span',{style:{display:'inline-block',width:'14px',height:'2px',borderRadius:'2px',background:'#D9D9D9'}});
 }
 
+const AUDIT_LOG=[
+  {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller'},
+  {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: Broadband added',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt'},
+  {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller'},
+  {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Sub-Reseller) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt'},
+  {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User)',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller'},
+  {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller'},
+  {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt'},
+  {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Dealer) under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller'},
+  {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom primary contact changed',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt'},
+  {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller'},
+];
+const AUDIT_CATEGORIES=['All categories','User administration','Organisation management','Product management','Billing','API access'];
+
 const BT_LOGO = h('svg',{width:40,height:40,viewBox:'0 0 40 40',fill:'none'},
   h('circle',{cx:20,cy:20,r:18,stroke:'#5514B4',strokeWidth:2.5,fill:'none'}),
   h('text',{x:20,y:25,textAnchor:'middle',fill:'#5514B4',fontFamily:"'BT Curve',Arial,sans-serif",fontWeight:700,fontSize:14,letterSpacing:0.5},'BT'));
@@ -265,6 +279,10 @@ function App(){
   const [userSort,setUserSort]=useState({col:'',dir:1});
   const [deactivateConfirm,setDeactivateConfirm]=useState(null);
   const [removeConfirm,setRemoveConfirm]=useState(null);
+  const [btOrgContext,setBtOrgContext]=useState(null);
+  const [roleWiz,setRoleWiz]=useState(null);
+  const [customRoles,setCustomRoles]=useState([]);
+  const [auditFilter,setAuditFilter]=useState('');
 
   function openUserDrawer(id){setUserDrawer(id);setDrawerPendingRole(null);}
   function closeUserDrawer(){setUserDrawer(null);setDrawerPendingRole(null);}
@@ -362,6 +380,7 @@ function App(){
         persona!=='user'&&navItem('Organisations',screen==='orgs'||screen==='orgDetail',()=>setScreen('orgs')),
         (persona==='bt'||persona==='reseller')&&navItem('Billing',screen==='billingSupport',()=>setScreen('billingSupport')),
         persona!=='user'&&navItem('Users',screen==='users',()=>setScreen('users')),
+        persona!=='user'&&navItem('Audit log',screen==='users'&&usersTab==='auditLog',()=>{setScreen('users');setUsersTab('auditLog');}),
         navItem('Knowledge Hub',screen==='knowledgeHub',()=>setScreen('knowledgeHub')),
         (persona==='bt'||persona==='reseller')&&navItem('API Portal',screen==='apiPortal',()=>setScreen('apiPortal'))),
 
@@ -410,6 +429,21 @@ function App(){
       // Content
       h('div',{style:{flex:1,overflowY:'auto',padding:'30px 32px 48px'}},
 
+          isBt&&(screen==='orgs'||screen==='users')&&h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',background:btOrgContext?'#F3EBFE':'#FAFAFA',border:'1px solid '+(btOrgContext?'#C4A0F0':'#E3E3E3'),borderRadius:'10px',padding:'10px 14px',flexWrap:'wrap'}},
+            h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flexShrink:0}},
+              ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:14,c:btOrgContext?'#5514B4':'#808080'}),
+              h('span',{style:{fontSize:'13px',fontWeight:700,color:btOrgContext?'#5514B4':'#434343'}},btOrgContext?'Acting in context of:':'Organisation context')),
+            btOrgContext
+              ?h('div',{style:{display:'flex',alignItems:'center',gap:'10px',flex:1}},
+                  h('span',{style:{fontSize:'13px',fontWeight:700,color:'#2A2A2A',background:'#fff',border:'1px solid #C4A0F0',borderRadius:'6px',padding:'3px 10px'}},orgById(btOrgContext)?orgById(btOrgContext).name:'—'),
+                  h('span',{style:{fontSize:'13px',color:'#808080',flex:1}},'All actions you take here are logged with your identity and this org context.'),
+                  h('button',{onClick:()=>setBtOrgContext(null),style:{fontSize:'12px',fontWeight:700,color:'#5514B4',background:'none',border:'1px solid #C4A0F0',borderRadius:'6px',padding:'4px 10px',cursor:'pointer',fontFamily:'inherit',flexShrink:0}},'Clear context'))
+              :h('div',{style:{display:'flex',alignItems:'center',gap:'10px',flex:1}},
+                  h('span',{style:{fontSize:'13px',color:'#808080',flex:1}},'Select an organisation to act in context of a specific reseller. Leave blank for platform-wide view.'),
+                  h('select',{value:btOrgContext||'',onChange:e=>setBtOrgContext(e.target.value||null),style:{padding:'5px 28px 5px 10px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'13px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#2A2A2A',appearance:'none',WebkitAppearance:'none',backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23808080%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E\")",backgroundRepeat:'no-repeat',backgroundPosition:'right 8px center',flexShrink:0}},
+                    h('option',{value:''},'Select reseller…'),
+                    orgs.filter(o=>o.typeKey==='reseller').map(o=>h('option',{key:o.id,value:o.id},o.name))))),
+
           screen==='orgDetail'&&h(Breadcrumb,{crumbs:[
             {label:isBt?'Reseller organisations':'Organisations',onClick:()=>setScreen('orgs')},
             {label:(orgById(selOrgId)||{name:'Organisation'}).name},
@@ -422,7 +456,7 @@ function App(){
             h('div',{style:{fontSize:'28px',fontWeight:400,fontFamily:"'BT Curve Headline','BT Curve',system-ui,sans-serif",letterSpacing:'-0.01em'}},
               screen==='orgDetail'?(orgById(selOrgId)||{name:'Organisation'}).name:
               screen==='orgs'?(isBt?'Reseller organisations':'Organisations'):
-              screen==='users'?(usersTab==='users'?'Users':'Roles & permissions'):
+              screen==='users'?(usersTab==='users'?'Users':usersTab==='auditLog'?'Audit log':'Roles & permissions'):
               screen==='helpSupport'?'Help & support':
               screen==='knowledgeHub'?'Knowledge Hub':
               screen==='billingSupport'?'Billing Support':
@@ -431,7 +465,9 @@ function App(){
               screen==='overview'?('Welcome back, '+P.person.name.split(' ')[0]):P.title),
             (screen==='orgs'&&canCreateOrg||screen==='overview'&&persona==='bt')&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,screen==='overview'?'Create reseller':createOrg.label)),
             screen==='overview'&&persona==='reseller'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,'Invite user')),
-            screen==='users'&&usersTab==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label))),
+            screen==='users'&&usersTab==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label)),
+            screen==='users'&&usersTab==='auditLog'&&h('div',{style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#F3EBFE',border:'1px solid #C4A0F0',color:'#5514B4',borderRadius:'999px',padding:'5px 12px',fontSize:'12px',fontWeight:700}},
+              ic(['M9 12l2 2 4-4','M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],{s:13,c:'#5514B4'}),'Immutable — read-only')),
           screen==='knowledgeHub'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
             h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',textAlign:'center',maxWidth:'440px',width:'100%'}},
               h('div',{style:{width:'56px',height:'56px',borderRadius:'20px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
@@ -905,12 +941,19 @@ function App(){
                             h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
                             h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
                         :h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}},
-                            ROLES.filter(r=>r.key!=='admin').map(r=>{
-                              const active=userWiz.role===r.key;
-                              return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                                h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                                h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
-                            }))),
+                            (()=>{
+                              const targetOrg=orgById(userWiz.orgId);
+                              const isSubRes=targetOrg&&targetOrg.typeKey==='subReseller';
+                              const billingBlockedRoles=['billingManager'];
+                              return ROLES.filter(r=>r.key!=='admin').map(r=>{
+                                const active=userWiz.role===r.key;
+                                const blocked=isSubRes&&billingBlockedRoles.includes(r.key);
+                                return h('button',{key:r.key,onClick:()=>!blocked&&setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:blocked?'not-allowed':'pointer',border:'1px solid '+(active?'#5514B4':blocked?'#F0E0E0':'#E3E3E3'),background:active?'#FAF6FF':blocked?'#FFF5F5':'#fff',fontFamily:'inherit',opacity:blocked?0.7:1}},
+                                  h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
+                                  h('span',{style:{textAlign:'left',flex:1}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:blocked?'#808080':'inherit'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},blocked?'Not available — Sub-Reseller orgs are blocked from billing access (PRD §17.2)':r.desc)),
+                                  blocked&&lockEl('#C8C8C8'));
+                              });
+                            })())),
                     h('div',null,
                       h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Permissions granted'),
                       h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px'}},
@@ -1346,6 +1389,42 @@ function App(){
                     h('div',{style:{fontWeight:700,fontSize:'14px',color:'#434343'}},'Select a user'),
                     h('div',{style:{fontSize:'14px',color:'#AAAAAA'}},'Choose from the list on the left to view their profile')));
           })(),
+            usersTab==='auditLog'&&(()=>{
+              const catColors={'User administration':['#3F187F','#F3EBFE'],'Organisation management':['#036C01','#E6F4E5'],'Product management':['#2A2A2A','#FDF0C4'],'Billing':['#1A4070','#E8F1FB'],'API access':['#1A4A3A','#E6F5F0']};
+              const q=auditFilter.toLowerCase();
+              const filtered=AUDIT_LOG.filter(e=>!q||(e.who+e.action+e.detail+e.category+e.org).toLowerCase().includes(q));
+              return h('div',{style:{maxWidth:'1120px'}},
+                h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 18px',display:'flex',gap:'12px',alignItems:'flex-start',marginBottom:'20px'}},
+                  ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#5514B4'}),
+                  h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.5}},'All role and permission changes are logged here. Records are ',h('b',null,'immutable'),' — actions are captured with the actor identity, organisation context, and a timestamp. Accessible only to Administrators.')),
+                h('div',{style:{display:'flex',gap:'12px',marginBottom:'20px',alignItems:'center'}},
+                  h('div',{style:{position:'relative',flex:1}},
+                    h('span',{style:{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex',color:'#AAAAAA'}},ic('M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0',{s:15})),
+                    h('input',{value:auditFilter,onChange:e=>setAuditFilter(e.target.value),placeholder:'Search log…',style:{width:'100%',padding:'9px 14px 9px 36px',border:'1px solid #6B6B6B',borderRadius:'10px',fontSize:'14px',fontFamily:'inherit',outline:'none',boxSizing:'border-box'}})),
+                  auditFilter&&h('button',{onClick:()=>setAuditFilter(''),style:{padding:'9px 14px',border:'1px solid #E3E3E3',borderRadius:'10px',fontSize:'14px',background:'#fff',cursor:'pointer',fontFamily:'inherit',color:'#808080',whiteSpace:'nowrap'}},'Clear')),
+                h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',overflow:'hidden'}},
+                  h('div',{style:{display:'grid',gridTemplateColumns:'1.4fr 2fr 1.2fr 0.9fr',padding:'11px 20px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontSize:'12px',fontWeight:600,color:'#434343'}},
+                    h('div',null,'Actor'),h('div',null,'Action'),h('div',null,'Category'),h('div',null,'Timestamp')),
+                  filtered.length===0
+                    ?h('div',{style:{padding:'40px',textAlign:'center',color:'#AAAAAA',fontSize:'14px'}},'No log entries match')
+                    :filtered.map((e,i)=>{
+                      const [cfg,cbg]=catColors[e.category]||['#434343','#F7F7F7'];
+                      return h('div',{key:e.id,style:{display:'grid',gridTemplateColumns:'1.4fr 2fr 1.2fr 0.9fr',padding:'14px 20px',borderBottom:i<filtered.length-1?'1px solid #F5F5F5':'none',alignItems:'start'}},
+                        h('div',null,
+                          h('div',{style:{fontWeight:700,fontSize:'14px',color:'#2A2A2A'}},e.who),
+                          h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},e.whoRole+' · '+e.org),
+                          h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',fontSize:'11px',fontWeight:700,color:e.actorType==='bt'?'#2A1C4A':'#5514B4',background:e.actorType==='bt'?'#EBE6F4':'#F3EBFE',border:'1px solid '+(e.actorType==='bt'?'#BDB0E0':'#C4A0F0'),borderRadius:'1000px',padding:'2px 8px',marginTop:'6px'}},
+                            ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:10,c:e.actorType==='bt'?'#2A1C4A':'#5514B4'}),
+                            e.actorType==='bt'?'BT Internal':'Reseller')),
+                        h('div',null,
+                          h('div',{style:{fontWeight:600,fontSize:'14px',color:'#2A2A2A'}},e.action),
+                          h('div',{style:{fontSize:'12px',color:'#6B6B6B',marginTop:'3px',lineHeight:1.4}},e.detail)),
+                        h('div',null,
+                          h('span',{style:{display:'inline-flex',alignItems:'center',fontSize:'12px',fontWeight:700,color:cfg,background:cbg,borderRadius:'6px',padding:'4px 10px'}},e.category)),
+                        h('div',{style:{fontSize:'12px',color:'#808080',fontVariantNumeric:'tabular-nums'}},e.ts));
+                    })));
+            })(),
+
             usersTab==='roles'&&(()=>{
               const tabs=isBt
                 ?[{key:'roleDirectory',label:'Available roles'},{key:'resellerAdmins',label:'Reseller admins'},{key:'whoHasAccess',label:'Who has access?'}]
@@ -1457,7 +1536,7 @@ function App(){
                           h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,flex:1}},isBt
                             ?'These are the roles available to BT Wholesale staff. Each role defines what someone can configure, view, or manage across the platform.'
                             :'Each role controls what a user can see and do. Roles are built from permission sets — click any role to see how it\'s composed.'),
-                          !isBt&&h('button',{onClick:()=>showToast('info','Custom role creation is in development. You\'ll be able to build a role by selecting permission sets from the catalogue.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
+                          !isBt&&h('button',{onClick:()=>setRoleWiz({step:1,name:'',desc:'',permSets:{}}),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
                             ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Create custom role')),
                         h('div',{style:{borderTop:'1px solid #E8E8E8'}},
                           h('table',{style:{borderCollapse:'collapse',width:'100%'}},
@@ -1590,12 +1669,7 @@ function App(){
                           h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#5514B4'}},'Administrator'),
                           h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35,marginTop:'4px'}},'Manages users, billing, orders and all platform settings'))
                       :h('div',{style:{display:'flex',flexDirection:'column',gap:'8px',maxHeight:'280px',overflowY:'auto',paddingRight:'4px'}},
-                          ROLES.filter(r=>r.key!=='admin').map(r=>{
-                            const active=userWiz.role===r.key;
-                            return h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                              h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                              h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));
-                          }))),
+                          (()=>{const tOrg=orgById(userWiz.orgId);const isSub=tOrg&&tOrg.typeKey==='subReseller';return ROLES.filter(r=>r.key!=='admin').map(r=>{const blocked=isSub&&r.key==='billingManager';const active=userWiz.role===r.key;return blocked?h('div',{key:r.key,style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#FAFAFA',opacity:0.7}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10',{s:16,c:'#C8C8C8'}),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px',color:'#C8C8C8'}},r.label),h('span',{style:{display:'block',fontSize:'11px',color:'#C8C8C8',lineHeight:1.35,marginTop:'2px'}},'Not available — Sub-Reseller orgs are blocked from billing access (PRD §17.2)'))):h('button',{key:r.key,onClick:()=>setUserWiz(w=>({...w,role:r.key})),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'12px 13px',borderRadius:'11px',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},h('span',{style:{width:'19px',height:'19px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),h('span',{style:{textAlign:'left'}},h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},r.label),h('span',{style:{display:'block',fontSize:'12px',color:'#808080',lineHeight:1.35}},r.desc)));})})()),
                   h('div',null,
                     h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Permissions granted'),
                     h('div',{style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px',maxHeight:'280px',overflowY:'auto'}},
@@ -1848,6 +1922,61 @@ function App(){
                 setOrgs(os=>[...os,org]);setSeq(n=>n+1);setOrgWiz(null);setSelOrgId(id);setScreen('orgs');
                 showToast('success',org.name+' created as a '+TYPE_LABELS[orgWiz.type]+' under '+p.name+'.');
               },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue')))),
+
+        // Role Wizard
+        roleWiz&&h('div',{onClick:()=>setRoleWiz(null),style:{position:'fixed',inset:0,background:'rgba(20,10,40,0.42)',display:'flex',alignItems:'center',justifyContent:'center',padding:'32px',zIndex:55}},
+          h('div',{onClick:e=>e.stopPropagation(),style:{background:'#fff',borderRadius:'20px',width:'720px',maxWidth:'100%',maxHeight:'90vh',display:'flex',flexDirection:'column',overflow:'hidden'}},
+            h('div',{style:{padding:'24px 28px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
+              h('div',null,
+                h('div',{style:{fontSize:'20px',fontWeight:700}},'Create custom role'),
+                h('div',{style:{fontSize:'14px',color:'#808080',marginTop:'2px'}},'Step '+roleWiz.step+' of 3 · '+['Name & description','Permission sets','Review'][roleWiz.step-1])),
+              h('button',{onClick:()=>setRoleWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
+            h('div',{style:{height:'4px',background:'#F0F0F0'}},h('div',{style:{height:'100%',background:'#5514B4',width:Math.round(roleWiz.step/3*100)+'%',transition:'width 240ms ease'}})),
+            h('div',{style:{padding:'24px 28px',overflowY:'auto',flex:1}},
+              roleWiz.step===1&&h('div',null,
+                h('div',{style:{background:'#F7F3FF',border:'1px solid #D9C3F8',borderRadius:'10px',padding:'12px 16px',marginBottom:'20px',display:'flex',gap:'10px',alignItems:'flex-start'}},
+                  ic('M12 16v-4M12 8h.01',{s:16,c:'#5514B4'}),
+                  h('div',{style:{fontSize:'13px',color:'#3D1070',lineHeight:1.5}},h('strong',null,'Custom roles use permission sets as building blocks.'),' Choose a name, then select which permission sets this role should include in step 2.')),
+                h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'6px'}},'Role name'),
+                h('input',{value:roleWiz.name,onChange:e=>setRoleWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Regional Sales Manager',style:{width:'100%',padding:'12px 14px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'16px',marginBottom:'20px',fontFamily:'inherit'}}),
+                h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'6px'}},'Description'),
+                h('textarea',{value:roleWiz.desc,onChange:e=>setRoleWiz(w=>({...w,desc:e.target.value})),placeholder:'What does this role allow the user to do?',rows:3,style:{width:'100%',padding:'12px 14px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'14px',fontFamily:'inherit',resize:'vertical'}})),
+              roleWiz.step===2&&h('div',null,
+                h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'16px'}},'Select the permission sets to include in this role. Sets are grouped by capability area.'),
+                [
+                  ['User & access management',['user_invite','user_deactivate','role_assign','role_create']],
+                  ['Order management',['order_place','order_view','order_cancel','order_bulk']],
+                  ['Billing & commercial',['billing_view','billing_manage','pricing_view','credit_request']],
+                  ['Reporting & analytics',['reports_standard','reports_advanced','usage_export']],
+                  ['Support',['fault_raise','fault_manage','ticket_view']],
+                  ['Organisation management',['org_create','org_edit','org_entitlements']],
+                  ['API access',['api_keys_manage','api_sandbox','api_production']],
+                ].map(([group,sets])=>
+                  h('div',{key:group,style:{marginBottom:'16px'}},
+                    h('div',{style:{fontSize:'11px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#808080',marginBottom:'8px'}},group),
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}},
+                      sets.map(s=>{const on=!!roleWiz.permSets[s];return h('button',{key:s,onClick:()=>setRoleWiz(w=>({...w,permSets:{...w.permSets,[s]:!w.permSets[s]}})),style:{display:'flex',alignItems:'center',gap:'10px',padding:'10px 12px',borderRadius:'8px',border:'1px solid '+(on?'#5514B4':'#E3E3E3'),background:on?'#FAF6FF':'#fff',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}},
+                        h('span',{style:{width:'17px',height:'17px',borderRadius:'4px',border:'1.5px solid '+(on?'#5514B4':'#C8C8C8'),background:on?'#5514B4':'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},on&&ic('M20 6 9 17l-5-5',{s:11,c:'#fff',w:2.8})),
+                        h('span',{style:{fontSize:'12px',fontWeight:on?700:400,color:on?'#5514B4':'#434343'}},s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())))})))))),
+              roleWiz.step===3&&h('div',null,
+                h('div',{style:{background:'#F7F7F7',borderRadius:'12px',padding:'16px 20px',marginBottom:'16px'}},
+                  h('div',{style:{fontWeight:700,fontSize:'16px',marginBottom:'4px'}},roleWiz.name||'(unnamed)'),
+                  roleWiz.desc&&h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'12px'}},roleWiz.desc),
+                  h('div',{style:{fontSize:'12px',fontWeight:700,color:'#808080',marginBottom:'6px'}},'Permission sets included'),
+                  Object.keys(roleWiz.permSets).filter(k=>roleWiz.permSets[k]).length===0
+                    ?h('div',{style:{fontSize:'13px',color:'#C8C8C8'}},'No permission sets selected')
+                    :h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}},
+                        Object.keys(roleWiz.permSets).filter(k=>roleWiz.permSets[k]).map(k=>
+                          h('span',{key:k,style:{background:'#EDE8FA',color:'#5514B4',borderRadius:'1000px',padding:'3px 10px',fontSize:'12px',fontWeight:600}},k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))))),
+                h('div',{style:{fontSize:'13px',color:'#808080',lineHeight:1.5}},'Once created, this role will appear in the role list and can be assigned to users. You can edit permission sets from the Roles & permissions tab.')))),
+            h('div',{style:{padding:'20px 28px',borderTop:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+              h('button',{onClick:()=>setRoleWiz(w=>({...w,step:Math.max(1,w.step-1)})),style:{background:'#fff',border:'1px solid #C8C8C8',borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',visibility:roleWiz.step===1?'hidden':'visible',fontFamily:'inherit'}},'Back'),
+              h('button',{onClick:()=>{
+                if(roleWiz.step<3){setRoleWiz(w=>({...w,step:w.step+1}));return;}
+                const sets=Object.keys(roleWiz.permSets).filter(k=>roleWiz.permSets[k]);
+                const newRole={key:'custom_'+Date.now(),label:roleWiz.name||'Custom role',desc:roleWiz.desc,grants:sets.map(s=>s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())),custom:true};
+                setCustomRoles(r=>[...r,newRole]);setRoleWiz(null);showToast('success','Custom role "'+newRole.label+'" created.');
+              },style:{background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},roleWiz.step===3?'Create role':'Next →')))),
 
         // Toast
         toast&&h('div',{style:{position:'fixed',bottom:'24px',right:'24px',zIndex:80,display:'flex',alignItems:'center',gap:'12px',padding:'15px 18px',borderRadius:'14px',background:'#fff',border:'1px solid #E3E3E3',boxShadow:'0 12px 32px rgba(20,10,40,0.18)',maxWidth:'420px'}},
