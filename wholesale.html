@@ -749,8 +749,7 @@ function App(){
         navItem('Dashboard',screen==='overview',()=>setScreen('overview')),
         persona!=='user'&&navItem('Organisations',screen==='orgs'||screen==='orgDetail',()=>setScreen('orgs')),
         (persona==='bt'||persona==='reseller')&&navItem('Billing',screen==='billingSupport',()=>setScreen('billingSupport')),
-        persona!=='user'&&navItem('Users',screen==='users'&&usersTab!=='auditLog',()=>{setScreen('users');setUsersTab('users');}),
-        persona!=='user'&&navItem('Audit log',screen==='users'&&usersTab==='auditLog',()=>{setScreen('users');setUsersTab('auditLog');}),
+        persona!=='user'&&navItem('Users',screen==='users',()=>{setScreen('users');setUsersTab('users');}),
         navItem('Knowledge Hub',screen==='knowledgeHub',()=>setScreen('knowledgeHub')),
         (persona==='bt'||persona==='reseller')&&navItem('API Portal',screen==='apiPortal',()=>setScreen('apiPortal'))),
 
