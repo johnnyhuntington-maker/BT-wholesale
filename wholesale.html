@@ -1607,10 +1607,10 @@ function App(){
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
-            h('div',{style:{marginBottom:'24px',display:'flex',gap:'8px',flexWrap:'wrap'}},
+            h('div',{style:{borderBottom:'1px solid #E3E3E3',marginBottom:'24px',display:'flex',gap:'8px'}},
               [{key:'users',label:'Users'},{key:'roles',label:'Roles & permissions'},{key:'auditLog',label:'Audit log'}].map(t=>
                 h('button',{key:t.key,onClick:()=>setUsersTab(t.key),
-                  style:{display:'inline-flex',alignItems:'center',padding:'6px 16px',borderRadius:'9999px',fontSize:'13px',fontWeight:usersTab===t.key?700:500,cursor:'pointer',border:'1px solid '+(usersTab===t.key?'#5514B4':'#E3E3E3'),background:usersTab===t.key?'#5514B4':'#fff',color:usersTab===t.key?'#fff':'#434343',fontFamily:'inherit',whiteSpace:'nowrap',transition:'background 120ms,color 120ms,border-color 120ms'}},
+                  style:{background:'none',border:'none',borderBottom:usersTab===t.key?'2px solid #2A1C4A':'2px solid transparent',padding:'10px 16px 10px 12px',fontWeight:usersTab===t.key?700:400,fontSize:'14px',color:usersTab===t.key?'#2A1C4A':'#5514B4',cursor:'pointer',fontFamily:'inherit',marginBottom:'-1px',whiteSpace:'nowrap'}},
                   t.label))),
             usersTab==='users'&&(()=>{
             const q=userSearch.toLowerCase();
