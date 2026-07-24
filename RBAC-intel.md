@@ -807,6 +807,24 @@ DV4B is Priority 1. Portal must support:
 
 ### 18.1 Features built by session
 
+#### Session: 2026-07-24 — Full 11-gap implementation
+
+Conducted exhaustive gap analysis against RBAC-intel, produced artifact with 14 built / 11 actionable / 7 blocked / 4 blind spots. Built all 11 actionable gaps in single session.
+
+| # | Gap | Priority | What was built |
+|---|---|---|---|
+| 1 | **Remove = permanent** | P1 | `removeConfirm` modal rewritten — "This action cannot be undone. Contact BT Wholesale support." Remove toast updated. Bulk remove toast updated. |
+| 2 | **Deactivate: session termination + API revocation** | P2 | `deactivateConfirm` modal now says "active sessions terminated and API access revoked immediately." Reactivate note preserved. |
+| 3 | **Invitation expiry status** | P2 | `Expired` added to `statusMap` (amber-brown: #78350F/#FDEFD0). Amber chip in user list. Marcus Webb (u9) added as example expired invite. `Expired` added to status filter dropdown. |
+| 4 | **Duplicate email guard** | P2 | Invite wizard Step 1 → Step 2 transition now checks `users.some(u=>u.email===wizEmail)`. Shows error toast and blocks progression if duplicate found. |
+| 5 | **BT Internal org context picker** | P1 | Already built (line 854 — banner + select persisted via `btOrgContext` state). No new work needed. |
+| 6 | **Sub-reseller restricted scope indicator** | P1 | Amber banner on Users / Orgs / Overview for `persona==='subReseller'`: "You are viewing as Partner Org Admin for Metro Connect. Billing data, parent org records and cross-org user lookup are restricted." |
+| 7 | **Bulk "Change role" action** | P2 | Bulk action bar gets "Change role" toggle. Clicking opens inline `<select>` over ROLES; selecting a role applies it to all selected non-Removed users and clears selection. `bulkRoleOpen` state added. |
+| 8 | **Transfer primary contact button** | P3 | "Transfer primary contact" button added to user drawer Actions section for `du.isPrimary && du.status==='Active'` users. Opens existing `contactChangeWiz` flow. |
+| 9 | **Three-layer RBAC model visible** | P2 | Permission Sets tab now opens with an info card: Permission Sets → Roles → Users with icon + description per layer, styled in purple. |
+| 10 | **Sub-reseller data visibility controls** | P2 | Org detail page: when `od.typeKey==='subReseller'`, a "Sub-reseller data visibility" panel renders with three toggle controls (View parent billing / View parent orders / Cross-org user lookup). Toggles show "info" toast — flagged as full-implementation item. |
+| 11 | **Dealer as entitlement-recipient note** | P3 | Org detail page: when `od.typeKey==='dealer'`, amber info card explains "Dealers are entitlement recipients — no direct portal login. Managed by parent reseller." |
+
 #### Session: 2026-07-23 — RBAC gap analysis + 7-feature build
 
 Reviewed RBAC-intel against prototype, identified 7 gaps, built and shipped all in one session.
@@ -835,16 +853,16 @@ Core prototype built across earlier sessions. Key features already in place befo
 
 ---
 
-### 18.2 Open prototype gaps (not yet built)
+### 18.2 Remaining prototype gaps
 
-These are known gaps identified but not yet implemented — either blocked on open questions or out of scope for current sprint:
+All 11 actionable gaps from the 2026-07-24 gap analysis are now built. Remaining items are either blocked on open questions or explicitly out of scope:
 
-| Gap | Reason not built |
-|---|---|
-| Permission catalogue UI (full list of granular capabilities) | PRD says "to be defined in detailed design" — no canonical list yet |
-| Custom role creation (reseller-configurable roles) | Open question: BT-fixed vs reseller-configurable not resolved (§12 open question) |
-| Org establishment flow (BT Admin creates new reseller) | Service Designer territory; BT Internal cannot self-register new orgs per PRD |
-| SSO / identity screens (login, MFA) | PRD flags identity as an open blocker — Salesforce RBAC chosen but not designed |
-| API Portal persona (API Consumer / Partner Developer) | Separate workstream; Matthew Lindley product owner |
-| Primary contact change flow | Process not documented; SLA unknown (§16 Phase 5 open question) |
-| Bulk user management | Known pain point (§16 Phase 4) but not in current sprint scope |
+| Gap | Status | Reason |
+|---|---|---|
+| Permission catalogue UI (full list of granular capabilities) | **Blocked** | PRD §14 says "to be defined in detailed design" — no canonical list yet |
+| Custom role creation (reseller-configurable roles) | **Blocked** | Open question: BT-fixed vs reseller-configurable not resolved (§12 open question) |
+| Org establishment flow (BT Admin creates new reseller) | **Out of scope** | Service Designer territory; BT Internal cannot self-register new orgs per PRD |
+| SSO / identity screens (login, MFA) | **Blocked** | Salesforce RBAC chosen (2026-07-21) but identity flows not yet designed; Vanmathi to confirm |
+| API Portal persona (API Consumer / Partner Developer) | **Out of scope** | Separate workstream; Matthew Lindley product owner |
+| Onboarding/establishment swim lane | **Blocked** | Deepa's Mural diagram cannot be exported — PDF needed (chase Deepa) |
+| Sub-reseller data visibility (functional toggles) | **Partial** | UI built (2026-07-24) but toggles show info toast — full backend logic blocked on permission model definition |
