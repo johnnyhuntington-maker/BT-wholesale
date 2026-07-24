@@ -586,6 +586,11 @@ function App(){
   const [btOrgContext,setBtOrgContext]=useState(null);
   const [roleWiz,setRoleWiz]=useState(null);
   const [customRoles,setCustomRoles]=useState([]);
+  const [contactChangeWiz,setContactChangeWiz]=useState(null);
+  const [loginStep,setLoginStep]=useState(1);
+  const [loginEmail,setLoginEmail]=useState('');
+  const [loginPass,setLoginPass]=useState('');
+  const [loginCode,setLoginCode]=useState('');
   const [auditFilter,setAuditFilter]=useState('');
   const [bulkSelected,setBulkSelected]=useState(new Set());
   const [auditOrgFilter,setAuditOrgFilter]=useState('');
@@ -688,6 +693,48 @@ function App(){
     ]));
   const viewLabels={bt:'BT Wholesale Admin',btAccountMgr:'BT Account Manager',reseller:'Partner Admin',subReseller:'Partner Org Admin',childReseller:'Partner Org Admin',user:'Standard User'};
 
+  // Login / SSO screen
+  if(screen==='login'){
+    const cardSt={background:'#fff',borderRadius:'16px',boxShadow:'0 4px 32px rgba(20,10,40,0.12)',padding:'40px 44px',width:'400px',maxWidth:'calc(100vw - 48px)',boxSizing:'border-box'};
+    const inputSt={width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'16px',fontFamily:'inherit',outline:'none',marginBottom:'14px',boxSizing:'border-box',color:'#2A2A2A'};
+    const btnSt={width:'100%',padding:'13px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',fontSize:'16px',fontWeight:700,cursor:'pointer',fontFamily:'inherit',marginBottom:'16px'};
+    const outlineBtnSt={width:'100%',padding:'13px',background:'#fff',color:'#5514B4',border:'1.5px solid #5514B4',borderRadius:'8px',fontSize:'16px',fontWeight:700,cursor:'pointer',fontFamily:'inherit'};
+    return h('div',{style:{minHeight:'100vh',background:'#F5F5F7',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:"'BT Curve',system-ui,sans-serif",position:'relative'}},
+      h('button',{onClick:()=>setScreen('overview'),style:{position:'absolute',top:'20px',left:'24px',background:'none',border:0,color:'#5514B4',fontSize:'14px',fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:'6px',fontFamily:'inherit',padding:'6px 10px',borderRadius:'8px'}},
+        ic('M15 18l-6-6 6-6',{s:14,c:'#5514B4',w:2.5}),'Back to prototype'),
+      h('div',{style:cardSt},
+        h('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'28px'}},
+          h('div',{style:{width:'36px',height:'36px',background:'#5514B4',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}},
+            h('span',{style:{color:'#fff',fontWeight:900,fontSize:'18px',letterSpacing:'-1px'}},'BT')),
+          h('span',{style:{fontWeight:700,fontSize:'18px',color:'#2A2A2A'}},'Wholesale')),
+        loginStep===1&&h('div',null,
+          h('h1',{style:{fontSize:'22px',fontWeight:700,marginBottom:'4px',color:'#2A2A2A'}},'Sign in to BT Wholesale'),
+          h('p',{style:{fontSize:'13px',color:'#808080',marginBottom:'24px',marginTop:0}},'Powered by Salesforce Identity'),
+          h('input',{type:'email',value:loginEmail,onChange:e=>setLoginEmail(e.target.value),placeholder:'your@company.co.uk',style:inputSt}),
+          h('button',{onClick:()=>setLoginStep(2),style:btnSt},'Continue'),
+          h('div',{style:{display:'flex',alignItems:'center',gap:'12px',margin:'4px 0 16px'}},
+            h('div',{style:{flex:1,height:'1px',background:'#E3E3E3'}}),
+            h('span',{style:{fontSize:'13px',color:'#808080'}},'or'),
+            h('div',{style:{flex:1,height:'1px',background:'#E3E3E3'}})),
+          h('button',{onClick:()=>showToast('info','SSO redirect would happen here.'),style:outlineBtnSt},'Sign in with SSO'),
+          h('p',{style:{fontSize:'12px',color:'#808080',textAlign:'center',marginTop:'20px'}},'New to BT Wholesale? Contact your administrator.')),
+        loginStep===2&&h('div',null,
+          h('button',{onClick:()=>setLoginStep(1),style:{background:'none',border:0,color:'#5514B4',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:0,marginBottom:'20px',display:'flex',alignItems:'center',gap:'4px'}},ic('M15 18l-6-6 6-6',{s:12,c:'#5514B4',w:2.5}),'Back'),
+          h('h1',{style:{fontSize:'22px',fontWeight:700,marginBottom:'24px',color:'#2A2A2A'}},'Enter your password'),
+          h('input',{type:'password',value:loginPass,onChange:e=>setLoginPass(e.target.value),placeholder:'Password',style:inputSt}),
+          h('button',{onClick:()=>setLoginStep(3),style:btnSt},'Sign in'),
+          h('button',{onClick:()=>showToast('info','Password reset email sent.'),style:{background:'none',border:0,color:'#5514B4',fontSize:'14px',cursor:'pointer',fontFamily:'inherit',width:'100%',textAlign:'center',marginTop:'4px'}},'Forgot password?')),
+        loginStep===3&&h('div',null,
+          h('h1',{style:{fontSize:'20px',fontWeight:700,marginBottom:'4px',color:'#2A2A2A'}},'Two-factor authentication'),
+          h('p',{style:{fontSize:'13px',color:'#808080',marginBottom:'20px',marginTop:0}},'Enter the 6-digit code from your authenticator app.'),
+          h('input',{type:'text',maxLength:6,value:loginCode,onChange:e=>setLoginCode(e.target.value.replace(/\D/g,'')),placeholder:'000000',style:{...inputSt,fontSize:'28px',letterSpacing:'0.3em',textAlign:'center'}}),
+          h('button',{onClick:()=>setScreen('overview'),style:btnSt},'Verify'))),
+      h('p',{style:{fontSize:'12px',color:'#AAAAAA',marginTop:'32px'}},
+        '© BT Wholesale 2026 · ',
+        h('a',{href:'#',style:{color:'#AAAAAA'}},'Privacy'),' · ',
+        h('a',{href:'#',style:{color:'#AAAAAA'}},'Terms')));
+  }
+
   return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',width:'100%',overflow:'hidden',fontFamily:"'BT Curve',system-ui,sans-serif",color:'#2A2A2A',background:'#fff',fontSize:'16px',lineHeight:1.4,WebkitFontSmoothing:'antialiased'}},
 
     // Top nav
@@ -721,7 +768,11 @@ function App(){
                 style:{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',padding:'8px 12px',border:0,borderRadius:'8px',cursor:'pointer',fontSize:'14px',fontWeight:active?700:500,background:active?'#F3EBFE':'transparent',color:active?'#5514B4':'#2A2A2A',fontFamily:'inherit',marginBottom:'1px'}},
                 h('span',null,label),
                 active&&ic('M20 6L9 17l-5-5',{s:13,c:'#5514B4'}));
-            }))),
+            }),
+            h('div',{style:{height:'1px',background:'#E3E3E3',margin:'4px 4px'}}),
+            h('button',{onClick:()=>{setScreen('login');setLoginStep(1);setLoginEmail('');setLoginPass('');setLoginCode('');setSwitchViewOpen(false);},
+              style:{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',padding:'8px 12px',border:0,borderRadius:'8px',cursor:'pointer',fontSize:'14px',fontWeight:screen==='login'?700:500,background:screen==='login'?'#F3EBFE':'transparent',color:screen==='login'?'#5514B4':'#2A2A2A',fontFamily:'inherit'}},
+              h('span',null,'Login / SSO screen ↗')))),
 
         // Avatar + dropdown
         h('div',{style:{position:'relative',flexShrink:0},onMouseEnter:()=>setAvatarMenuOpen(true),onMouseLeave:()=>setAvatarMenuOpen(false)},
@@ -1509,9 +1560,9 @@ function App(){
                           :type==='url'&&val
                           ?h('a',{href:val,target:'_blank',rel:'noopener noreferrer',style:{fontSize:'14px',color:'#5514B4',textDecoration:'none'}},displayText||val)
                           :h('div',{style:{fontSize:'14px',color:'#434343'}},val||'—'));
-                      const sec=(title)=>h('div',{style:{fontSize:'12px',fontWeight:500,color:'#808080',padding:'12px 0 4px',marginTop:'4px'}},title);
+                      const sec=(title,action)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',fontSize:'12px',fontWeight:500,color:'#808080',padding:'12px 0 4px',marginTop:'4px'}},h('span',null,title),action||null);
                       return h('div',null,
-                        sec('Primary contact'),
+                        sec('Primary contact',canAdmin&&h('button',{onClick:()=>setContactChangeWiz({step:1,name:od.primaryName||'',email:od.primaryEmail||'',oldName:od.primaryName||'',oldEmail:od.primaryEmail||'',orgId:od.id}),style:{background:'none',border:0,color:'#5514B4',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',padding:'2px 6px',borderRadius:'6px'}},'Change')),
                         row('Name',od.primaryName),
                         row('Email',od.primaryEmail,'email'),
                         row('Phone',od.primaryPhone),
@@ -1967,6 +2018,20 @@ function App(){
                                       String((r.permSets||[]).length)+' sets')),
                               h('td',{style:{padding:'12px 16px',borderBottom:i<arr.length-1?'1px solid #F0F0F0':'none',textAlign:'right',fontSize:'14px',color:'#5514B4',fontWeight:700}},
                                 isBt?String(r.users):String(users.filter(u=>u.roleKey===r.key).length))))))))),
+                        !isBt&&customRoles.length>0&&h('div',{style:{marginTop:'32px'}},
+                          h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 4px',marginBottom:'12px'}},
+                            h('div',{style:{fontSize:'15px',fontWeight:700}},'Custom roles ',h('span',{style:{fontWeight:400,color:'#808080',fontSize:'14px'}},'('+customRoles.length+')')),
+                            h('button',{onClick:()=>setRoleWiz({step:1,name:'',desc:'',permSets:{}}),style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:'1px solid #C4A0F0',borderRadius:'32px',padding:'7px 14px',fontSize:'13px',fontWeight:600,color:'#5514B4',cursor:'pointer',fontFamily:'inherit'}},ic('M12 5v14M5 12h14',{s:12,c:'#5514B4'}),'Add another')),
+                          h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
+                            customRoles.map(cr=>h('div',{key:cr.key,style:{border:'1px solid #E3E3E3',borderRadius:'12px',padding:'16px 20px',background:'#fff',display:'flex',alignItems:'flex-start',gap:'16px'}},
+                              h('div',{style:{flex:1,minWidth:0}},
+                                h('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}},
+                                  h('span',{style:{fontWeight:700,fontSize:'15px'}},cr.label),
+                                  h('span',{style:{background:'#F3EBFE',color:'#5514B4',borderRadius:'1000px',padding:'2px 9px',fontSize:'11px',fontWeight:700,border:'1px solid #C4A0F0'}},'Custom')),
+                                cr.desc&&h('div',{style:{fontSize:'13px',color:'#6B6B6B',marginBottom:'10px'}},cr.desc),
+                                h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}},
+                                  (cr.grants||[]).map(g=>h('span',{key:g,style:{background:'#F0F0F0',color:'#434343',borderRadius:'1000px',padding:'3px 10px',fontSize:'12px',fontWeight:500}},g)))),
+                              h('button',{onClick:()=>{if(window.confirm('Delete custom role "'+cr.label+'"?')){setCustomRoles(rs=>rs.filter(r=>r.key!==cr.key));showToast('success','Custom role "'+cr.label+'" deleted.');}},style:{background:'none',border:'1px solid #E3E3E3',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',fontWeight:600,color:'#DA020F',cursor:'pointer',fontFamily:'inherit',flexShrink:0}},'Delete'))))),
                   activeTab==='permSets'&&!isBt&&h('div',{style:{padding:'20px 24px'}},
                     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}},
                       h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,maxWidth:'600px'}},'Permission sets are the building blocks of roles. Each set represents a specific capability — administrators combine them into roles that match how people work.'),
@@ -2411,8 +2476,48 @@ function App(){
                 if(roleWiz.step<3){setRoleWiz(w=>({...w,step:w.step+1}));return;}
                 const sets=Object.keys(roleWiz.permSets).filter(k=>roleWiz.permSets[k]);
                 const newRole={key:'custom_'+Date.now(),label:roleWiz.name||'Custom role',desc:roleWiz.desc,grants:sets.map(s=>s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())),custom:true};
-                setCustomRoles(r=>[...r,newRole]);setRoleWiz(null);showToast('success','Custom role "'+newRole.label+'" created.');
+                setCustomRoles(r=>[...r,newRole]);setRoleWiz(null);setScreen('users');setUsersTab('roles');showToast('success',newRole.label+' created. You can now assign it to users.');
               },style:{background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},roleWiz.step===3?'Create role':'Next →')))),
+
+        // Primary Contact Change Wizard
+        contactChangeWiz&&h('div',{onClick:()=>setContactChangeWiz(null),style:{position:'fixed',inset:0,background:'rgba(20,10,40,0.42)',zIndex:60,display:'flex',justifyContent:'flex-end'}},
+          h('div',{onClick:e=>e.stopPropagation(),style:{background:'#fff',width:'480px',maxWidth:'100vw',height:'100%',display:'flex',flexDirection:'column',boxShadow:'-8px 0 32px rgba(20,10,40,0.14)',overflowY:'auto'}},
+            h('div',{style:{padding:'24px 28px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}},
+              h('div',null,
+                h('div',{style:{fontSize:'18px',fontWeight:700}},'Change primary contact'),
+                h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'2px'}},'Step '+contactChangeWiz.step+' of 2 · '+(contactChangeWiz.step===1?'New contact details':'Confirm change'))),
+              h('button',{onClick:()=>setContactChangeWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
+            h('div',{style:{height:'4px',background:'#F0F0F0',flexShrink:0}},h('div',{style:{height:'100%',background:'#5514B4',width:(contactChangeWiz.step/2*100)+'%',transition:'width 240ms ease'}})),
+            h('div',{style:{padding:'24px 28px',flex:1}},
+              contactChangeWiz.step===1&&h('div',null,
+                h('div',{style:{background:'#FFF8E6',border:'1px solid #F0D879',borderRadius:'10px',padding:'12px 16px',marginBottom:'24px',fontSize:'13px',color:'#6B5800',lineHeight:1.5}},
+                  'The new primary contact will receive an email to confirm. They must accept before the change takes effect.'),
+                h('label',{style:{display:'block',fontSize:'14px',fontWeight:600,marginBottom:'6px'}},'Full name'),
+                h('input',{value:contactChangeWiz.name,onChange:e=>setContactChangeWiz(w=>({...w,name:e.target.value})),placeholder:'e.g. Sarah Whitfield',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',fontFamily:'inherit',marginBottom:'16px',boxSizing:'border-box'}}),
+                h('label',{style:{display:'block',fontSize:'14px',fontWeight:600,marginBottom:'6px'}},'Email address'),
+                h('input',{type:'email',value:contactChangeWiz.email,onChange:e=>setContactChangeWiz(w=>({...w,email:e.target.value})),placeholder:'name@company.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'15px',fontFamily:'inherit',marginBottom:'16px',boxSizing:'border-box'}})),
+              contactChangeWiz.step===2&&h('div',null,
+                h('div',{style:{fontSize:'14px',fontWeight:600,marginBottom:'16px',color:'#2A2A2A'}},'Review the change'),
+                h('div',{style:{background:'#F7F7F7',borderRadius:'12px',padding:'16px 20px',marginBottom:'20px'}},
+                  h('div',{style:{display:'flex',alignItems:'flex-start',gap:'12px',paddingBottom:'14px',borderBottom:'1px solid #E3E3E3',marginBottom:'14px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:600,color:'#808080',width:'60px',flexShrink:0,paddingTop:'2px'}},'From'),
+                    h('div',null,
+                      h('div',{style:{fontSize:'14px',fontWeight:700}},contactChangeWiz.oldName||'—'),
+                      h('a',{href:'mailto:'+contactChangeWiz.oldEmail,style:{fontSize:'13px',color:'#5514B4',textDecoration:'none'}},contactChangeWiz.oldEmail))),
+                  h('div',{style:{display:'flex',alignItems:'flex-start',gap:'12px'}},
+                    h('div',{style:{fontSize:'12px',fontWeight:600,color:'#808080',width:'60px',flexShrink:0,paddingTop:'2px'}},'To'),
+                    h('div',null,
+                      h('div',{style:{fontSize:'14px',fontWeight:700}},contactChangeWiz.name||'—'),
+                      h('a',{href:'mailto:'+contactChangeWiz.email,style:{fontSize:'13px',color:'#5514B4',textDecoration:'none'}},contactChangeWiz.email)))),
+                h('div',{style:{background:'#FFF8E6',border:'1px solid #F0D879',borderRadius:'10px',padding:'12px 16px',fontSize:'13px',color:'#6B5800',lineHeight:1.5}},
+                  h('strong',null,contactChangeWiz.name||'The new contact'),' will receive a confirmation email before the change takes effect.'))),
+            h('div',{style:{padding:'20px 28px',borderTop:'1px solid #E3E3E3',display:'flex',gap:'12px',flexShrink:0}},
+              h('button',{onClick:()=>contactChangeWiz.step===1?setContactChangeWiz(null):setContactChangeWiz(w=>({...w,step:1})),style:{flex:1,background:'#fff',border:'1px solid #C8C8C8',borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},contactChangeWiz.step===1?'Cancel':'Back'),
+              h('button',{onClick:()=>{
+                if(contactChangeWiz.step===1){setContactChangeWiz(w=>({...w,step:2}));return;}
+                setContactChangeWiz(null);
+                showToast('success','Primary contact change requested. '+(contactChangeWiz.name||'They')+' will receive a confirmation email.');
+              },style:{flex:1,background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},contactChangeWiz.step===2?'Submit request':'Next →')))),
 
         // Toast
         toast&&h('div',{style:{position:'fixed',bottom:'24px',right:'24px',zIndex:80,display:'flex',alignItems:'center',gap:'12px',padding:'15px 18px',borderRadius:'14px',background:'#fff',border:'1px solid #E3E3E3',boxShadow:'0 12px 32px rgba(20,10,40,0.18)',maxWidth:'420px'}},
