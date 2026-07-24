@@ -1739,14 +1739,18 @@ function App(){
                             h('span',{style:{width:'6px',height:'6px',borderRadius:'999px',background:'currentColor'}}),du.status),
                           du.isPrimary&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',background:'#E8F1FB',color:'#1A4070',borderRadius:'6px',padding:'4px 10px',fontSize:'12px',fontWeight:700}},
                             ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:12,c:'#1A4070'}),'Primary contact')))),
-                    // Details strip
-                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'24px'}},
+                    // Details strip — hidden for Invited (not yet accepted)
+                    du.status!=='Invited'&&h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'24px'}},
                       [['Organisation',dOrg?dOrg.name:'—'],['Role since',du.roleDate||'—'],['Org type',dOrg?TYPE_LABELS[dOrg.typeKey]:'—']].map(([lbl,val])=>
                         h('div',{key:lbl,style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'12px'}},
                           h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'5px'}},lbl),
                           h('div',{style:{fontWeight:700,fontSize:'14px',color:'#2A2A2A'}},val)))),
-                    // Capabilities
-                    (()=>{
+                    // Pending invite notice
+                    du.status==='Invited'&&h('div',{style:{display:'flex',alignItems:'flex-start',gap:'10px',background:'#FDF8E8',border:'1px solid #F5DFA0',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#78350F',lineHeight:1.5}},
+                      ic('M12 16v-4M12 8h.01',{s:15,c:'#B45309'}),
+                      h('div',null,h('strong',null,'Invitation pending. '),'This user has been invited but hasn\'t accepted yet. Their role and access will be confirmed on sign-up.')),
+                    // Capabilities — hidden for Invited
+                    du.status!=='Invited'&&(()=>{
                       const caps=ROLE_CAPS[du.roleKey]||[];
                       return caps.length>0?h('div',{style:{marginBottom:'24px'}},
                         h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Capabilities'),
@@ -1757,8 +1761,8 @@ function App(){
                               ic('M20 6 9 17l-5-5',{s:11,c:fg,w:2.5}),cap);
                           }))):null;
                     })(),
-                    // Role section
-                    dr&&(()=>{
+                    // Role section — hidden for Invited
+                    du.status!=='Invited'&&dr&&(()=>{
                       const previewKey=drawerPendingRole??du.roleKey;
                       const previewRole=ROLES.find(r=>r.key===previewKey)||dr;
                       const isPreviewing=previewKey!==du.roleKey;
@@ -1820,11 +1824,11 @@ function App(){
                             onClick:()=>showToast('success','Invitation resent to '+du.name+'.'),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
                             ic('M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3 18a2 2 0 0 1-2-2.18V13a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v.92',{s:14,c:'#434343'}),'Resend invite email'),
-                          (du.status==='Active'||du.status==='Invited')&&h('button',{
+                          du.status==='Active'&&h('button',{
                             onClick:()=>showToast('success','Password reset email sent to '+du.name+'.'),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
                             ic('M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3M8 12h8',{s:14,c:'#434343'}),'Reset password'),
-                          !isSelf&&(du.status==='Active'||du.status==='Invited')&&h('button',{
+                          !isSelf&&du.status==='Active'&&h('button',{
                             onClick:()=>setDeactivateConfirm(du.id),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #F8E0C0',borderRadius:'12px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#8A5A00',textAlign:'left'}},
                             ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:14,c:'#8A5A00'}),'Deactivate user'),
@@ -1832,10 +1836,14 @@ function App(){
                             onClick:()=>{setUsers(us=>us.map(u=>u.id===du.id?{...u,status:'Active'}:u));showToast('success',du.name+' has been reactivated.');},
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #A3D9A1',borderRadius:'12px',background:'#E6F4E5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#036C01',textAlign:'left'}},
                             ic('M20 6 9 17l-5-5',{s:14,c:'#357E3C'}),'Reactivate user'),
-                          !isSelf&&h('button',{
+                          !isSelf&&du.status!=='Invited'&&h('button',{
                             onClick:()=>setRemoveConfirm(du.id),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #FAD4D4',borderRadius:'8px',background:'#FEF5F5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#A0121B',textAlign:'left'}},
-                            ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:14,c:'#A0121B'}),'Remove user')))
+                            ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:14,c:'#A0121B'}),'Remove user'),
+                          !isSelf&&du.status==='Invited'&&h('button',{
+                            onClick:()=>setRemoveConfirm(du.id),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #FAD4D4',borderRadius:'8px',background:'#FEF5F5',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#A0121B',textAlign:'left'}},
+                            ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:14,c:'#A0121B'}),'Cancel invitation')))
                     })())
                 :h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'12px',padding:'40px'}},
                     h('div',{style:{width:'52px',height:'52px',borderRadius:'14px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'4px'}},
