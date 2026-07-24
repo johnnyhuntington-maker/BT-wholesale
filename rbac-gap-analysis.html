@@ -309,7 +309,7 @@
   <!-- SUMMARY -->
   <div class="section" id="summary">
     <h2>Summary</h2>
-    <div class="section-desc">The gap analysis ran on 24 Jul 2026 against the RBAC PRD (§17.5, §17.6, §17.9, §17.10), the RBAC-intel.md doc, and the wholesale.html prototype. It identified 11 things that could be built now, 6 blocked on open questions, and 4 areas the prototype doesn't model at all.</div>
+    <div class="section-desc">The gap analysis ran on 24 Jul 2026 against the RBAC PRD (Section 17.5, Section 17.6, Section 17.9, Section 17.10), the RBAC-intel.md doc, and the wholesale.html prototype. It identified 11 things that could be built now, 6 blocked on open questions, and 4 areas the prototype doesn't model at all.</div>
     <div class="info-box amber">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
       <span>All 11 actionable gaps were implemented in a single session on 24 Jul 2026. The prototype is now current with everything that can be built given the open questions outstanding.</span>
@@ -342,15 +342,15 @@
         <tr><td>Transfer primary contact from user drawer</td><td><span class="badge badge-built">✓ Built</span></td><td>Button in Actions for isPrimary active users</td></tr>
         <tr><td>Sub-reseller restricted scope indicator</td><td><span class="badge badge-built">✓ Built</span></td><td>Amber banner on Users/Orgs/Overview for Partner Org Admin persona</td></tr>
         <tr><td>BT Internal org context picker</td><td><span class="badge badge-built">✓ Built</span></td><td>Was already built (banner + select on Orgs/Users for BT personas)</td></tr>
-        <tr><td>Custom role creation</td><td><span class="badge badge-blocked">Blocked</span></td><td>Open question: BT-fixed vs reseller-configurable not resolved (§12)</td></tr>
+        <tr><td>Custom role creation</td><td><span class="badge badge-blocked">Blocked</span></td><td>Open question: BT-fixed vs reseller-configurable not resolved (Section 12)</td></tr>
         <tr><td>SSO / identity (login, MFA)</td><td><span class="badge badge-blocked">Blocked</span></td><td>Salesforce RBAC chosen; flows not designed; Vanmathi to confirm</td></tr>
         <tr><td>API Portal persona</td><td><span class="badge badge-blocked">Blocked</span></td><td>Separate workstream — Matthew Lindley product owner</td></tr>
         <tr><td>Onboarding swim lane</td><td><span class="badge badge-blocked">Blocked</span></td><td>Deepa's diagram on Mural cannot be exported — PDF needed</td></tr>
-        <tr><td>Permission catalogue (full granular list)</td><td><span class="badge badge-blocked">Blocked</span></td><td>PRD §14: "to be defined in detailed design"</td></tr>
+        <tr><td>Permission catalogue (full granular list)</td><td><span class="badge badge-blocked">Blocked</span></td><td>PRD Section 14: "to be defined in detailed design"</td></tr>
         <tr><td>Org establishment flow (BT creates new reseller)</td><td><span class="badge badge-blocked">Blocked</span></td><td>Service Designer territory; not in RBAC scope</td></tr>
         <tr><td>API consumer RBAC scopes</td><td><span class="badge badge-blind">Blind spot</span></td><td>How API keys map to permission sets — not modelled</td></tr>
         <tr><td>Multi-tenant data isolation</td><td><span class="badge badge-blind">Blind spot</span></td><td>Prototype doesn't show how data leaks between orgs are prevented</td></tr>
-        <tr><td>Role inheritance across org tiers</td><td><span class="badge badge-blind">Blind spot</span></td><td>PRD §17.5 mentions inheritance — not yet visible in prototype</td></tr>
+        <tr><td>Role inheritance across org tiers</td><td><span class="badge badge-blind">Blind spot</span></td><td>PRD Section 17.5 mentions inheritance — not yet visible in prototype</td></tr>
         <tr><td>Offboarding / user removal cascade</td><td><span class="badge badge-blind">Blind spot</span></td><td>What happens to open orders/faults when a user is removed?</td></tr>
       </tbody>
     </table>
@@ -384,7 +384,7 @@
         <div class="card-row-body">
           <div class="card-row-title">typeAllows() entitlement gating</div>
           <div class="card-row-desc">Function gates entitlements by org type. Sub-Reseller / Dealer cannot get support, createOrgs, or orderBtw. Dealer limited to product keys and branding.</div>
-          <div class="card-row-meta">PRD §17.10</div>
+          <div class="card-row-meta">PRD Section 17.10</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -409,7 +409,7 @@
         <div class="card-row-body">
           <div class="card-row-title">Self-action prevention</div>
           <div class="card-row-desc">Deactivate and Remove buttons hidden on the signed-in user's own profile. Replaced with "You cannot deactivate or remove your own account" notice.</div>
-          <div class="card-row-meta">§16 Phase 5</div>
+          <div class="card-row-meta">Section 16 Phase 5</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -418,7 +418,7 @@
         <div class="card-row-body">
           <div class="card-row-title">Force password reset</div>
           <div class="card-row-desc">Reset password action available for Active users from the user drawer. Shows success toast.</div>
-          <div class="card-row-meta">§17.6</div>
+          <div class="card-row-meta">Section 17.6</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -427,7 +427,7 @@
         <div class="card-row-body">
           <div class="card-row-title">Audit log with actor type chips</div>
           <div class="card-row-desc">Immutable badge, category filters, BT Internal / Reseller actor chips. Assisted journeys flagged with amber "⚡ Assisted · OrgName" badge.</div>
-          <div class="card-row-meta">§17.9</div>
+          <div class="card-row-meta">Section 17.9</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -436,7 +436,7 @@
         <div class="card-row-body">
           <div class="card-row-title">Entitlement provisioning status chips</div>
           <div class="card-row-desc">Active / Pending / Failed coloured chips per entitlement in org detail panel where status is set.</div>
-          <div class="card-row-meta">§17.7</div>
+          <div class="card-row-meta">Section 17.7</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -445,7 +445,7 @@
         <div class="card-row-body">
           <div class="card-row-title">Hardware ordering blocked for Sub-Reseller / Dealer</div>
           <div class="card-row-desc">Hardware entitlement row greyed out with "Not available" state and PRD reference in org detail panel.</div>
-          <div class="card-row-meta">§17.10 + §3</div>
+          <div class="card-row-meta">Section 17.10 + Section 3</div>
         </div>
         <span class="badge badge-built">Built</span>
       </div>
@@ -543,8 +543,8 @@
         <div class="card-row-num">G7</div>
         <div class="card-row-body">
           <div class="card-row-title">Three-layer RBAC model visible</div>
-          <div class="card-row-desc">Permission Sets tab now opens with a "How the three layers work together" card: Permission Sets → Roles → Users, each with icon + description. Follows PRD §17.5.</div>
-          <div class="card-row-meta">PRD §17.5</div>
+          <div class="card-row-desc">Permission Sets tab now opens with a "How the three layers work together" card: Permission Sets → Roles → Users, each with icon + description. Follows PRD Section 17.5.</div>
+          <div class="card-row-meta">PRD Section 17.5</div>
         </div>
         <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
       </div>
@@ -596,7 +596,7 @@
       <tbody>
         <tr>
           <td>Custom role creation</td>
-          <td>BT-fixed vs reseller-configurable roles not resolved. PRD §12 flags this as an open question.</td>
+          <td>BT-fixed vs reseller-configurable roles not resolved. PRD Section 12 flags this as an open question.</td>
           <td>Neil / PRD</td>
         </tr>
         <tr>
@@ -616,7 +616,7 @@
         </tr>
         <tr>
           <td>Permission catalogue (full granular list)</td>
-          <td>PRD §14 says "to be defined in detailed design." No canonical permission list exists yet.</td>
+          <td>PRD Section 14 says "to be defined in detailed design." No canonical permission list exists yet.</td>
           <td>PRD / detailed design</td>
         </tr>
         <tr>
@@ -655,8 +655,8 @@
         <div class="card-row-num">B3</div>
         <div class="card-row-body">
           <div class="card-row-title">Role inheritance across org tiers</div>
-          <div class="card-row-desc">PRD §17.5 mentions a three-layer model but is silent on whether permissions cascade down the org tree. If a Reseller Admin grants a role, does that role also apply within their child orgs? The prototype doesn't model this.</div>
-          <div class="card-row-meta">PRD §17.5</div>
+          <div class="card-row-desc">PRD Section 17.5 mentions a three-layer model but is silent on whether permissions cascade down the org tree. If a Reseller Admin grants a role, does that role also apply within their child orgs? The prototype doesn't model this.</div>
+          <div class="card-row-meta">PRD Section 17.5</div>
         </div>
         <span class="badge badge-blind">Blind spot</span>
       </div>
@@ -676,7 +676,7 @@
   <!-- OPEN QUESTIONS -->
   <div class="section" id="open-questions">
     <h2>Open questions</h2>
-    <div class="section-desc">Questions that need answers before the blocked items can move. Sourced from RBAC-intel.md §12 and the gap analysis.</div>
+    <div class="section-desc">Questions that need answers before the blocked items can move. Sourced from RBAC-intel.md Section 12 and the gap analysis.</div>
     <table>
       <thead>
         <tr><th>Question</th><th>Why it matters</th><th>Who to ask</th></tr>
@@ -710,7 +710,7 @@
         <tr>
           <td>What data does a sub-reseller admin see from their parent?</td>
           <td>Sub-reseller data visibility UI is built with three toggles, but the actual default state (open / closed) and what BT controls vs reseller controls isn't defined.</td>
-          <td>Neil / PRD §17.2</td>
+          <td>Neil / PRD Section 17.2</td>
         </tr>
       </tbody>
     </table>
@@ -723,7 +723,7 @@
     <h2>Changelog</h2>
     <div class="log-entry">
       <div class="log-date">24 Jul 2026</div>
-      <div class="log-text"><strong>All 11 gaps implemented.</strong> Remove = permanent, sub-reseller scope banner, deactivate modal updated, Expired status chip, duplicate email guard, bulk Change Role, three-layer RBAC diagram, sub-reseller data visibility UI, dealer note, Transfer primary contact button. RBAC-intel.md §18 updated.</div>
+      <div class="log-text"><strong>All 11 gaps implemented.</strong> Remove = permanent, sub-reseller scope banner, deactivate modal updated, Expired status chip, duplicate email guard, bulk Change Role, three-layer RBAC diagram, sub-reseller data visibility UI, dealer note, Transfer primary contact button. RBAC-intel.md Section 18 updated.</div>
     </div>
     <div class="log-entry">
       <div class="log-date">24 Jul 2026</div>
