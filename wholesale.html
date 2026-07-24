@@ -670,16 +670,16 @@ function App(){
   const drawerOrg=drawerUser?orgById(drawerUser.orgId):null;
 
   const AUDIT_LOG=[
-    {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller'},
-    {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: Broadband added',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt',assisted:true,assistedOrg:'Metro Connect'},
-    {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller'},
-    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Partner Organisation) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
-    {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User)',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller'},
-    {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller'},
-    {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
-    {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Partner Organisation) under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller'},
-    {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom primary contact changed',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
-    {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller'},
+    {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',before:'Order Manager',after:'Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller',outcome:'success'},
+    {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: None → Broadband',before:'None',after:'Broadband',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt',assisted:true,assistedOrg:'Metro Connect',outcome:'success'},
+    {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen invited as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller',outcome:'success'},
+    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Partner Organisation) created under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
+    {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User) deactivated',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller',outcome:'success'},
+    {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',before:'Support Agent',after:'Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller',outcome:'success'},
+    {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric included → removed',before:'UK Fabric included',after:'UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
+    {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Partner Organisation) created under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller',outcome:'failed'},
+    {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom: David Holt → Sarah Whitfield (primary contact)',before:'David Holt',after:'Sarah Whitfield',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
+    {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller',outcome:'success'},
   ];
   const AUDIT_CATEGORIES=['All categories','User administration','Organisation management','Product management','Billing','API access'];
 
@@ -1862,13 +1862,14 @@ function App(){
                   h('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:'13px'}},
                     h('thead',null,
                       h('tr',{style:{background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},
-                        h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343',whiteSpace:'nowrap'}},'Actor'),
+                        h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343',whiteSpace:'nowrap'}},'Changed by'),
                         h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343'}},'Action'),
                         h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343',whiteSpace:'nowrap'}},'Category'),
+                        h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343',whiteSpace:'nowrap'}},'Outcome'),
                         h('th',{style:{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'#434343',whiteSpace:'nowrap'}},'Timestamp'))),
                     h('tbody',null,
                       filtered.length===0
-                        ?h('tr',null,h('td',{colSpan:4,style:{padding:'32px',textAlign:'center',color:'#808080'}},'No records match your filters.'))
+                        ?h('tr',null,h('td',{colSpan:5,style:{padding:'32px',textAlign:'center',color:'#808080'}},'No records match your filters.'))
                         :filtered.map(r=>h('tr',{key:r.id,style:{borderBottom:'1px solid #F0F0F0'}},
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
                             h('div',{style:{fontWeight:600,fontSize:'13px'}},r.who),
@@ -1881,6 +1882,10 @@ function App(){
                             h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},r.detail)),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
                             (()=>{const[tc,bg]=catColors[r.category]||['#444','#F5F5F5'];return h('span',{style:{background:bg,color:tc,borderRadius:'999px',padding:'3px 10px',fontSize:'11px',fontWeight:700,whiteSpace:'nowrap'}},r.category)})()),
+                          h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
+                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',background:r.outcome==='failed'?'#FEF2F2':'#F0FDF4',color:r.outcome==='failed'?'#B91C1C':'#15803D',border:'1px solid '+(r.outcome==='failed'?'#FECACA':'#BBF7D0'),borderRadius:'999px',padding:'3px 10px',fontSize:'11px',fontWeight:700,whiteSpace:'nowrap'}},
+                              ic(r.outcome==='failed'?'M18 6 6 18M6 6l12 12':'M20 6 9 17l-5-5',{s:10,c:r.outcome==='failed'?'#B91C1C':'#15803D',w:2.5}),
+                              r.outcome==='failed'?'Failed':'Success')),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top',color:'#808080',whiteSpace:'nowrap'}},r.ts)))))));
             })(),
             usersTab==='roles'&&(()=>{
