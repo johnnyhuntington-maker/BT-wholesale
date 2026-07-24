@@ -1,0 +1,566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>BT Nexus — API Intel</title>
+<style>
+:root {
+  --purple:        #5514B4;
+  --purple-deep:   #3D1070;
+  --purple-light:  #EDE8FA;
+  --amber:         #92400E;
+  --amber-bg:      #FEF3C7;
+  --amber-border:  #FCD34D;
+  --green:         #166534;
+  --green-bg:      #DCFCE7;
+  --green-border:  #86EFAC;
+  --coral:         #9B1C1C;
+  --coral-bg:      #FEE2E2;
+  --coral-border:  #FCA5A5;
+  --teal:          #0E7490;
+  --teal-bg:       #CFFAFE;
+  --teal-border:   #67E8F9;
+  --ground:        #F3F1F9;
+  --surface:       #FFFFFF;
+  --nav-bg:        #1E1535;
+  --nav-text:      rgba(255,255,255,0.55);
+  --nav-active:    #FFFFFF;
+  --nav-hover:     rgba(255,255,255,0.8);
+  --ink:           #1A1023;
+  --ink-2:         #4B4460;
+  --ink-3:         #8B82A8;
+  --border:        #DDD8EE;
+  --th-bg:         #F3F1F9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --purple:#9B6DFF; --purple-deep:#C4B0FF; --purple-light:#2A1854;
+    --amber:#FCD34D; --amber-bg:#2A1C08; --amber-border:#92400E;
+    --green:#86EFAC; --green-bg:#052E16; --green-border:#166534;
+    --coral:#FCA5A5; --coral-bg:#2A0A0A; --coral-border:#9B1C1C;
+    --teal:#67E8F9; --teal-bg:#0A2328; --teal-border:#0E7490;
+    --ground:#0F0B1A; --surface:#1A1530; --nav-bg:#0A0715;
+    --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+    --border:#2C2848; --th-bg:#1A1530;
+  }
+}
+:root[data-theme="light"] {
+  --purple:#5514B4; --purple-deep:#3D1070; --purple-light:#EDE8FA;
+  --amber:#92400E; --amber-bg:#FEF3C7; --amber-border:#FCD34D;
+  --green:#166534; --green-bg:#DCFCE7; --green-border:#86EFAC;
+  --coral:#9B1C1C; --coral-bg:#FEE2E2; --coral-border:#FCA5A5;
+  --teal:#0E7490; --teal-bg:#CFFAFE; --teal-border:#67E8F9;
+  --ground:#F3F1F9; --surface:#FFFFFF; --nav-bg:#1E1535;
+  --ink:#1A1023; --ink-2:#4B4460; --ink-3:#8B82A8;
+  --border:#DDD8EE; --th-bg:#F3F1F9;
+}
+:root[data-theme="dark"] {
+  --purple:#9B6DFF; --purple-deep:#C4B0FF; --purple-light:#2A1854;
+  --amber:#FCD34D; --amber-bg:#2A1C08; --amber-border:#92400E;
+  --green:#86EFAC; --green-bg:#052E16; --green-border:#166534;
+  --coral:#FCA5A5; --coral-bg:#2A0A0A; --coral-border:#9B1C1C;
+  --teal:#67E8F9; --teal-bg:#0A2328; --teal-border:#0E7490;
+  --ground:#0F0B1A; --surface:#1A1530; --nav-bg:#0A0715;
+  --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+  --border:#2C2848; --th-bg:#1A1530;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+
+nav {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--nav-bg);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px 0 32px;
+  display: flex;
+  flex-direction: column;
+}
+.nav-brand { padding: 0 16px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px; }
+.nav-brand-title { font-family: Georgia, serif; font-size: 12.5px; color: rgba(255,255,255,0.9); line-height: 1.3; }
+.nav-brand-sub { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
+.nav-section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 16px 4px; }
+nav a { display: block; padding: 5px 16px; font-size: 12px; color: var(--nav-text); text-decoration: none; line-height: 1.35; transition: color 0.12s; border-left: 2px solid transparent; }
+nav a:hover { color: var(--nav-hover); }
+nav a.active { color: var(--nav-active); border-left-color: var(--purple); background: rgba(255,255,255,0.04); }
+.nav-lib { margin-top: auto; padding: 12px 16px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+.nav-lib a { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; padding: 0; border: none; }
+.nav-lib a:hover { color: rgba(255,255,255,0.7); }
+
+main { flex: 1; min-width: 0; padding: 0 40px 80px; max-width: 860px; }
+
+.snapshot-header { background: var(--purple-deep); margin: 0 -40px; padding: 28px 40px 22px; margin-bottom: 32px; }
+.snapshot-eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+.snapshot-title { font-family: Georgia, serif; font-size: 22px; color: #fff; font-weight: normal; line-height: 1.2; margin-bottom: 10px; }
+.snapshot-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.snapshot-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 7px; }
+
+h2 { font-size: 14px; font-weight: 700; color: var(--ink); margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 16px 0 6px; }
+p { margin-bottom: 10px; color: var(--ink-2); }
+ul, ol { padding-left: 18px; margin-bottom: 10px; color: var(--ink-2); }
+li { margin-bottom: 3px; }
+strong { color: var(--ink); font-weight: 600; }
+code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11.5px; background: var(--th-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; color: var(--purple); }
+
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+
+.callout { border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+.callout-amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+.callout-green  { background: var(--green-bg);  border: 1px solid var(--green-border);  color: var(--green); }
+.callout-coral  { background: var(--coral-bg);  border: 1px solid var(--coral-border);  color: var(--coral); }
+.callout-teal   { background: var(--teal-bg);   border: 1px solid var(--teal-border);   color: var(--teal); }
+.callout-purple { background: var(--purple-light); border: 1px solid #C4A0F0; color: var(--purple); }
+.callout svg { flex-shrink: 0; margin-top: 1px; }
+.callout-body { line-height: 1.5; }
+.callout-body strong { color: inherit; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 10px; }
+th { background: var(--th-bg); font-weight: 700; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--ink-2); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+
+.tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.tag-gap  { background: var(--coral-bg);  color: var(--coral);  border: 1px solid var(--coral-border); }
+.tag-ux   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-border); }
+.tag-info { background: var(--purple-light); color: var(--purple); border: 1px solid #C4A0F0; }
+.tag-q    { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+
+.meeting-card { background: var(--th-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; }
+.meeting-card-title { font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+.meeting-card-meta { font-size: 11px; color: var(--ink-3); display: flex; gap: 14px; flex-wrap: wrap; }
+
+.flow { display: flex; flex-direction: column; gap: 0; margin: 10px 0; }
+.flow-step { display: flex; align-items: flex-start; gap: 10px; }
+.flow-step-num { width: 22px; height: 22px; background: var(--purple); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.flow-step-body { padding-bottom: 12px; border-left: 2px solid var(--border); margin-left: 11px; padding-left: 14px; padding-bottom: 10px; color: var(--ink-2); font-size: 13px; flex: 1; }
+.flow-step:last-child .flow-step-body { border-left-color: transparent; }
+.flow-label { font-weight: 600; color: var(--ink); }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.compare-col { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.compare-head { padding: 8px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.compare-head.tmf  { background: #FEF3C7; color: #92400E; }
+.compare-head.exp  { background: var(--green-bg); color: var(--green); }
+.compare-body { padding: 10px 14px; font-size: 12.5px; color: var(--ink-2); }
+.compare-body li { margin-bottom: 4px; }
+
+@media (max-width: 680px) { .compare { grid-template-columns: 1fr; } }
+
+.quote { border-left: 3px solid var(--purple); padding: 8px 14px; margin: 10px 0; font-style: italic; color: var(--ink-2); font-size: 13px; }
+.quote-attr { font-style: normal; font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-title">BT Nexus</div>
+    <div class="nav-brand-sub">API Intel</div>
+  </div>
+
+  <div class="nav-section-label">Overview</div>
+  <a href="#scale">Scale &amp; channel mix</a>
+  <a href="#products">Product API sets</a>
+  <a href="#access">Who has access</a>
+
+  <div class="nav-section-label">Developer Portal</div>
+  <a href="#portal">developer.bt.com</a>
+  <a href="#journey">API journey</a>
+  <a href="#auth">Auth &amp; keys</a>
+  <a href="#sandbox">Sandbox vs production</a>
+
+  <div class="nav-section-label">Architecture</div>
+  <a href="#tmf">TMF APIs (current)</a>
+  <a href="#experience">Experience APIs (Matthew)</a>
+  <a href="#errors">Error handling model</a>
+
+  <div class="nav-section-label">Design Implications</div>
+  <a href="#ux">UX observations</a>
+  <a href="#gaps">Gaps &amp; open questions</a>
+
+  <div class="nav-section-label">Meetings</div>
+  <a href="#meeting-1" class="active">24 Jul 2026 — Intro session</a>
+
+  <div class="nav-lib">
+    <a href="library.html">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Project Library
+    </a>
+  </div>
+</nav>
+
+<main>
+
+  <div class="snapshot-header">
+    <div class="snapshot-eyebrow">Living document · API workstream</div>
+    <div class="snapshot-title">BT Wholesale API Intel</div>
+    <div class="snapshot-meta">
+      <span class="snapshot-badge">First meeting: 24 Jul 2026</span>
+      <span class="snapshot-badge">John Daffern · Matthew Lindley · Jason Grant</span>
+      <span class="snapshot-badge">Add new meetings as they happen</span>
+    </div>
+  </div>
+
+  <!-- MEETINGS LOG -->
+  <h2 id="meeting-1">Meeting log</h2>
+  <div class="meeting-card">
+    <div class="meeting-card-title">API Portal &amp; Developer Experience — intro session</div>
+    <div class="meeting-card-meta">
+      <span>24 Jul 2026</span>
+      <span>John Daffern (NCE R) · Matthew Lindley (NCE R) · Jason Grant (NCB C) · Neil Ballinger (NCB R) · Zoya Azar (NCB R)</span>
+    </div>
+    <p style="margin-top:8px;font-size:12.5px;color:var(--ink-2);">Walkthrough of developer.bt.com, live API demos (broadband address lookup, appointment availability), sandbox vs production, approval workflow, Postman, AI-generated code. Matthew introduced the Experience API concept (TMF orchestration layer). Full transcript available from Johnny.</p>
+  </div>
+
+  <!-- SCALE & CHANNEL MIX -->
+  <h2 id="scale">Scale &amp; channel mix</h2>
+  <div class="section">
+    <p>API is the primary channel for wholesale — not the portal. Most partners never log in to anything; they connect their own CRM systems directly to BT.</p>
+    <table>
+      <thead><tr><th>Product</th><th>Connections</th><th>API share</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>WBMC</strong> (layer 2 broadband)</td><td>600,000+</td><td>&gt;95%</td><td>Biggest volume product. Customers: Gamma, Giacom, Virgin Media.</td></tr>
+        <tr><td><strong>Broadband One</strong> (layer 3)</td><td>~100,000</td><td>&gt;90%</td><td>Consumer-style broadband sold wholesale.</td></tr>
+        <tr><td><strong>Ethernet</strong></td><td>—</td><td>High (quotes)</td><td>All customers use quoting APIs. Some use order APIs too.</td></tr>
+        <tr><td><strong>WHC</strong> (legacy voice)</td><td>—</td><td>Lower</td><td>Voice APIs described as hard to use; product behind market.</td></tr>
+        <tr><td><strong>Complete Mobile</strong></td><td>—</td><td>New</td><td>Just launched. Expected 6 customers, already 20 in backlog.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-amber">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>Portal used for exceptions only.</strong> When things go wrong — adjusting dates, authorising spend, handling edge cases — partners switch to the portal rather than write code for every scenario. The portal is the exception channel, not the primary one.</div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <h2 id="products">Product API sets</h2>
+  <div class="section">
+    <p>Five sets of APIs accessible via <code>developer.bt.com → API Products → Wholesale</code>. None are surfaced on the developer portal homepage — users must know to navigate there.</p>
+    <table>
+      <thead><tr><th>API set</th><th>Product</th><th>Matthew's workstream?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Broadband One</strong></td><td>Layer 3 broadband</td><td>Yes — primary focus</td></tr>
+        <tr><td><strong>WBMC</strong></td><td>Layer 2 broadband</td><td>Yes</td></tr>
+        <tr><td><strong>Ethernet</strong></td><td>High-capacity connectivity</td><td>Yes</td></tr>
+        <tr><td><strong>WHC</strong></td><td>Legacy voice</td><td>Yes</td></tr>
+        <tr><td><strong>Complete Mobile</strong></td><td>Mobile SIMs</td><td>Out of scope for now</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ACCESS MODEL -->
+  <h2 id="access">Who has access</h2>
+  <div class="section">
+    <div class="callout callout-purple">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+      <div class="callout-body"><strong>API access is for direct Partners only.</strong> <code>developer.bt.com</code> is only available to organisations with a direct contractual relationship with BT Wholesale. Partner Organisations (child resellers) do not have API access — their relationship is with the Partner, not BT.</div>
+    </div>
+    <p>This is a significant constraint for Nexus design: any API-related features on the portal (API keys, sandbox apps, usage dashboards) are only relevant to the Partner tier, not Partner Organisations.</p>
+    <p>The portal is also shared across BT Group — not wholesale-exclusive. Other teams on <code>developer.bt.com</code> include Active Intelligence (location data APIs) and an Identity team.</p>
+  </div>
+
+  <!-- DEVELOPER PORTAL -->
+  <h2 id="portal">developer.bt.com</h2>
+  <div class="section">
+    <p>The developer portal is publicly accessible (pre-login) and provides documentation, tutorials, and code examples. Logging in adds a <strong>Dashboard</strong> for managing sandbox and production apps.</p>
+    <h3>Pre-login</h3>
+    <ul>
+      <li>API catalogue, tutorials, process diagrams, code examples</li>
+      <li>Wholesale APIs buried — not on homepage, must navigate to <em>API Products → Wholesale</em></li>
+      <li>Documentation is very detailed — the simplest API (Address Management) has a full tutorial; the Order API has introduction, prerequisites, provide, modify, tables of codes, response examples, and process diagrams</li>
+    </ul>
+    <h3>Post-login</h3>
+    <ul>
+      <li>Dashboard appears — shows sandbox and production apps</li>
+      <li>Can create sandbox apps instantly (no approval needed)</li>
+      <li>Production apps require BT admin approval (email-based workflow)</li>
+    </ul>
+    <div class="quote">
+      "I haven't even logged in. So I'll do the next thing and log in just to show what additional thing that gives you."
+      <div class="quote-attr">— John Daffern</div>
+    </div>
+    <div class="callout callout-amber">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>Discovery gap.</strong> A new partner arriving at the homepage would find nothing about wholesale broadband or any wholesale products. The discoverability of wholesale APIs on the shared portal is poor.</div>
+    </div>
+  </div>
+
+  <!-- API JOURNEY -->
+  <h2 id="journey">API journey (broadband example)</h2>
+  <div class="section">
+    <p>The API journey mirrors a portal order flow — the same steps apply whether via API or UI. Each step depends on the previous one.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-step-body"><span class="flow-label">Address lookup</span> — provide postcode (+ optional house number) → receive Openreach UPRN (unique address code). Also supports UPRN-direct lookup.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-step-body"><span class="flow-label">Products &amp; network availability</span> — what speeds/products are available at that address, whether there's an existing line in use.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-step-body"><span class="flow-label">Appointments</span> — check engineer availability. Some installs don't require an appointment (e.g. working line present).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div class="flow-step-body"><span class="flow-label">Product selection &amp; order submission</span> — submit the order with chosen product, appointment, and address details.</div>
+      </div>
+    </div>
+    <p>Customers are expected to understand the sequencing themselves with TMF APIs — this is a large part of the complexity burden Matthew's Experience API is designed to eliminate.</p>
+  </div>
+
+  <!-- AUTH -->
+  <h2 id="auth">Authentication &amp; keys</h2>
+  <div class="section">
+    <ul>
+      <li><strong>OAuth</strong> — standard authentication flow. Apps use a Key + Secret (like username + password) to obtain a token.</li>
+      <li>Token required before any API call can be made.</li>
+      <li><strong>Sandbox apps</strong> — Key + Secret available immediately on creation. No approval needed.</li>
+      <li><strong>Production apps</strong> — no Key + Secret until BT admin approves. Production keys must be associated with a verified company to prevent fraudulent orders.</li>
+    </ul>
+  </div>
+
+  <!-- SANDBOX VS PRODUCTION -->
+  <h2 id="sandbox">Sandbox vs production</h2>
+  <div class="section">
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-head tmf">Sandbox</div>
+        <div class="compare-body">
+          <ul>
+            <li>Instant access — no approval</li>
+            <li>No risk — can't break anything</li>
+            <li>No account manager involved</li>
+            <li>Endpoint: <code>api-sandbox.wholesale.bt.com</code></li>
+            <li>Same request/response format as production</li>
+          </ul>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-head exp">Production</div>
+        <div class="compare-body">
+          <ul>
+            <li>Requires BT admin approval (email workflow)</li>
+            <li>Keys linked to verified company</li>
+            <li>Endpoint: <code>api.wholesale.bt.com</code></li>
+            <li>Code is identical — only hostname changes</li>
+            <li>Live orders, live addresses</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-coral">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="callout-body"><strong>Gap: no migration path from sandbox → production.</strong> Currently "contact your account manager" is the answer. There's no proper self-service or guided process to move from "I've tested my code and it works" to "I'm now live." John confirmed this is a known gap with no current solution.</div>
+    </div>
+  </div>
+
+  <!-- TMF APIs -->
+  <h2 id="tmf">TMF APIs — current state</h2>
+  <div class="section">
+    <p><strong>TMF (TM Forum)</strong> APIs are the telecom industry standard. They are low-level, powerful, and flexible — but put the full complexity burden on the customer's development team.</p>
+    <div class="quote">
+      "The expectation is that we get these developers to make lots of calls, all of these different services… a modify is different from an amend. Yet to most people that's literally the same thing. It is not in the world of telco."
+      <div class="quote-attr">— Matthew Lindley</div>
+    </div>
+    <h3>What customers must handle themselves with TMF</h3>
+    <ul>
+      <li>Know the correct API sequencing (address → availability → appointment → order)</li>
+      <li>Understand Openreach codes and what to do with each response</li>
+      <li>Handle all business rules (what's a modify vs an amend vs a cease)</li>
+      <li>Build orchestration logic to stitch calls together</li>
+      <li>Interpret complex, multi-field JSON responses</li>
+      <li>Know telecom-specific terminology (GEA, FTTP, UPRN, OMT, ORDI…)</li>
+    </ul>
+    <h3>Who can afford to do this</h3>
+    <ul>
+      <li>Large enterprise partners (Gamma, Giacom, Virgin Media)</li>
+      <li>"API-first" companies — IT specialists for whom this is their core competency</li>
+      <li>Both groups invest heavily: architects, solution designers, developers, months of work</li>
+    </ul>
+    <div class="callout callout-amber">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>High barrier to entry.</strong> Standing up a TMF integration can take 12–18 months and is a major capital expense. Only the largest partners tackle it. Smaller partners are effectively locked out of programmatic access.</div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE APIs -->
+  <h2 id="experience">Experience APIs — Matthew Lindley's workstream</h2>
+  <div class="section">
+    <p>Matthew is building an orchestration layer — the <strong>Experience API</strong> — that sits in front of the TMF APIs and absorbs complexity on behalf of the customer.</p>
+    <div class="callout callout-purple">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div class="callout-body"><strong>Analogy.</strong> TMF = raw building materials (you coordinate builders, electricians, plumbers yourself). Experience API = a project manager who handles all the specialists and only asks you for what they genuinely need from you.</div>
+    </div>
+
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-head tmf">TMF API — customer's responsibility</div>
+        <div class="compare-body">
+          <ul>
+            <li>Call address API</li>
+            <li>Call availability API</li>
+            <li>Call appointment API</li>
+            <li>Understand all responses</li>
+            <li>Apply business rules</li>
+            <li>Handle errors and edge cases</li>
+            <li>Submit order API</li>
+          </ul>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-head exp">Experience API — BT's responsibility</div>
+        <div class="compare-body">
+          <ul>
+            <li>Customer provides: address</li>
+            <li>BT runs: lookup, availability, rules</li>
+            <li>Customer receives: available products</li>
+            <li>Customer selects: product + appointment</li>
+            <li>BT handles: order orchestration</li>
+            <li>Customer receives: simple confirmation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <h3>Hypermedia / "what's next"</h3>
+    <p>A core design principle: every API response contains <strong>links to valid next actions</strong>. Customers don't need documentation open beside them — the response tells them what they can do next.</p>
+    <div class="quote">
+      "This is your next step."
+      <div class="quote-attr">— Matthew Lindley, on the Experience API design intent</div>
+    </div>
+    <p>Invalid actions are <strong>omitted from responses</strong> rather than returned as errors. Example: once an order passes the point of no return, the cancel link simply disappears, and the API explains why.</p>
+
+    <h3>AI compatibility</h3>
+    <p>Matthew specifically designed responses to be human-readable and AI-consumable. Tools like Copilot, Gemini, and Claude can parse the API definitions and generate forms, portals, and integration code from them. John demonstrated this with a Google Sheets demo — 800+ lines of JavaScript, 100% AI-generated via Google Anti-Gravity / Gemini.</p>
+
+    <div class="callout callout-green">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="callout-body"><strong>Key shift.</strong> TMF: "Tell me exactly what you want and how to do it." Experience API: "Tell me your goal and I'll guide you there." This is the philosophical difference — and it has direct implications for what the Nexus portal needs to expose to Partners.</div>
+    </div>
+  </div>
+
+  <!-- ERROR HANDLING -->
+  <h2 id="errors">Error handling model</h2>
+  <div class="section">
+    <h3>TMF (current)</h3>
+    <p>Customer handles all errors. System returns telecom-specific error codes; customer's application must interpret them and decide what to do next.</p>
+
+    <h3>Experience API (proposed)</h3>
+    <p>Errors are absorbed or translated by BT's orchestration layer. Instead of raw error codes, the API returns business-friendly messages and always includes valid next actions.</p>
+    <table>
+      <thead><tr><th>Scenario</th><th>TMF response</th><th>Experience API response</th></tr></thead>
+      <tbody>
+        <tr><td>Order can be cancelled</td><td>Customer checks status codes and conditionally shows Cancel</td><td>Cancel link present in response</td></tr>
+        <tr><td>Order cannot be cancelled</td><td>Cancel API returns error; customer handles it</td><td>Cancel link absent; reason provided in response</td></tr>
+        <tr><td>Wrong API sequence</td><td>Error returned; customer must diagnose</td><td>Experience API enforces sequence; next step always explicit</td></tr>
+        <tr><td>Telecom code returned</td><td>Customer must look up code meaning</td><td>Human-readable message returned</td></tr>
+      </tbody>
+    </table>
+    <p>The principle: <strong>prevent errors rather than handle them after the fact</strong>. The front end shows only what the API says is valid.</p>
+  </div>
+
+  <!-- UX OBSERVATIONS -->
+  <h2 id="ux">UX observations &amp; design implications</h2>
+  <div class="section">
+
+    <div class="callout callout-teal">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="callout-body"><strong>API in the portal ≠ API integration.</strong> The portal and the API are separate channels. Most large partners never use the portal at all. When they do, it's for exception handling — not routine ordering. Any API features in Nexus (key management, usage, sandbox) serve a small but important subset of Partners.</div>
+    </div>
+
+    <h3>What Nexus may need for the API workstream</h3>
+    <ul>
+      <li><span class="tag tag-ux">UX</span> &nbsp;<strong>API key management</strong> — Partners need to create, view and rotate sandbox and production keys from within Nexus</li>
+      <li><span class="tag tag-ux">UX</span> &nbsp;<strong>Sandbox → production onboarding</strong> — there's currently no UX for this transition. A guided flow in Nexus could fill the gap</li>
+      <li><span class="tag tag-ux">UX</span> &nbsp;<strong>Usage / analytics dashboard</strong> — currently no meaningful reporting exists. If BT resolves the Apigee → GCP export, Nexus is the natural home for this</li>
+      <li><span class="tag tag-ux">UX</span> &nbsp;<strong>API access is Partner-only</strong> — Partner Organisations should never see API features; role and org-type gating required</li>
+      <li><span class="tag tag-ux">UX</span> &nbsp;<strong>API persona in RBAC</strong> — Matthew Lindley's workstream (mentioned separately in RBAC intel) maps to this; need to understand the API Developer role</li>
+    </ul>
+
+    <h3>Experience API implications for portal design</h3>
+    <ul>
+      <li>If the portal consumes Experience APIs rather than TMF, the ordering and management flows become <strong>much simpler to build</strong></li>
+      <li>Show/hide controls can be driven by what the API returns — no complex front-end state logic</li>
+      <li>The portal becomes a thin UI layer over the Experience API; the same API could serve both the portal and partners' own CRM integrations</li>
+    </ul>
+  </div>
+
+  <!-- GAPS -->
+  <h2 id="gaps">Gaps &amp; open questions</h2>
+  <div class="section">
+    <table>
+      <thead><tr><th>Gap / question</th><th>Type</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>No sandbox → production migration path. Current answer: "contact your account manager."</td>
+          <td><span class="tag tag-gap">Gap</span></td>
+          <td>John Daffern, 24 Jul</td>
+        </tr>
+        <tr>
+          <td>API analytics are effectively broken — Apigee retains 2 weeks, Dynatrace is an engineer tool not a reporting tool. Attempting GCP/BigQuery export but blocked by BT Security.</td>
+          <td><span class="tag tag-gap">Gap</span></td>
+          <td>John Daffern, 24 Jul</td>
+        </tr>
+        <tr>
+          <td>Wholesale APIs are not discoverable on developer.bt.com homepage — must navigate to API Products → Wholesale.</td>
+          <td><span class="tag tag-gap">Gap</span></td>
+          <td>John Daffern, 24 Jul</td>
+        </tr>
+        <tr>
+          <td>What does the API Developer persona need in Nexus? (Matthew Lindley's workstream — flagged in RBAC intel as blocked)</td>
+          <td><span class="tag tag-q">Open Q</span></td>
+          <td>RBAC intel cross-ref</td>
+        </tr>
+        <tr>
+          <td>Should Nexus host API key management, or does that stay on developer.bt.com?</td>
+          <td><span class="tag tag-q">Open Q</span></td>
+          <td>Design team</td>
+        </tr>
+        <tr>
+          <td>When Experience APIs are live, should the portal consume them instead of TMF? What's the timeline?</td>
+          <td><span class="tag tag-q">Open Q</span></td>
+          <td>Design team</td>
+        </tr>
+        <tr>
+          <td>Does the portal need an in-built API testing tool (like a lightweight Postman), or is developer.bt.com sufficient?</td>
+          <td><span class="tag tag-q">Open Q</span></td>
+          <td>Design team</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('h2[id], h3[id]');
+const navLinks  = document.querySelectorAll('nav a[href^="#"]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+}, { passive: true });
+
+// Theme toggle on 't' key
+document.addEventListener('keydown', e => {
+  if (e.key === 't') {
+    const root = document.documentElement;
+    const cur  = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  }
+});
+</script>
+</body></html>
