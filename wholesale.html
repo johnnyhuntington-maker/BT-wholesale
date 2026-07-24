@@ -507,6 +507,7 @@ const INIT_USERS=[
   {id:'u3',name:'Priya Nair',email:'priya.nair@northgate.co.uk',roleKey:'billingManager',orgId:'northgate',status:'Active',roleDate:'Mar 2024',removedAt:null},
   {id:'u4',name:'Tom Reeves',email:'tom.reeves@metroconnect.co.uk',roleKey:'support',orgId:'metro',status:'Active',roleDate:'Jun 2024',photo:'https://randomuser.me/api/portraits/men/41.jpg',removedAt:null},
   {id:'u5',name:'Lucy Chen',email:'lucy.chen@northgate.co.uk',roleKey:'reporting',orgId:'northgate',status:'Invited',roleDate:'May 2025',photo:'https://randomuser.me/api/portraits/women/63.jpg',removedAt:null},
+  {id:'u9',name:'Marcus Webb',email:'marcus.webb@northgate.co.uk',roleKey:'orderManager',orgId:'northgate',status:'Expired',roleDate:'Jan 2025',removedAt:null},
   {id:'u6',name:'Daniel Frost',email:'daniel.frost@northgate.co.uk',roleKey:'apiDev',orgId:'northgate',status:'Active',roleDate:'Sep 2024',removedAt:null},
   {id:'u7',name:'Aisha Bello',email:'aisha.bello@apextelecom.co.uk',roleKey:'readonly',orgId:'apex',status:'Inactive',roleDate:'Nov 2023',photo:'https://randomuser.me/api/portraits/women/26.jpg',removedAt:null},
   {id:'u8',name:'Robert Haines',email:'robert.haines@beaconwholesale.co.uk',roleKey:'admin',orgId:'beacon',status:'Active',roleDate:'Feb 2024',removedAt:null},
@@ -598,6 +599,7 @@ function App(){
   const [loginCode,setLoginCode]=useState('');
   const [auditFilter,setAuditFilter]=useState('');
   const [bulkSelected,setBulkSelected]=useState(new Set());
+  const [bulkRoleOpen,setBulkRoleOpen]=useState(false);
   const [auditOrgFilter,setAuditOrgFilter]=useState('');
   const [usersLoading,setUsersLoading]=useState(true);
   useEffect(()=>{const t=setTimeout(()=>setUsersLoading(false),900);return()=>clearTimeout(t);},[]);
@@ -641,7 +643,7 @@ function App(){
   const visibleUsers=isBt?users:users.filter(u=>{const o=orgById(u.orgId);return o&&(o.id===home||o.parentId===home);});
   const sel=orgById(selOrgId)||orgById(home);
   const selParent=sel.parentId?orgById(sel.parentId):null;
-  const statusMap={Active:['#036C01','#E6F4E5','#036C01'],Invited:['#2A2A2A','#FDF0C4','#D97706'],Inactive:['#2A2A2A','#F0F0F0','#9CA3AF'],Removed:['#A0121B','#FEF5F5','#A0121B']};
+  const statusMap={Active:['#036C01','#E6F4E5','#036C01'],Invited:['#2A2A2A','#FDF0C4','#D97706'],Expired:['#78350F','#FDEFD0','#B45309'],Inactive:['#2A2A2A','#F0F0F0','#9CA3AF'],Removed:['#A0121B','#FEF5F5','#A0121B']};
 
   function mkActionBtn(kind){
     const isOrg=kind==='org';
@@ -865,6 +867,10 @@ function App(){
                       orgs.filter(o=>o.typeKey==='reseller'||o.typeKey==='partnerOrg').map(o=>h('option',{key:o.id,value:o.id},o.name))),
                     h('span',{style:{position:'absolute',right:'7px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:12,c:'#808080'}))),
                   h('span',{style:{fontSize:'12px',color:'#808080'}},'Select an org context before making changes on behalf of a reseller.'))),
+
+          persona==='subReseller'&&(screen==='overview'||screen==='orgs'||screen==='users')&&h('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px',background:'#FFF8E7',border:'1px solid #F5D878',borderRadius:'10px',padding:'10px 14px'}},
+            ic('M12 16v-4M12 8h.01',{s:15,c:'#92400E'}),
+            h('span',{style:{fontSize:'13px',color:'#78350F',lineHeight:1.5}},'You are viewing as ',h('b',null,'Partner Org Admin'),' for Metro Connect. Billing data, parent organisation records and cross-org user lookup are restricted in this view.')),
 
           screen==='overview'&&persona==='user'&&(()=>{
             const me=users.find(u=>u.id==='u2')||users[0];
@@ -1345,7 +1351,15 @@ function App(){
               h('div',{style:{padding:'20px 28px',borderTop:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between',alignItems:'center'}},
                 h('button',{onClick:()=>{if(userWiz.step===1){setUserWiz(null);setOverviewTab('network');}else setUserWiz(w=>({...w,step:w.step-1}));},style:{background:'#fff',border:'1px solid #C8C8C8',borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===1?'Cancel':'Back'),
                 h('button',{onClick:()=>{
-                  if(userWiz.step<3){setUserWiz(w=>({...w,step:w.step+1}));return;}
+                  if(userWiz.step<3){
+                    if(userWiz.step===1){
+                      const emailLc=userWiz.email.trim().toLowerCase();
+                      if(emailLc&&users.some(u=>u.email.trim().toLowerCase()===emailLc)){
+                        showToast('error','A user with that email already exists.');return;
+                      }
+                    }
+                    setUserWiz(w=>({...w,step:w.step+1}));return;
+                  }
                   const o=orgById(userWiz.orgId);const id='nu'+seq;
                   const rk=userWiz.profileType==='admin'?'admin':userWiz.role;
                   const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
@@ -1594,7 +1608,7 @@ function App(){
                         h('div',{style:{fontWeight:700,fontSize:'14px'}},u.name),
                         h('div',{style:{fontSize:'12px',color:'#808080'}},roleLabel(u.roleKey))))))),
 
-                  odChildren.length>0&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden'}},
+                  odChildren.length>0&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',marginBottom:'20px'}},
                     h('div',{style:{padding:'20px 24px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
                       h('div',{style:{fontWeight:700,fontSize:'16px'}},'Sub-organisations (',odChildren.length,')'),
                       h('button',{onClick:()=>setScreen('orgs'),style:{background:'none',border:0,color:'#5514B4',fontWeight:400,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',display:'inline-flex',alignItems:'center',gap:'4px',textDecoration:'underline',textUnderlineOffset:'2px'}},'View in tree',ic('m9 18 6-6-6-6',{s:13,c:'#5514B4'}))),
@@ -1603,7 +1617,36 @@ function App(){
                       h('div',{style:{flex:1}},
                         h('div',{style:{fontWeight:600,fontSize:'14px'}},c.name),
                         h('div',{style:{fontSize:'12px',color:'#808080'}},TYPE_LABELS[c.typeKey])),
-                      h('div',{style:{fontSize:'14px',color:'#808080'}},userCountFor(c.id),' users')))),  // close text, row, map, sub-orgs card
+                      h('div',{style:{fontSize:'14px',color:'#808080'}},userCountFor(c.id),' users')))),
+
+                  // Dealer note
+                  od.typeKey==='dealer'&&h('div',{style:{background:'#FFFBEB',border:'1px solid #FDE68A',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
+                    h('div',{style:{display:'flex',gap:'12px',alignItems:'flex-start'}},
+                      h('div',{style:{width:'36px',height:'36px',borderRadius:'10px',background:'#FEF3C7',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                        ic('M13 16h-1v-4h-1m1-4h.01',{s:18,c:'#92400E'})),
+                      h('div',null,
+                        h('div',{style:{fontWeight:700,fontSize:'15px',color:'#78350F',marginBottom:'6px'}},'Dealer organisation'),
+                        h('div',{style:{fontSize:'14px',color:'#78350F',lineHeight:1.55,marginBottom:'8px'}},'Dealers are entitlement recipients — they receive products and capabilities from their parent reseller but do not have direct access to the Nexus portal.'),
+                        h('div',{style:{fontSize:'13px',color:'#92400E',lineHeight:1.5}},'User management and portal access for this organisation are controlled by ',h('b',null,odParent?odParent.name:'the parent reseller'),'. Contact BT Wholesale to configure dealer-level entitlements.')))),
+
+                  // Sub-reseller data visibility controls
+                  od.typeKey==='subReseller'&&canAdmin&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',marginBottom:'20px'}},
+                    h('div',{style:{padding:'20px 24px',borderBottom:'1px solid #E3E3E3'}},
+                      h('div',{style:{fontWeight:700,fontSize:'16px',marginBottom:'4px'}},'Sub-reseller data visibility'),
+                      h('div',{style:{fontSize:'14px',color:'#808080'}},'Control what data this sub-reseller can see from its parent hierarchy.')),
+                    h('div',{style:{padding:'16px 24px',display:'flex',flexDirection:'column',gap:'14px'}},
+                      [['View parent billing data','Allows this sub-reseller to see invoices and billing reports from the parent.',false],
+                       ['View parent order history','Allows access to orders placed by the parent organisation.',false],
+                       ['Cross-org user lookup','Allows this sub-reseller to search users across sibling organisations.',false]].map(([label,desc,defaultOn],i)=>
+                        h('div',{key:i,style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'16px'}},
+                          h('div',{style:{flex:1}},
+                            h('div',{style:{fontWeight:600,fontSize:'14px',color:'#2A2A2A',marginBottom:'2px'}},label),
+                            h('div',{style:{fontSize:'13px',color:'#808080'}},desc)),
+                          h('div',{onClick:()=>showToast('info','Data visibility controls will be configurable in the full implementation.'),
+                            style:{width:'40px',height:'22px',borderRadius:'11px',background:defaultOn?'#5514B4':'#E3E3E3',cursor:'pointer',flexShrink:0,position:'relative',transition:'background 150ms'}},
+                            h('div',{style:{position:'absolute',top:'3px',left:defaultOn?'21px':'3px',width:'16px',height:'16px',borderRadius:'999px',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 150ms'}})))))),
+
+                  // ← this comma closes the left column div array
 
                 h('div',null,
                   h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'20px',marginBottom:'16px'}},
@@ -1650,13 +1693,21 @@ function App(){
                   h('div',{style:{display:'flex',gap:'6px'}},
                     h('select',{value:filterStatus,onChange:e=>setFilterStatus(e.target.value),style:{flex:1,padding:'10px 36px 10px 12px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'14px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343',appearance:'none',WebkitAppearance:'none',backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2020/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23808080%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E\")",backgroundRepeat:'no-repeat',backgroundPosition:'right 12px center'}},
                       h('option',{value:''},'Status'),
-                      ['Active','Invited','Inactive','Removed'].map(s=>h('option',{key:s,value:s},s))),
+                      ['Active','Invited','Expired','Inactive','Removed'].map(s=>h('option',{key:s,value:s},s))),
                     h('select',{value:filterRole,onChange:e=>setFilterRole(e.target.value),style:{flex:1,padding:'10px 36px 10px 12px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'14px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343',appearance:'none',WebkitAppearance:'none',backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23808080%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E\")",backgroundRepeat:'no-repeat',backgroundPosition:'right 12px center'}},
                       h('option',{value:''},'All roles'),
                       ROLES.map(r=>h('option',{key:r.key,value:r.key},r.label))))),
                 bulkSelected.size>0&&h('div',{style:{margin:'0 13px 8px',padding:'8px 12px',background:'#F3EBFE',border:'1px solid #D9C9F5',borderRadius:'10px',display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}},
                   h('span',{style:{fontSize:'13px',fontWeight:700,color:'#3F187F',flex:1}}),
                   h('span',{style:{fontSize:'13px',fontWeight:700,color:'#3F187F'}},bulkSelected.size+' selected'),
+                  bulkRoleOpen
+                    ?h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
+                        h('select',{onChange:e=>{const rk=e.target.value;if(!rk)return;let count=0;setUsers(us=>us.map(u=>{if(bulkSelected.has(u.id)&&u.status!=='Removed'){count++;return{...u,roleKey:rk};}return u;}));setBulkSelected(new Set());setBulkRoleOpen(false);showToast('success',count+' user'+(count!==1?'s':'')+' role updated to '+(ROLES.find(r=>r.key===rk)||{label:rk}).label+'.');},
+                          style:{padding:'5px 10px',border:'1px solid #C4A8F0',borderRadius:'8px',background:'#fff',fontWeight:600,fontSize:'12px',color:'#3F187F',cursor:'pointer',fontFamily:'inherit'}},
+                          h('option',{value:''},'Select role…'),
+                          ROLES.map(r=>h('option',{key:r.key,value:r.key},r.label))),
+                        h('button',{onClick:()=>setBulkRoleOpen(false),style:{padding:'5px 8px',border:'none',borderRadius:'8px',background:'transparent',fontWeight:700,fontSize:'14px',color:'#808080',cursor:'pointer',fontFamily:'inherit',lineHeight:1}},'×'))
+                    :h('button',{onClick:()=>setBulkRoleOpen(true),style:{padding:'5px 12px',border:'1px solid #C4A8F0',borderRadius:'8px',background:'#fff',fontWeight:700,fontSize:'12px',color:'#3F187F',cursor:'pointer',fontFamily:'inherit'}},'Change role'),
                   h('button',{onClick:()=>{
                     let count=0;
                     setUsers(us=>us.map(u=>{if(bulkSelected.has(u.id)&&(u.status==='Active'||u.status==='Invited')){count++;return{...u,status:'Inactive'};}return u;}));
@@ -1668,7 +1719,7 @@ function App(){
                     const now=Date.now();
                     setUsers(us=>us.map(u=>{if(bulkSelected.has(u.id)){count++;return{...u,status:'Removed',removedAt:now};}return u;}));
                     setBulkSelected(new Set());
-                    showToast('success',count+' user'+(count!==1?'s':'')+' removed. They can be restored within 30 days.');
+                    showToast('success',count+' user'+(count!==1?'s':'')+' permanently removed.');
                   },style:{padding:'5px 12px',border:'1px solid #FAD4D4',borderRadius:'8px',background:'#fff',fontWeight:700,fontSize:'12px',color:'#A0121B',cursor:'pointer',fontFamily:'inherit'}},'Remove'),
                   h('button',{onClick:()=>setBulkSelected(new Set()),style:{padding:'5px 8px',border:'none',borderRadius:'8px',background:'transparent',fontWeight:700,fontSize:'14px',color:'#808080',cursor:'pointer',fontFamily:'inherit',lineHeight:1}},'×')),
                 h('div',{style:{flex:1,overflowY:'auto'}},
@@ -1828,6 +1879,10 @@ function App(){
                             onClick:()=>showToast('success','Password reset email sent to '+du.name+'.'),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #E3E3E3',borderRadius:'12px',background:'#fff',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#2A2A2A',textAlign:'left'}},
                             ic('M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3M8 12h8',{s:14,c:'#434343'}),'Reset password'),
+                          du.isPrimary&&du.status==='Active'&&h('button',{
+                            onClick:()=>setContactChangeWiz({step:1,name:'',email:'',oldName:du.name,oldEmail:du.email,orgId:du.orgId}),
+                            style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #B8D0EC',borderRadius:'12px',background:'#EFF6FF',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#1A4070',textAlign:'left'}},
+                            ic('M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',{s:14,c:'#1A4070'}),'Transfer primary contact'),
                           !isSelf&&du.status==='Active'&&h('button',{
                             onClick:()=>setDeactivateConfirm(du.id),
                             style:{display:'flex',alignItems:'center',gap:'8px',padding:'8px 14px',border:'1px solid #F8E0C0',borderRadius:'12px',background:'#FFF9F0',cursor:'pointer',fontFamily:'inherit',fontWeight:600,fontSize:'14px',color:'#8A5A00',textAlign:'left'}},
@@ -2060,6 +2115,23 @@ function App(){
                                   (cr.grants||[]).map(g=>h('span',{key:g,style:{background:'#F0F0F0',color:'#434343',borderRadius:'1000px',padding:'3px 10px',fontSize:'12px',fontWeight:500}},g)))),
                               h('button',{onClick:()=>{if(window.confirm('Delete custom role "'+cr.label+'"?')){setCustomRoles(rs=>rs.filter(r=>r.key!==cr.key));showToast('success','Custom role "'+cr.label+'" deleted.');}},style:{background:'none',border:'1px solid #E3E3E3',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',fontWeight:600,color:'#DA020F',cursor:'pointer',fontFamily:'inherit',flexShrink:0}},'Delete'))))),
                   activeTab==='permSets'&&!isBt&&h('div',{style:{padding:'20px 24px'}},
+                    h('div',{style:{background:'#F7F5FF',border:'1px solid #D9C9F5',borderRadius:'16px',padding:'20px 24px',marginBottom:'24px'}},
+                      h('div',{style:{fontWeight:700,fontSize:'14px',color:'#3F187F',marginBottom:'16px'}},'How the three layers work together'),
+                      h('div',{style:{display:'flex',alignItems:'center',gap:'0',flexWrap:'wrap'}},
+                        h('div',{style:{flex:1,minWidth:'140px',textAlign:'center',padding:'14px 12px',background:'#fff',borderRadius:'12px',border:'1px solid #C4A0F0'}},
+                          h('div',{style:{width:'36px',height:'36px',borderRadius:'8px',background:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px'}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:17,c:'#fff'})),
+                          h('div',{style:{fontWeight:700,fontSize:'13px',color:'#3F187F',marginBottom:'4px'}},'Permission sets'),
+                          h('div',{style:{fontSize:'12px',color:'#808080',lineHeight:1.4}},'Atomic capabilities (e.g. "Place order", "View billing")')),
+                        h('div',{style:{padding:'0 8px',color:'#C4A0F0',fontWeight:700,fontSize:'18px'}},'→'),
+                        h('div',{style:{flex:1,minWidth:'140px',textAlign:'center',padding:'14px 12px',background:'#fff',borderRadius:'12px',border:'1px solid #C4A0F0'}},
+                          h('div',{style:{width:'36px',height:'36px',borderRadius:'8px',background:'#8B44D4',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px'}},ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'],{s:17,c:'#fff'})),
+                          h('div',{style:{fontWeight:700,fontSize:'13px',color:'#3F187F',marginBottom:'4px'}},'Roles'),
+                          h('div',{style:{fontSize:'12px',color:'#808080',lineHeight:1.4}},'Named bundles of sets matching how people work')),
+                        h('div',{style:{padding:'0 8px',color:'#C4A0F0',fontWeight:700,fontSize:'18px'}},'→'),
+                        h('div',{style:{flex:1,minWidth:'140px',textAlign:'center',padding:'14px 12px',background:'#fff',borderRadius:'12px',border:'1px solid #C4A0F0'}},
+                          h('div',{style:{width:'36px',height:'36px',borderRadius:'8px',background:'#B07FE8',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px'}},ic(['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2','M23 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75',{el:'circle',cx:9,cy:7,r:4}],{s:17,c:'#fff'})),
+                          h('div',{style:{fontWeight:700,fontSize:'13px',color:'#3F187F',marginBottom:'4px'}},'Users'),
+                          h('div',{style:{fontSize:'12px',color:'#808080',lineHeight:1.4}},'People assigned a role and inherit its permission sets')))),
                     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}},
                       h('p',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.55,margin:0,maxWidth:'600px'}},'Permission sets are the building blocks of roles. Each set represents a specific capability — administrators combine them into roles that match how people work.'),
                       h('button',{onClick:()=>showToast('info','Permission set creation is in development. You\'ll be able to define new capabilities and add them to any role.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',flexShrink:0,marginLeft:'20px'}},
@@ -2310,8 +2382,8 @@ function App(){
               h('div',{style:{width:'48px',height:'48px',borderRadius:'12px',background:'#FEF6DE',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px'}},
                 ic(['M18 8h1a4 4 0 0 1 0 8h-1','M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z','M6 1v3','M10 1v3','M14 1v3'],{s:22,c:'#8A5A00'})),
               h('div',{style:{fontSize:'16px',fontWeight:700,marginBottom:'8px'}},'Deactivate user?'),
-              h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.5,marginBottom:'6px'}},'You are about to deactivate ',h('b',null,dUser.name),'. They will lose access to the portal immediately.'),
-              h('div',{style:{fontSize:'14px',color:'#808080',marginBottom:'24px'}},'You can reactivate them at any time from their profile.'),
+              h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.5,marginBottom:'6px'}},'You are about to deactivate ',h('b',null,dUser.name),'. Their active sessions will be terminated and API access revoked immediately.'),
+              h('div',{style:{fontSize:'14px',color:'#808080',marginBottom:'24px'}},'You can reactivate them at any time from their profile. Their data, settings and role are preserved.'),
               h('div',{style:{display:'flex',gap:'12px',justifyContent:'flex-end'}},
                 h('button',{onClick:()=>setDeactivateConfirm(null),style:{padding:'11px 20px',border:'1px solid #E3E3E3',borderRadius:'32px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#fff',fontFamily:'inherit'}},'Cancel'),
                 h('button',{onClick:()=>{
@@ -2329,15 +2401,15 @@ function App(){
               h('div',{style:{width:'48px',height:'48px',borderRadius:'12px',background:'#FDECEC',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px'}},
                 ic(['M3 6h18','M8 6V4h8v2','M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'],{s:22,c:'#A0121B'})),
               h('div',{style:{fontSize:'16px',fontWeight:700,marginBottom:'8px'}},'Remove user?'),
-              h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.5,marginBottom:'6px'}},'You are about to remove ',h('b',null,rUser.name),' from the platform.'),
-              h('div',{style:{fontSize:'14px',color:'#808080',marginBottom:'24px'}},'They can be restored within 30 days. After that, their account will be permanently deleted.'),
+              h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.5,marginBottom:'6px'}},'You are about to permanently remove ',h('b',null,rUser.name),' from the platform.'),
+              h('div',{style:{fontSize:'14px',color:'#808080',marginBottom:'24px'}},'This action cannot be undone. If reversal is needed, contact BT Wholesale support.'),
               h('div',{style:{display:'flex',gap:'12px',justifyContent:'flex-end'}},
                 h('button',{onClick:()=>setRemoveConfirm(null),style:{padding:'11px 20px',border:'1px solid #E3E3E3',borderRadius:'32px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#fff',fontFamily:'inherit'}},'Cancel'),
                 h('button',{onClick:()=>{
                   const name=rUser.name;
                   setUsers(us=>us.map(u=>u.id===removeConfirm?{...u,status:'Removed',removedAt:Date.now()}:u));
                   setRemoveConfirm(null);
-                  showToast('success',name+' removed. They can be restored within 30 days.');
+                  showToast('success',name+' has been permanently removed from the platform.');
                 },style:{padding:'12px 20px',border:0,borderRadius:'32px',fontWeight:700,fontSize:'14px',cursor:'pointer',background:'#A0121B',color:'#fff',fontFamily:'inherit'}},'Remove')))):null;
         })(),
 
