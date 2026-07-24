@@ -1607,10 +1607,10 @@ function App(){
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
-            h('div',{style:{borderBottom:'1px solid #E3E3E3',marginBottom:'24px',display:'flex',gap:'8px'}},
+            h('div',{style:{marginBottom:'24px',display:'flex',gap:'8px',flexWrap:'wrap'}},
               [{key:'users',label:'Users'},{key:'roles',label:'Roles & permissions'},{key:'auditLog',label:'Audit log'}].map(t=>
                 h('button',{key:t.key,onClick:()=>setUsersTab(t.key),
-                  style:{background:'none',border:'none',borderBottom:usersTab===t.key?'2px solid #2A1C4A':'1px solid #C8C8C8',padding:'10px 16px 10px 12px',fontWeight:usersTab===t.key?700:400,fontSize:'14px',color:usersTab===t.key?'#2A1C4A':'#5514B4',cursor:'pointer',fontFamily:'inherit',marginBottom:'-1px',whiteSpace:'nowrap'}},
+                  style:{display:'inline-flex',alignItems:'center',padding:'6px 16px',borderRadius:'9999px',fontSize:'13px',fontWeight:usersTab===t.key?700:500,cursor:'pointer',border:'1px solid '+(usersTab===t.key?'#5514B4':'#E3E3E3'),background:usersTab===t.key?'#5514B4':'#fff',color:usersTab===t.key?'#fff':'#434343',fontFamily:'inherit',whiteSpace:'nowrap',transition:'background 120ms,color 120ms,border-color 120ms'}},
                   t.label))),
             usersTab==='users'&&(()=>{
             const q=userSearch.toLowerCase();
@@ -1944,8 +1944,8 @@ function App(){
                     h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.5}},'To request a role change, contact your organisation administrator (Sarah Whitfield).')))
                 :h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden'}},
                   h('div',{style:{padding:'20px 24px 18px'}},
-                    h('div',{style:{display:'flex',borderBottom:'1px solid #E3E3E3',gap:'8px'}},
-                      tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:tabBtnSt(activeTab===t.key)},t.label)))),
+                    h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}},
+                      tabs.map(t=>h('button',{key:t.key,onClick:()=>setRolesTab(t.key),style:{display:'inline-flex',alignItems:'center',padding:'6px 16px',borderRadius:'9999px',fontSize:'13px',fontWeight:activeTab===t.key?700:500,cursor:'pointer',border:'1px solid '+(activeTab===t.key?'#5514B4':'#E3E3E3'),background:activeTab===t.key?'#5514B4':'#fff',color:activeTab===t.key?'#fff':'#434343',fontFamily:'inherit',whiteSpace:'nowrap',transition:'background 120ms,color 120ms,border-color 120ms'}},t.label)))),
                   activeTab==='roleDirectory'&&(selRole&&!isBt
                     ?(()=>{
                         const ro=ROLES.find(r=>r.key===selRole);
