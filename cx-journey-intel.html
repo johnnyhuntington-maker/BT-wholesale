@@ -1,0 +1,841 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>BT Nexus — CX Journey Intel</title>
+<style>
+:root {
+  --purple:       #5514B4;
+  --purple-deep:  #3D1070;
+  --purple-light: #EDE8FA;
+  --amber:        #92400E;
+  --amber-bg:     #FEF3C7;
+  --amber-border: #FCD34D;
+  --green:        #166534;
+  --green-bg:     #DCFCE7;
+  --green-border: #86EFAC;
+  --coral:        #9B1C1C;
+  --coral-bg:     #FEE2E2;
+  --coral-border: #FCA5A5;
+  --teal:         #0E7490;
+  --teal-bg:      #CFFAFE;
+  --teal-border:  #67E8F9;
+  --ground:       #F3F1F9;
+  --surface:      #FFFFFF;
+  --nav-bg:       #1E1535;
+  --nav-text:     rgba(255,255,255,0.55);
+  --nav-active:   #FFFFFF;
+  --nav-hover:    rgba(255,255,255,0.8);
+  --ink:          #1A1023;
+  --ink-2:        #4B4460;
+  --ink-3:        #8B82A8;
+  --border:       #DDD8EE;
+  --th-bg:        #F3F1F9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --purple:#9B6DFF; --purple-deep:#C4B0FF; --purple-light:#2A1854;
+    --amber:#FCD34D; --amber-bg:#2A1C08; --amber-border:#92400E;
+    --green:#86EFAC; --green-bg:#052E16; --green-border:#166534;
+    --coral:#FCA5A5; --coral-bg:#2A0A0A; --coral-border:#9B1C1C;
+    --teal:#67E8F9; --teal-bg:#0A2328; --teal-border:#0E7490;
+    --ground:#0F0B1A; --surface:#1A1530; --nav-bg:#0A0715;
+    --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+    --border:#2C2848; --th-bg:#1A1530;
+  }
+}
+:root[data-theme="light"] {
+  --purple:#5514B4; --purple-deep:#3D1070; --purple-light:#EDE8FA;
+  --amber:#92400E; --amber-bg:#FEF3C7; --amber-border:#FCD34D;
+  --green:#166534; --green-bg:#DCFCE7; --green-border:#86EFAC;
+  --coral:#9B1C1C; --coral-bg:#FEE2E2; --coral-border:#FCA5A5;
+  --teal:#0E7490; --teal-bg:#CFFAFE; --teal-border:#67E8F9;
+  --ground:#F3F1F9; --surface:#FFFFFF; --nav-bg:#1E1535;
+  --ink:#1A1023; --ink-2:#4B4460; --ink-3:#8B82A8;
+  --border:#DDD8EE; --th-bg:#F3F1F9;
+}
+:root[data-theme="dark"] {
+  --purple:#9B6DFF; --purple-deep:#C4B0FF; --purple-light:#2A1854;
+  --amber:#FCD34D; --amber-bg:#2A1C08; --amber-border:#92400E;
+  --green:#86EFAC; --green-bg:#052E16; --green-border:#166534;
+  --coral:#FCA5A5; --coral-bg:#2A0A0A; --coral-border:#9B1C1C;
+  --teal:#67E8F9; --teal-bg:#0A2328; --teal-border:#0E7490;
+  --ground:#0F0B1A; --surface:#1A1530; --nav-bg:#0A0715;
+  --ink:#EDE8FA; --ink-2:#9B93B0; --ink-3:#5C5270;
+  --border:#2C2848; --th-bg:#1A1530;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+nav {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--nav-bg);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px 0 32px;
+  display: flex;
+  flex-direction: column;
+}
+.nav-brand { padding: 0 16px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px; }
+.nav-brand-title { font-family: Georgia, serif; font-size: 12.5px; color: rgba(255,255,255,0.9); line-height: 1.3; }
+.nav-brand-sub { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
+.nav-section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 16px 4px; }
+nav a { display: block; padding: 5px 16px; font-size: 12px; color: var(--nav-text); text-decoration: none; line-height: 1.35; transition: color 0.12s; border-left: 2px solid transparent; }
+nav a:hover { color: var(--nav-hover); }
+nav a.active { color: var(--nav-active); border-left-color: var(--purple); background: rgba(255,255,255,0.04); }
+.nav-lib { margin-top: auto; padding: 12px 16px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+.nav-lib a { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; padding: 0; border: none; }
+.nav-lib a:hover { color: rgba(255,255,255,0.7); }
+
+main { flex: 1; min-width: 0; padding: 0 40px 80px; max-width: 960px; }
+
+.snapshot-header { background: var(--purple-deep); margin: 0 -40px; padding: 28px 40px 22px; margin-bottom: 32px; }
+.snapshot-eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+.snapshot-title { font-family: Georgia, serif; font-size: 22px; color: #fff; font-weight: normal; line-height: 1.2; margin-bottom: 10px; }
+.snapshot-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.snapshot-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border-radius: 4px; padding: 2px 7px; }
+
+h2 { font-size: 14px; font-weight: 700; color: var(--ink); margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+h3 { font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 16px 0 6px; }
+p { margin-bottom: 10px; color: var(--ink-2); }
+ul, ol { padding-left: 18px; margin-bottom: 10px; color: var(--ink-2); }
+li { margin-bottom: 3px; }
+strong { color: var(--ink); font-weight: 600; }
+code { font-family: 'SF Mono', monospace; font-size: 11.5px; background: var(--th-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; color: var(--purple); }
+
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+
+.callout { border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+.callout-amber  { background: var(--amber-bg);  border: 1px solid var(--amber-border);  color: var(--amber); }
+.callout-coral  { background: var(--coral-bg);  border: 1px solid var(--coral-border);  color: var(--coral); }
+.callout-green  { background: var(--green-bg);  border: 1px solid var(--green-border);  color: var(--green); }
+.callout-teal   { background: var(--teal-bg);   border: 1px solid var(--teal-border);   color: var(--teal); }
+.callout-purple { background: var(--purple-light); border: 1px solid #C4A0F0; color: var(--purple); }
+.callout svg { flex-shrink: 0; margin-top: 1px; }
+.callout-body { line-height: 1.5; }
+.callout-body strong { color: inherit; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 10px; }
+th { background: var(--th-bg); font-weight: 700; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--ink-2); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+
+.tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.tag-gap  { background: var(--coral-bg);  color: var(--coral);  border: 1px solid var(--coral-border); }
+.tag-opp  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+.tag-jtbd { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-border); }
+.tag-mm   { background: var(--purple-light); color: var(--purple); border: 1px solid #C4A0F0; }
+
+/* Journey step cards */
+.steps-grid { display: flex; flex-direction: column; gap: 0; }
+.step-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; background: var(--surface); }
+.step-header { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px 12px; }
+.step-num { width: 28px; height: 28px; background: var(--purple); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.step-stage { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.step-title { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.step-jtbd { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; font-style: italic; }
+.step-mm { margin-left: auto; flex-shrink: 0; }
+.step-body { border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.step-col { padding: 12px 14px; font-size: 12px; color: var(--ink-2); }
+.step-col + .step-col { border-left: 1px solid var(--border); }
+.step-col-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px; }
+.step-col ul { padding-left: 14px; margin: 0; }
+.step-col li { margin-bottom: 4px; line-height: 1.45; }
+.step-insights { border-top: 1px solid var(--border); padding: 10px 14px; background: var(--th-bg); font-size: 12px; color: var(--ink-2); display: flex; gap: 8px; align-items: flex-start; }
+.step-insight-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; padding-top: 1px; }
+.step-insight-text { font-style: italic; line-height: 1.5; }
+
+/* Stage pill */
+.stage-pill { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 3px; padding: 2px 6px; }
+.stage-learn   { background: #DBEAFE; color: #1E40AF; }
+.stage-buy     { background: #EDE9FE; color: #6D28D9; }
+.stage-get     { background: #D1FAE5; color: #065F46; }
+.stage-use     { background: #FEF3C7; color: #92400E; }
+.stage-pay     { background: #FFE4E6; color: #9F1239; }
+.stage-support { background: #F1F5F9; color: #475569; }
+
+.quote { border-left: 3px solid var(--purple); padding: 8px 14px; margin: 8px 0; font-style: italic; color: var(--ink-2); font-size: 12.5px; }
+
+/* Source doc note */
+.source-note { font-size: 11px; color: var(--ink-3); background: var(--th-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin-bottom: 16px; display: flex; gap: 8px; align-items: center; }
+
+@media (max-width: 700px) { .step-body { grid-template-columns: 1fr; } .step-col + .step-col { border-left: none; border-top: 1px solid var(--border); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-title">BT Nexus</div>
+    <div class="nav-brand-sub">CX Journey Intel</div>
+  </div>
+
+  <div class="nav-section-label">Journey stages</div>
+  <a href="#learn">Learn</a>
+  <a href="#buy">Buy</a>
+  <a href="#get">Get</a>
+  <a href="#use">Use</a>
+  <a href="#pay">Pay</a>
+  <a href="#support">Support</a>
+
+  <div class="nav-section-label">Analysis</div>
+  <a href="#jtbd">Jobs to be done</a>
+  <a href="#gaps">Pain &amp; gaps</a>
+  <a href="#opportunities">Future state</a>
+  <a href="#kpis">KPIs</a>
+
+  <div class="nav-lib">
+    <a href="library.html">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Project Library
+    </a>
+  </div>
+</nav>
+
+<main>
+
+  <div class="snapshot-header">
+    <div class="snapshot-eyebrow">Source document · CX Library</div>
+    <div class="snapshot-title">Wholesale New Customer CX Journey</div>
+    <div class="snapshot-meta">
+      <span class="snapshot-badge">Source: CX Library Wholesale Digital New Customer &amp; B2B.xlsb</span>
+      <span class="snapshot-badge">Persona: Phil (small–large reseller)</span>
+      <span class="snapshot-badge">Covers APIs, Broadband, Ethernet, WHC, Voice</span>
+    </div>
+  </div>
+
+  <div class="source-note">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>This document synthesises an older internal CX Library blueprint. Content is accurate to that point in time — Neil flagged it may be dated, though BT's processes move slowly. Use as a structural baseline, validate specifics against current research.</span>
+  </div>
+
+  <!-- JTBD FRAMEWORK -->
+  <h2 id="jtbd">Jobs to be done — linear journey</h2>
+  <div class="section">
+    <p>Thirteen discrete steps across six stages. Steps marked <span class="tag tag-mm">Moment that matters</span> are identified as highest customer value in the source document.</p>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Stage</th><th>Job to be done (customer's voice)</th><th>Theme</th><th>Moment?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>—</td><td><span class="stage-pill stage-learn">Learn</span></td><td>I am aware of BT Wholesale and want to understand what solutions are available.</td><td>Accurate and easy</td><td>—</td></tr>
+        <tr><td>1</td><td><span class="stage-pill stage-buy">Buy</span></td><td>I become a BT Wholesale customer.</td><td>Easy to set up</td><td><span class="tag tag-mm">Yes</span></td></tr>
+        <tr><td>2</td><td><span class="stage-pill stage-buy">Buy</span></td><td>I want you to recommend and quote a product based on my needs.</td><td>Help is available</td><td>—</td></tr>
+        <tr><td>3</td><td><span class="stage-pill stage-buy">Buy</span></td><td>I decide to use BT APIs.</td><td>It meets my needs</td><td>—</td></tr>
+        <tr><td>4</td><td><span class="stage-pill stage-buy">Buy</span></td><td>I'm happy with the quote and I place my order.</td><td>The right solution</td><td>—</td></tr>
+        <tr><td>5</td><td><span class="stage-pill stage-get">Get</span></td><td>I want to know the status and progress of my order.</td><td>Easy to use</td><td>—</td></tr>
+        <tr><td>6</td><td><span class="stage-pill stage-get">Get</span></td><td>My order is complete and I have everything I'm paying for.</td><td>Delivered as promised</td><td><span class="tag tag-mm">Yes</span></td></tr>
+        <tr><td>7</td><td><span class="stage-pill stage-use">Use</span></td><td>I can independently access and manage my service.</td><td>Easy to use</td><td>—</td></tr>
+        <tr><td>8</td><td><span class="stage-pill stage-pay">Pay</span></td><td>I'm billed as agreed.</td><td>Accurate and easy</td><td>—</td></tr>
+        <tr><td>9</td><td><span class="stage-pill stage-pay">Pay</span></td><td>I pay my bill.</td><td>Accurate and easy</td><td>—</td></tr>
+        <tr><td>10</td><td><span class="stage-pill stage-support">Support</span></td><td>I need help with my order.</td><td>Help is available</td><td>—</td></tr>
+        <tr><td>11</td><td><span class="stage-pill stage-support">Support</span></td><td>I need help with my services.</td><td>Help is available</td><td>—</td></tr>
+        <tr><td>12</td><td><span class="stage-pill stage-support">Support</span></td><td>I need help with my bill.</td><td>Help is available</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STEP DETAIL CARDS -->
+  <h2 id="learn">Learn</h2>
+  <div class="steps-grid">
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">—</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-learn">Learn</span></div>
+          <div class="step-title">I am aware of BT Wholesale and want to understand what's available.</div>
+          <div class="step-jtbd">Theme: Accurate and easy</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>BT is a well-established, safe choice.</li>
+            <li>What new solutions are available to me?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Attending industry conferences and forums.</li>
+            <li>Visiting BT Wholesale website.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Curious about what's available and how to partner.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">A single second of added page load speed can cause sales to drop. Discoverability and speed of access to relevant information at this stage is critical.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 id="buy">Buy</h2>
+  <div class="steps-grid">
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-buy">Buy</span></div>
+          <div class="step-title">I become a BT Wholesale customer.</div>
+          <div class="step-jtbd">Theme: Easy to set up</div>
+        </div>
+        <div class="step-mm"><span class="tag tag-mm">Moment that matters</span></div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Hoping it doesn't take long to set up my account.</li>
+            <li>Have I effectively relayed our requirements?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Asking BT Wholesale for an overview of the partnership process.</li>
+            <li>Registering online or via Account Manager.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Anxious — did I give the right information?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"Customers who have experienced or are currently experiencing the most friction are those trying to get started." Onboarding is the most cited pain point across the journey.</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-buy">Buy</span></div>
+          <div class="step-title">I want you to recommend and quote a product based on my needs.</div>
+          <div class="step-jtbd">Theme: Help is available</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Need more information before making a decision.</li>
+            <li>Conscious of my stakeholders' interests.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Confirming detailed requirements with a Sales Specialist.</li>
+            <li>Comparing options and requesting a formal quote.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Conscious of their stakeholders' expectations.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"BTW providing a single quoting tool (drag and drop) where we can quote and order would be a huge improvement." The quoting process is described as labour-intensive with no single tool.</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-buy">Buy</span></div>
+          <div class="step-title">I decide to use BT APIs.</div>
+          <div class="step-jtbd">Theme: It meets my needs</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>What do we need to get started — is everything in place?</li>
+            <li>Can my systems communicate with BT's systems?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Finding API credentials (previously set up).</li>
+            <li>Setting up testing environment.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Anxious — will my systems communicate with BT's?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">Customers need API credentials, a test emulator, a test library, and clear documentation — all in one place. Currently scattered across developer.bt.com with poor discoverability.</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-buy">Buy</span></div>
+          <div class="step-title">I'm happy with the quote and I place my order.</div>
+          <div class="step-jtbd">Theme: The right solution</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Is this process going to be painfully slow?</li>
+            <li>When can we go live?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Placing the order via portal or API.</li>
+            <li>Confirming documentation is complete.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Thankful to reach this milestone.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"The ordering portal is clunky and frustrating to use. It is not intuitive." Order placement is cited as a high-friction, high-effort step.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 id="get">Get</h2>
+  <div class="steps-grid">
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-get">Get</span></div>
+          <div class="step-title">I want to know the status and progress of my order.</div>
+          <div class="step-jtbd">Theme: Easy to use</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Does it look like the order is progressing as agreed?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Scrutinising order updates and measuring against expectations.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Empowered to set appropriate expectations with stakeholders.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"Eco via the wholesale website is extremely slow and can be difficult to track." Real-time tracking is a minimum expectation, not a nice-to-have.</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">6</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-get">Get</span></div>
+          <div class="step-title">My order is complete and I have everything I'm paying for.</div>
+          <div class="step-jtbd">Theme: Delivered as promised</div>
+        </div>
+        <div class="step-mm"><span class="tag tag-mm">Moment that matters</span></div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Hoping products are activated as planned.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Following confirmation through the portal.</li>
+            <li>Scrutinising that delivery matches the order.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Relieved — installation successful.</li>
+            <li>Curious about what comes next.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"Always having to send mail and we spend a lot of time chasing." Order completion confirmation is too manual and slow — customers shouldn't be chasing BT to confirm their own activation.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 id="use">Use</h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">7</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-use">Use</span></div>
+          <div class="step-title">I can independently access and manage my service.</div>
+          <div class="step-jtbd">Theme: Easy to use</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>I'm busy — I need support within my business.</li>
+            <li>Is my service performing as expected?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Setting and amending access privileges for colleagues.</li>
+            <li>Logging into the portal and navigating to recent activity.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Empowered to give the right access to their team.</li>
+            <li>Nervous about unexpected fees or overspill.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">User access and role management is a daily job for customers, not an admin task. They need to delegate, restrict, and audit access without calling BT. This directly maps to the RBAC work.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="pay">Pay</h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">8</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-pay">Pay</span></div>
+          <div class="step-title">I'm billed as agreed.</div>
+          <div class="step-jtbd">Theme: Accurate and easy</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>I have some free time — let me check what's on my next invoice.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Logging in to check the amount due and validate it.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Nervous about unexpected charges.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"I want super accurate electronic invoices so I can do reconciliation." Billing accuracy and format (electronic, exportable, structured) is critical for resellers doing their own billing downstream.</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">9</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-pay">Pay</span></div>
+          <div class="step-title">I pay my bill.</div>
+          <div class="step-jtbd">Theme: Accurate and easy</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>What's the latest date I can settle by?</li>
+            <li>What are my payment options?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Checking amount and ensuring funds are available.</li>
+            <li>Paying through the portal or direct debit.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Relieved — bill is paid, one less thing to think about.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="support">Support</h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">10</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-support">Support</span></div>
+          <div class="step-title">I need help with my order.</div>
+          <div class="step-jtbd">Theme: Help is available</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>Can I make changes to my order?</li>
+            <li>When is the latest date I can change the details?</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Checking if there's a cut-off for changes.</li>
+            <li>Contacting BT via phone or chat.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Anxious that they won't be able to change the date in time.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"Nobody wants to hunt for a phone number to reach an agent." Support discoverability and self-serve capabilities are low. Contact volumes are high because self-serve fails.</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">11</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-support">Support</span></div>
+          <div class="step-title">I need help with my services.</div>
+          <div class="step-jtbd">Theme: Help is available</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>I need to understand what is wrong with my service.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Logging into the portal and checking notification feed.</li>
+            <li>Raising a fault ticket.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Frustrated — a fault is impacting their customers.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"The ticketing system is so slow and tickets regularly disappear." Fault management is a major pain. Customers lose confidence when tickets vanish or don't update.</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">12</div>
+        <div>
+          <div class="step-stage"><span class="stage-pill stage-support">Support</span></div>
+          <div class="step-title">I need help with my bill.</div>
+          <div class="step-jtbd">Theme: Help is available</div>
+        </div>
+      </div>
+      <div class="step-body">
+        <div class="step-col">
+          <div class="step-col-label">Thinking</div>
+          <ul>
+            <li>I'm worried our bill is not accurate.</li>
+            <li>This is going to take time to correct.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Doing</div>
+          <ul>
+            <li>Querying usage with colleagues to verify before calling BT.</li>
+            <li>Raising a billing query.</li>
+          </ul>
+        </div>
+        <div class="step-col">
+          <div class="step-col-label">Feeling</div>
+          <ul>
+            <li>Annoyed at having to spend time correcting something avoidable.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-insights">
+        <div class="step-insight-label">Insight</div>
+        <div class="step-insight-text">"Incorrect invoices affect the customer directly. We credit it back to our customers, so we eat the cost." Billing errors have downstream financial impact on resellers — more than a portal frustration, it's a business liability.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAPS -->
+  <h2 id="gaps">Pain points &amp; identified gaps</h2>
+  <div class="section">
+    <div class="callout callout-coral">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="callout-body"><strong>Below minimum at time of this document:</strong> Learn stage (information discoverability), Buy step 1 (onboarding), Buy step 4 (order placement — described as "clunky").</div>
+    </div>
+    <table>
+      <thead><tr><th>Stage</th><th>Pain point (verbatim quotes)</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stage-pill stage-learn">Learn</span></td><td>"A single second of added page load speed can cause sales to drop."</td><td><span class="tag tag-gap">UX</span></td></tr>
+        <tr><td><span class="stage-pill stage-buy">Buy</span></td><td>"The journey is very labour intensive, especially as the majority of orders require manual intervention."</td><td><span class="tag tag-gap">Process</span></td></tr>
+        <tr><td><span class="stage-pill stage-buy">Buy</span></td><td>"BTW providing a single quoting tool (drag and drop) would be a huge improvement."</td><td><span class="tag tag-gap">UX</span></td></tr>
+        <tr><td><span class="stage-pill stage-buy">Buy</span></td><td>"The ordering portal is clunky and frustrating to use. It is not intuitive."</td><td><span class="tag tag-gap">UX</span></td></tr>
+        <tr><td><span class="stage-pill stage-get">Get</span></td><td>"Eco via the wholesale website is extremely slow and can be difficult to track."</td><td><span class="tag tag-gap">Performance</span></td></tr>
+        <tr><td><span class="stage-pill stage-get">Get</span></td><td>"Always having to send mail and we spend a lot of time chasing."</td><td><span class="tag tag-gap">Process</span></td></tr>
+        <tr><td><span class="stage-pill stage-support">Support</span></td><td>"When raising a ticket the system can be slow and it has occasionally resulted in losing the raised ticket."</td><td><span class="tag tag-gap">Reliability</span></td></tr>
+        <tr><td><span class="stage-pill stage-pay">Pay</span></td><td>"I want super accurate electronic invoices so I can do reconciliation."</td><td><span class="tag tag-gap">Data</span></td></tr>
+        <tr><td><span class="stage-pill stage-support">Support</span></td><td>"Incorrect invoices affect the customer directly. We credit it back to our customers, so we eat the cost."</td><td><span class="tag tag-gap">Financial</span></td></tr>
+        <tr><td><span class="stage-pill stage-support">Support</span></td><td>"Nobody wants to hunt for a phone number to reach an agent."</td><td><span class="tag tag-gap">UX</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FUTURE STATE -->
+  <h2 id="opportunities">Future state opportunities (from source doc)</h2>
+  <div class="section">
+    <p>These requirements were identified in the original blueprint. Annotated with relevance to the current Nexus workstream.</p>
+    <h3>Minimum standard requirements</h3>
+    <table>
+      <thead><tr><th>Req ID</th><th>Capability</th><th>Description</th><th>Nexus relevance</th></tr></thead>
+      <tbody>
+        <tr><td><code>CX01</code></td><td>Single information repository</td><td>One place for all BT Wholesale product information.</td><td><span class="tag tag-opp">Library</span></td></tr>
+        <tr><td><code>CX04</code></td><td>Automated onboarding</td><td>Wholesale customers can self-serve partner registration.</td><td><span class="tag tag-opp">RBAC</span></td></tr>
+        <tr><td><code>CX07</code></td><td>Collaborative customer insight hub</td><td>Shared account visibility across the reseller org.</td><td><span class="tag tag-opp">Org mgmt</span></td></tr>
+        <tr><td><code>CX34</code></td><td>APIs module</td><td>Single API dashboard with credential management.</td><td><span class="tag tag-opp">API</span></td></tr>
+        <tr><td><code>CX11</code></td><td>Integrated quote to order</td><td>Single flow from quoting to order placement.</td><td>—</td></tr>
+        <tr><td><code>CX13</code></td><td>Customer dashboard</td><td>Self-serve order tracker, service usage, billing view.</td><td><span class="tag tag-opp">Portal</span></td></tr>
+        <tr><td><code>CX25</code></td><td>Billing module</td><td>'Your bill is ready' notifications, structured invoices.</td><td>—</td></tr>
+        <tr><td><code>CX30</code></td><td>Interactive issue management</td><td>Self-serve fault raising and tracking.</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <h3>Aspirational requirements</h3>
+    <table>
+      <thead><tr><th>Req ID</th><th>Capability</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>CX14</code></td><td>API access to portal</td><td>Testing and trial environment accessible via portal; AI-ready API access.</td></tr>
+        <tr><td><code>CX09</code></td><td>Interactive quote tool</td><td>Integrated mapping, guided selling.</td></tr>
+        <tr><td><code>CX24</code></td><td>Administration interface</td><td>Advanced self-serve access management (directly maps to RBAC).</td></tr>
+        <tr><td><code>CX03</code></td><td>Interactive collaboration hub</td><td>Collaborative workspace with BT and partner teams.</td></tr>
+        <tr><td><code>CX22</code></td><td>Proactive repair</td><td>BT proactively notifies and repairs faults before the customer reports them.</td></tr>
+        <tr><td><code>CX28</code></td><td>Billing improvements</td><td>Real-time billing data, automated reconciliation.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-purple">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+      <div class="callout-body"><strong>CX24 and CX34 directly validate the Nexus RBAC and API workstreams.</strong> These were identified as requirements in this older blueprint — the current project is effectively implementing them. Good alignment signal.</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <h2 id="kpis">Success metrics (from source doc)</h2>
+  <div class="section">
+    <p>KPIs identified per stage in the original blueprint. Use as baseline targets when defining success criteria for Nexus features.</p>
+    <table>
+      <thead><tr><th>Stage</th><th>KPI</th></tr></thead>
+      <tbody>
+        <tr><td><span class="stage-pill stage-learn">Learn</span></td><td>No. visits to BTWholesale.com; Customer engagement score</td></tr>
+        <tr><td><span class="stage-pill stage-buy">Buy</span></td><td>Cycle time for customer onboarding (days); &gt;95% of new customers contacted by Account Manager within SLA; &gt;90% enrolling in Partner Programme; Overall score of 7+ on Ease NPS; &lt;10% of orders abandoned</td></tr>
+        <tr><td><span class="stage-pill stage-buy">Buy</span></td><td>0% error rate on quote generation; &gt;95% customers who set up API within agreed SLA; 99% of orders placed online completed within 20 minutes; 100% of orders acknowledged within 5 hours</td></tr>
+        <tr><td><span class="stage-pill stage-get">Get</span></td><td>&gt;90% Clean Rate Order (zero touches); &gt;90% orders fulfilled on original customer date; Provision journey CSAT +8; &lt;96% orders cancelled/amended by customer</td></tr>
+        <tr><td><span class="stage-pill stage-use">Use</span></td><td>Volume of transactions per logged-in session; &lt;5% who attempted self-serve called into service; Repair journey CSAT +7</td></tr>
+        <tr><td><span class="stage-pill stage-pay">Pay</span></td><td>&gt;89% of payments made on time; Billing journey CSAT +8; No. of billing calls after first bill</td></tr>
+        <tr><td><span class="stage-pill stage-support">Support</span></td><td>&gt;95% of issues resolved on first call; &lt;5% repeat contacts for same issue; &gt;85% on-time repair; &gt;96% billing issues resolved in SLA; Support journey CSAT +8</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-amber">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>Note:</strong> These KPIs are from the original blueprint and may not reflect current targets. Verify with Neil or the BT Wholesale CX team before using as live benchmarks.</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('h2[id]');
+const navLinks  = document.querySelectorAll('nav a[href^="#"]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+}, { passive: true });
+document.addEventListener('keydown', e => {
+  if (e.key === 't') {
+    const r = document.documentElement;
+    r.setAttribute('data-theme', r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  }
+});
+</script>
+</body></html>
