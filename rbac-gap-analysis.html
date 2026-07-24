@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RBAC Gap Analysis — BT Nexus</title>
+<style>
+  :root {
+    --bg: #F7F5FF;
+    --surface: #ffffff;
+    --surface2: #F3EBFE;
+    --border: #E3D9F5;
+    --ink: #1A1230;
+    --ink2: #4A3D6A;
+    --ink3: #807099;
+    --accent: #5514B4;
+    --accent2: #8B44D4;
+    --nav-bg: #1A0A3C;
+    --nav-ink: #C4B0E8;
+    --nav-active: #ffffff;
+    --nav-active-bg: rgba(255,255,255,0.12);
+    --built-bg: #E6F4E5; --built-fg: #036C01; --built-border: #A3D9A1;
+    --blocked-bg: #FEF3E2; --blocked-fg: #7C4A00; --blocked-border: #F5CBA7;
+    --blind-bg: #EFF6FF; --blind-fg: #1A4070; --blind-border: #BFDBFE;
+    --p1-bg: #FEE2E2; --p1-fg: #A0121B;
+    --p2-bg: #FEF3E2; --p2-fg: #7C4A00;
+    --p3-bg: #F0F0F0; --p3-fg: #434343;
+  }
+  [data-theme="dark"] {
+    --bg: #0F0A1E;
+    --surface: #1C1232;
+    --surface2: #2A1C4A;
+    --border: #3A2A5A;
+    --ink: #EDE8F8;
+    --ink2: #C4B0E8;
+    --ink3: #7A6AA0;
+    --accent: #A070E8;
+    --accent2: #C09AF0;
+    --nav-bg: #0A0618;
+    --nav-ink: #8070B0;
+    --nav-active: #ffffff;
+    --nav-active-bg: rgba(255,255,255,0.1);
+    --built-bg: #0E2E0E; --built-fg: #5CB85C; --built-border: #2A6A2A;
+    --blocked-bg: #2A1A00; --blocked-fg: #F5A623; --blocked-border: #5A3A00;
+    --blind-bg: #0A1E30; --blind-fg: #60A8E0; --blind-border: #1A4070;
+    --p1-bg: #2A0A0A; --p1-fg: #F87171;
+    --p2-bg: #2A1800; --p2-fg: #F5A623;
+    --p3-bg: #1E1E1E; --p3-fg: #A0A0A0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F0A1E; --surface: #1C1232; --surface2: #2A1C4A; --border: #3A2A5A;
+      --ink: #EDE8F8; --ink2: #C4B0E8; --ink3: #7A6AA0; --accent: #A070E8; --accent2: #C09AF0;
+      --nav-bg: #0A0618; --nav-ink: #8070B0; --nav-active: #ffffff; --nav-active-bg: rgba(255,255,255,0.1);
+      --built-bg: #0E2E0E; --built-fg: #5CB85C; --built-border: #2A6A2A;
+      --blocked-bg: #2A1A00; --blocked-fg: #F5A623; --blocked-border: #5A3A00;
+      --blind-bg: #0A1E30; --blind-fg: #60A8E0; --blind-border: #1A4070;
+      --p1-bg: #2A0A0A; --p1-fg: #F87171; --p2-bg: #2A1800; --p2-fg: #F5A623; --p3-bg: #1E1E1E; --p3-fg: #A0A0A0;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body {
+    font-family: 'BT Curve', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    width: 228px;
+    flex-shrink: 0;
+    background: var(--nav-bg);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 0 24px;
+  }
+  .nav-header {
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 8px;
+  }
+  .nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--nav-ink);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    opacity: 0.7;
+    transition: opacity 150ms;
+  }
+  .nav-back:hover { opacity: 1; }
+  .nav-title { color: #fff; font-size: 13px; font-weight: 700; line-height: 1.35; margin-bottom: 4px; }
+  .nav-sub { color: var(--nav-ink); font-size: 11px; }
+  .nav-section { padding: 10px 20px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 20px;
+    color: var(--nav-ink);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    border-radius: 0;
+    transition: background 120ms, color 120ms;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .nav-link.active { color: var(--nav-active); background: var(--nav-active-bg); font-weight: 700; }
+  .nav-link .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-built { background: #5CB85C; }
+  .dot-blocked { background: #F5A623; }
+  .dot-blind { background: #60A8E0; }
+  .dot-accent { background: var(--accent); }
+  .theme-toggle {
+    margin: auto 20px 0;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--nav-ink);
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    font-family: inherit;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.06); }
+
+  /* MAIN */
+  main { flex: 1; min-width: 0; padding: 48px 52px 80px; max-width: 900px; }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 48px;
+    padding: 36px 40px;
+    background: linear-gradient(135deg, #2A1C4A 0%, #5514B4 100%);
+    border-radius: 20px;
+    color: #fff;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-bottom: 10px; }
+  .hero h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .hero-desc { font-size: 14px; opacity: 0.75; line-height: 1.6; max-width: 540px; margin-bottom: 24px; }
+  .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat-n { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .hero-stat-l { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+  .stat-green { color: #7EE8A2; }
+  .stat-amber { color: #FCD34D; }
+  .stat-blue { color: #93C5FD; }
+  .stat-grey { color: rgba(255,255,255,0.5); }
+
+  /* SECTIONS */
+  .section { margin-bottom: 52px; scroll-margin-top: 24px; }
+  h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 6px; }
+  .section-desc { font-size: 14px; color: var(--ink3); line-height: 1.6; margin-bottom: 20px; }
+  h3 { font-size: 14px; font-weight: 700; color: var(--ink2); margin: 24px 0 10px; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+  .card-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-row:last-child { border-bottom: none; }
+  .card-row-num { font-size: 11px; font-weight: 700; color: var(--ink3); padding-top: 2px; }
+  .card-row-body { min-width: 0; }
+  .card-row-title { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 3px; }
+  .card-row-desc { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+  .card-row-meta { font-size: 11px; color: var(--ink3); margin-top: 5px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 1000px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-built { background: var(--built-bg); color: var(--built-fg); border: 1px solid var(--built-border); }
+  .badge-blocked { background: var(--blocked-bg); color: var(--blocked-fg); border: 1px solid var(--blocked-border); }
+  .badge-blind { background: var(--blind-bg); color: var(--blind-fg); border: 1px solid var(--blind-border); }
+  .badge-p1 { background: var(--p1-bg); color: var(--p1-fg); }
+  .badge-p2 { background: var(--p2-bg); color: var(--p2-fg); }
+  .badge-p3 { background: var(--p3-bg); color: var(--p3-fg); }
+
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  th { background: var(--surface2); font-weight: 700; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink3); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--ink2); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  td:first-child, th:first-child { color: var(--ink); font-weight: 600; }
+  tr:hover td { background: var(--surface2); }
+
+  /* INFO BOX */
+  .info-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .info-box.amber { background: var(--blocked-bg); border: 1px solid var(--blocked-border); color: var(--blocked-fg); }
+  .info-box.blue { background: var(--blind-bg); border: 1px solid var(--blind-border); color: var(--blind-fg); }
+
+  /* CHANGELOG */
+  .log-entry { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-date { font-size: 12px; font-weight: 700; color: var(--accent); white-space: nowrap; min-width: 90px; padding-top: 1px; }
+  .log-text { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+  .log-text strong { color: var(--ink); }
+
+  /* divider */
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+  @media (max-width: 700px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; position: relative; }
+    main { padding: 28px 20px 60px; }
+    .hero { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-header">
+    <a class="nav-back" href="library.html">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Library
+    </a>
+    <div class="nav-title">RBAC Gap Analysis</div>
+    <div class="nav-sub">BT Nexus · Fine tooth comb</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a class="nav-link active" href="#summary" onclick="setActive(this)"><span class="dot dot-accent"></span>Summary</a>
+  <a class="nav-link" href="#scorecard" onclick="setActive(this)"><span class="dot dot-accent"></span>Scorecard</a>
+
+  <div class="nav-section">Built</div>
+  <a class="nav-link" href="#built-pre" onclick="setActive(this)"><span class="dot dot-built"></span>Pre-analysis (14)</a>
+  <a class="nav-link" href="#built-gaps" onclick="setActive(this)"><span class="dot dot-built"></span>Gap fixes (11)</a>
+
+  <div class="nav-section">Not built</div>
+  <a class="nav-link" href="#blocked" onclick="setActive(this)"><span class="dot dot-blocked"></span>Blocked (6)</a>
+  <a class="nav-link" href="#blind-spots" onclick="setActive(this)"><span class="dot dot-blind"></span>Blind spots (4)</a>
+
+  <div class="nav-section">Reference</div>
+  <a class="nav-link" href="#open-questions" onclick="setActive(this)"><span class="dot dot-accent"></span>Open questions</a>
+  <a class="nav-link" href="#changelog" onclick="setActive(this)"><span class="dot dot-accent"></span>Changelog</a>
+
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">BT Nexus · Wholesale RBAC Prototype</div>
+    <h1>RBAC Gap Analysis</h1>
+    <div class="hero-desc">Fine tooth comb review of the wholesale.html prototype against RBAC-intel.md. All 11 actionable gaps identified on 24 Jul 2026 have now been implemented.</div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-n stat-green">25</div>
+        <div class="hero-stat-l">Features built</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n stat-green">11</div>
+        <div class="hero-stat-l">Gaps closed</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n stat-amber">6</div>
+        <div class="hero-stat-l">Blocked</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n stat-blue">4</div>
+        <div class="hero-stat-l">Blind spots</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section" id="summary">
+    <h2>Summary</h2>
+    <div class="section-desc">The gap analysis ran on 24 Jul 2026 against the RBAC PRD (§17.5, §17.6, §17.9, §17.10), the RBAC-intel.md doc, and the wholesale.html prototype. It identified 11 things that could be built now, 6 blocked on open questions, and 4 areas the prototype doesn't model at all.</div>
+    <div class="info-box amber">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>All 11 actionable gaps were implemented in a single session on 24 Jul 2026. The prototype is now current with everything that can be built given the open questions outstanding.</span>
+    </div>
+    <div class="info-box blue">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>The prototype is a single-file React UMD prototype at <strong>wholesale.html</strong>. It's a design and stakeholder tool — not production code. Decisions made here inform the Salesforce RBAC implementation.</span>
+    </div>
+  </div>
+
+  <!-- SCORECARD -->
+  <div class="section" id="scorecard">
+    <h2>Scorecard</h2>
+    <div class="section-desc">Quick-read status across every area reviewed.</div>
+    <table>
+      <thead>
+        <tr><th>Area</th><th>Status</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Org hierarchy (5-tier)</td><td><span class="badge badge-built">✓ Built</span></td><td>BT Wholesale → Reseller → Sub-Reseller / Child Reseller / Dealer → Partner Org</td></tr>
+        <tr><td>Three-layer permission model (Sets → Roles → Users)</td><td><span class="badge badge-built">✓ Built</span></td><td>Visible in Permission Sets tab with diagram</td></tr>
+        <tr><td>Persona switching (Switch View)</td><td><span class="badge badge-built">✓ Built</span></td><td>Reseller Admin, BT Admin, BT Account Mgr, Sub-Reseller, Child Reseller, Standard User</td></tr>
+        <tr><td>Invitation expiry status</td><td><span class="badge badge-built">✓ Built</span></td><td>Expired chip (amber-brown) + Marcus Webb as example</td></tr>
+        <tr><td>Duplicate email guard</td><td><span class="badge badge-built">✓ Built</span></td><td>Invite wizard Step 1 → 2 checks for existing email</td></tr>
+        <tr><td>Deactivate = session termination + API revocation</td><td><span class="badge badge-built">✓ Built</span></td><td>Deactivate modal updated with correct language</td></tr>
+        <tr><td>Remove = permanent (no 30-day window)</td><td><span class="badge badge-built">✓ Built</span></td><td>Modal + toast updated; "requires BT support to reverse"</td></tr>
+        <tr><td>Bulk user actions (Change role)</td><td><span class="badge badge-built">✓ Built</span></td><td>Inline role picker in bulk action bar</td></tr>
+        <tr><td>Sub-reseller data visibility controls</td><td><span class="badge badge-built">✓ Built</span></td><td>UI in org detail; functional toggles blocked on permission model</td></tr>
+        <tr><td>Dealer as entitlement-recipient (no portal login)</td><td><span class="badge badge-built">✓ Built</span></td><td>Amber note in org detail for Dealer orgs</td></tr>
+        <tr><td>Transfer primary contact from user drawer</td><td><span class="badge badge-built">✓ Built</span></td><td>Button in Actions for isPrimary active users</td></tr>
+        <tr><td>Sub-reseller restricted scope indicator</td><td><span class="badge badge-built">✓ Built</span></td><td>Amber banner on Users/Orgs/Overview for Partner Org Admin persona</td></tr>
+        <tr><td>BT Internal org context picker</td><td><span class="badge badge-built">✓ Built</span></td><td>Was already built (banner + select on Orgs/Users for BT personas)</td></tr>
+        <tr><td>Custom role creation</td><td><span class="badge badge-blocked">Blocked</span></td><td>Open question: BT-fixed vs reseller-configurable not resolved (§12)</td></tr>
+        <tr><td>SSO / identity (login, MFA)</td><td><span class="badge badge-blocked">Blocked</span></td><td>Salesforce RBAC chosen; flows not designed; Vanmathi to confirm</td></tr>
+        <tr><td>API Portal persona</td><td><span class="badge badge-blocked">Blocked</span></td><td>Separate workstream — Matthew Lindley product owner</td></tr>
+        <tr><td>Onboarding swim lane</td><td><span class="badge badge-blocked">Blocked</span></td><td>Deepa's diagram on Mural cannot be exported — PDF needed</td></tr>
+        <tr><td>Permission catalogue (full granular list)</td><td><span class="badge badge-blocked">Blocked</span></td><td>PRD §14: "to be defined in detailed design"</td></tr>
+        <tr><td>Org establishment flow (BT creates new reseller)</td><td><span class="badge badge-blocked">Blocked</span></td><td>Service Designer territory; not in RBAC scope</td></tr>
+        <tr><td>API consumer RBAC scopes</td><td><span class="badge badge-blind">Blind spot</span></td><td>How API keys map to permission sets — not modelled</td></tr>
+        <tr><td>Multi-tenant data isolation</td><td><span class="badge badge-blind">Blind spot</span></td><td>Prototype doesn't show how data leaks between orgs are prevented</td></tr>
+        <tr><td>Role inheritance across org tiers</td><td><span class="badge badge-blind">Blind spot</span></td><td>PRD §17.5 mentions inheritance — not yet visible in prototype</td></tr>
+        <tr><td>Offboarding / user removal cascade</td><td><span class="badge badge-blind">Blind spot</span></td><td>What happens to open orders/faults when a user is removed?</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BUILT PRE-ANALYSIS -->
+  <div class="section" id="built-pre">
+    <h2>Built before gap analysis</h2>
+    <div class="section-desc">14 features confirmed present in the prototype before the 24 Jul 2026 review.</div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-row-num">01</div>
+        <div class="card-row-body">
+          <div class="card-row-title">5-tier org hierarchy</div>
+          <div class="card-row-desc">BT Wholesale → Reseller → Sub-Reseller / Child Reseller → Dealer → Partner Org. Tree view with depth indentation, type badges, dot indicators.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">02</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Persona Switch View (6 personas)</div>
+          <div class="card-row-desc">Reseller Admin (Northgate), BT Wholesale Admin, BT Account Manager, Sub-Reseller Admin (Metro), Child Reseller Admin (Halo), Standard User. Each resets all state on switch.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">03</div>
+        <div class="card-row-body">
+          <div class="card-row-title">typeAllows() entitlement gating</div>
+          <div class="card-row-desc">Function gates entitlements by org type. Sub-Reseller / Dealer cannot get support, createOrgs, or orderBtw. Dealer limited to product keys and branding.</div>
+          <div class="card-row-meta">PRD §17.10</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">04</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Invite user wizard with role selection</div>
+          <div class="card-row-desc">3-step wizard. Step 2 blocks Billing Manager and Support Agent roles for Sub-Reseller orgs with PRD reference. Profile type toggle (Admin / Regular).</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">05</div>
+        <div class="card-row-body">
+          <div class="card-row-title">User status chips + lifecycle actions</div>
+          <div class="card-row-desc">Active, Invited, Inactive, Removed. Deactivate / Reactivate / Remove buttons with confirmation modals. Removed users show restore option.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">06</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Self-action prevention</div>
+          <div class="card-row-desc">Deactivate and Remove buttons hidden on the signed-in user's own profile. Replaced with "You cannot deactivate or remove your own account" notice.</div>
+          <div class="card-row-meta">§16 Phase 5</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">07</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Force password reset</div>
+          <div class="card-row-desc">Reset password action available for Active users from the user drawer. Shows success toast.</div>
+          <div class="card-row-meta">§17.6</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">08</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Audit log with actor type chips</div>
+          <div class="card-row-desc">Immutable badge, category filters, BT Internal / Reseller actor chips. Assisted journeys flagged with amber "⚡ Assisted · OrgName" badge.</div>
+          <div class="card-row-meta">§17.9</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">09</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Entitlement provisioning status chips</div>
+          <div class="card-row-desc">Active / Pending / Failed coloured chips per entitlement in org detail panel where status is set.</div>
+          <div class="card-row-meta">§17.7</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">10</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Hardware ordering blocked for Sub-Reseller / Dealer</div>
+          <div class="card-row-desc">Hardware entitlement row greyed out with "Not available" state and PRD reference in org detail panel.</div>
+          <div class="card-row-meta">§17.10 + §3</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">11</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Standard User permission chips</div>
+          <div class="card-row-desc">Standard User view → My profile panel: grants render as coloured pill chips (from CAP_COLORS map) instead of a plain tick-list.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">12</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Permission sets on role detail</div>
+          <div class="card-row-desc">Roles → role drill-down shows permission sets grouped by category (Ordering, Billing, Faults, etc.) as purple chips. "Add permission set" button wired.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">13</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Contact change wizard (org detail)</div>
+          <div class="card-row-desc">2-step wizard to request primary contact transfer for an org. Step 2 shows before/after diff. Confirmation email noted.</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">14</div>
+        <div class="card-row-body">
+          <div class="card-row-title">BT Internal org context picker</div>
+          <div class="card-row-desc">Banner + select on Orgs/Users screens for BT personas. Acting-in-context label when set. "All actions are logged with your BT identity and this org context."</div>
+        </div>
+        <span class="badge badge-built">Built</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BUILT GAPS -->
+  <div class="section" id="built-gaps">
+    <h2>Gaps closed — 24 Jul 2026</h2>
+    <div class="section-desc">All 11 actionable gaps identified in the fine tooth comb review. All implemented in a single session.</div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-row-num">G1</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Remove = permanent</div>
+          <div class="card-row-desc">Remove modal previously said "restored within 30 days." Updated to: "This action cannot be undone. Contact BT Wholesale support." Bulk remove toast and individual toast also updated.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p1">P1</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G2</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Sub-reseller restricted scope indicator</div>
+          <div class="card-row-desc">Amber banner on Users, Orgs, and Overview for Partner Org Admin persona: "Billing data, parent organisation records and cross-org user lookup are restricted in this view."</div>
+        </div>
+        <div class="badges"><span class="badge badge-p1">P1</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G3</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Deactivate: session termination + API revocation</div>
+          <div class="card-row-desc">Deactivate modal updated from vague "lose access immediately" to "active sessions will be terminated and API access revoked immediately." Reactivation note retained.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G4</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Invitation expiry status</div>
+          <div class="card-row-desc">Expired added to statusMap (amber-brown #78350F / #FDEFD0). Marcus Webb (u9) added as a pre-seeded expired invite. Expired option added to status filter dropdown.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G5</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Duplicate email guard</div>
+          <div class="card-row-desc">Invite wizard Step 1 → Step 2 transition checks users.some(u => u.email === wizEmail). Shows error toast "A user with that email already exists" and blocks progression.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G6</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Bulk "Change role" action</div>
+          <div class="card-row-desc">Bulk action bar gains "Change role" toggle. Clicking reveals an inline role select; selecting a role applies it to all selected non-Removed users and clears selection with a success toast.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G7</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Three-layer RBAC model visible</div>
+          <div class="card-row-desc">Permission Sets tab now opens with a "How the three layers work together" card: Permission Sets → Roles → Users, each with icon + description. Follows PRD §17.5.</div>
+          <div class="card-row-meta">PRD §17.5</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G8</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Sub-reseller data visibility controls</div>
+          <div class="card-row-desc">Org detail page: when od.typeKey === 'subReseller', a "Sub-reseller data visibility" panel renders with three toggle controls. Toggles currently show info toast — full implementation requires permission model definition.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G9</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Transfer primary contact from user drawer</div>
+          <div class="card-row-desc">"Transfer primary contact" button added to user drawer Actions for isPrimary + Active users. Opens the existing contactChangeWiz 2-step flow.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p3">P3</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G10</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Dealer as entitlement-recipient</div>
+          <div class="card-row-desc">Org detail page: when od.typeKey === 'dealer', amber info card explains "Dealers are entitlement recipients — no direct portal login. Managed by parent reseller / BT Wholesale."</div>
+        </div>
+        <div class="badges"><span class="badge badge-p3">P3</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">G11</div>
+        <div class="card-row-body">
+          <div class="card-row-title">BT Internal org context (confirmed already built)</div>
+          <div class="card-row-desc">Banner + select already existed on Orgs/Users screens for BT personas (btOrgContext state at line 591). No new work needed — confirmed and documented.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p1">P1</span><span class="badge badge-built">Done</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BLOCKED -->
+  <div class="section" id="blocked">
+    <h2>Blocked items</h2>
+    <div class="section-desc">Cannot be built yet — each requires an open question to be resolved first.</div>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Blocked on</th><th>Owner</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Custom role creation</td>
+          <td>BT-fixed vs reseller-configurable roles not resolved. PRD §12 flags this as an open question.</td>
+          <td>Neil / PRD</td>
+        </tr>
+        <tr>
+          <td>SSO / identity screens (login, MFA, password set)</td>
+          <td>Salesforce RBAC chosen (21 Jul 2026). Identity flows not yet designed. Vanmathi to confirm approach.</td>
+          <td>Vanmathi</td>
+        </tr>
+        <tr>
+          <td>API Portal persona (API Consumer / Partner Developer)</td>
+          <td>Separate product workstream. Matthew Lindley is product owner. Out of Nexus RBAC scope.</td>
+          <td>Matthew Lindley</td>
+        </tr>
+        <tr>
+          <td>Onboarding / establishment swim lane</td>
+          <td>Deepa's 23-system CRF onboarding diagram is on Mural and cannot be exported. PDF needed to progress design.</td>
+          <td>Deepa (chase for PDF)</td>
+        </tr>
+        <tr>
+          <td>Permission catalogue (full granular list)</td>
+          <td>PRD §14 says "to be defined in detailed design." No canonical permission list exists yet.</td>
+          <td>PRD / detailed design</td>
+        </tr>
+        <tr>
+          <td>Org establishment flow (BT creates new reseller)</td>
+          <td>Service Designer territory. BT Internal cannot self-register new orgs per PRD. Requires CRF onboarding intel first.</td>
+          <td>Service Designer</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BLIND SPOTS -->
+  <div class="section" id="blind-spots">
+    <h2>Blind spots</h2>
+    <div class="section-desc">Areas the prototype doesn't model at all — not blocked, just not yet in scope. Worth flagging before detailed design.</div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-row-num">B1</div>
+        <div class="card-row-body">
+          <div class="card-row-title">API consumer RBAC scopes</div>
+          <div class="card-row-desc">The prototype has an API Developer role and API key management UI, but doesn't model how API keys map to permission sets or what scopes an API consumer gets. This is the intersection with Matthew Lindley's API workstream.</div>
+        </div>
+        <span class="badge badge-blind">Blind spot</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">B2</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Multi-tenant data isolation</div>
+          <div class="card-row-desc">The prototype shows who can see what in the UI but doesn't model or surface how data leaks between orgs are prevented at the API/data layer. A reseller admin theoretically can't see another reseller's data — but this isn't shown or enforced in the prototype.</div>
+        </div>
+        <span class="badge badge-blind">Blind spot</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">B3</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Role inheritance across org tiers</div>
+          <div class="card-row-desc">PRD §17.5 mentions a three-layer model but is silent on whether permissions cascade down the org tree. If a Reseller Admin grants a role, does that role also apply within their child orgs? The prototype doesn't model this.</div>
+          <div class="card-row-meta">PRD §17.5</div>
+        </div>
+        <span class="badge badge-blind">Blind spot</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">B4</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Offboarding / removal cascade</div>
+          <div class="card-row-desc">What happens to open orders, active faults, and billing queries when a user is permanently removed? The prototype treats removal as a user-only action but in practice it may need to reassign or close linked records. No design exists for this yet.</div>
+        </div>
+        <span class="badge badge-blind">Blind spot</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- OPEN QUESTIONS -->
+  <div class="section" id="open-questions">
+    <h2>Open questions</h2>
+    <div class="section-desc">Questions that need answers before the blocked items can move. Sourced from RBAC-intel.md §12 and the gap analysis.</div>
+    <table>
+      <thead>
+        <tr><th>Question</th><th>Why it matters</th><th>Who to ask</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Can resellers create their own custom roles, or are roles BT-fixed?</td>
+          <td>Determines whether the "Create custom role" feature stays in the prototype or gets removed. Currently built but gated behind an info toast.</td>
+          <td>Neil</td>
+        </tr>
+        <tr>
+          <td>What is the exact invitation expiry window?</td>
+          <td>Expired chip exists but the prototype doesn't show a countdown or expiry date. PRD is silent on the window (24h? 7 days?)</td>
+          <td>PRD / Neil</td>
+        </tr>
+        <tr>
+          <td>Do Salesforce permission sets map 1:1 to the RBAC permission sets in the PRD?</td>
+          <td>If yes, the permission set catalogue can be built directly. If not, there's a translation layer to design.</td>
+          <td>Vanmathi</td>
+        </tr>
+        <tr>
+          <td>What are the SLAs for primary contact changes?</td>
+          <td>The contactChangeWiz says "confirmation email before change takes effect" but the actual SLA (instant? 24h? requires BT approval?) is unknown.</td>
+          <td>PRD / Neil</td>
+        </tr>
+        <tr>
+          <td>Does remove require BT approval or is it self-service?</td>
+          <td>Prototype now says "contact BT Wholesale support" to reverse — but the actual removal action is self-service. Confirm this split is correct.</td>
+          <td>Neil / Service Owner</td>
+        </tr>
+        <tr>
+          <td>What data does a sub-reseller admin see from their parent?</td>
+          <td>Sub-reseller data visibility UI is built with three toggles, but the actual default state (open / closed) and what BT controls vs reseller controls isn't defined.</td>
+          <td>Neil / PRD §17.2</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CHANGELOG -->
+  <div class="section" id="changelog">
+    <h2>Changelog</h2>
+    <div class="log-entry">
+      <div class="log-date">24 Jul 2026</div>
+      <div class="log-text"><strong>All 11 gaps implemented.</strong> Remove = permanent, sub-reseller scope banner, deactivate modal updated, Expired status chip, duplicate email guard, bulk Change Role, three-layer RBAC diagram, sub-reseller data visibility UI, dealer note, Transfer primary contact button. RBAC-intel.md §18 updated.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">24 Jul 2026</div>
+      <div class="log-text"><strong>Gap analysis run.</strong> Fine tooth comb review against RBAC-intel.md. Identified 11 actionable gaps, 6 blocked, 4 blind spots. Artifact published.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">23 Jul 2026</div>
+      <div class="log-text"><strong>7 features shipped.</strong> Self-action prevention, force password reset, standard user chips, assisted audit flag, hardware block for sub-reseller/dealer, entitlement status chips, support agent role block.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">Pre 23 Jul 2026</div>
+      <div class="log-text"><strong>Core prototype built.</strong> 5-tier hierarchy, Switch View, org detail, invite wizard, audit log, user lifecycle, dashboard.</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function setActive(el) {
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 't') toggleTheme(); });
+
+  // Scroll spy
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => {
+          l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
