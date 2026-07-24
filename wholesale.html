@@ -367,20 +367,25 @@ const ENT=[
   {key:'digitalVoice',label:'Digital Voice for Business',kind:'product'},
   {key:'strategicBroadband',label:'Strategic Broadband',kind:'product'},
   {key:'ukFabric',label:'UK Fabric (Ethernet)',kind:'product'},
-  {key:'hardware',label:'Hardware ordering',kind:'service'},
-  {key:'kci',label:'Customer KCIs',kind:'service'},
-  {key:'businessZone',label:'Business Zone',kind:'service'},
-  {key:'fmsEmpirix',label:'FMS / Empirix',kind:'service'},
-  {key:'support',label:'Support tickets',kind:'service'},
-  {key:'branding',label:'Custom branding',kind:'service'},
+  {key:'orderBtw',label:'Place orders on BTW.com',kind:'capability'},
+  {key:'orderPortal',label:'Place orders on Business Portal',kind:'capability'},
+  {key:'hardware',label:'Order hardware',kind:'capability'},
+  {key:'support',label:'Raise support tickets',kind:'capability'},
+  {key:'kci',label:'Receive provision KCIs',kind:'capability'},
+  {key:'diagnostics',label:'Access diagnostics',kind:'capability'},
+  {key:'fms',label:'Access FMS',kind:'capability'},
+  {key:'empirix',label:'Access Empirix',kind:'capability'},
+  {key:'branding',label:'Manage branding',kind:'capability'},
+  {key:'createOrgs',label:'Create child organisations',kind:'capability'},
 ];
 const PRODUCT_KEYS=['broadband','digitalVoice','strategicBroadband','ukFabric'];
-const TYPE_LABELS={root:'BT Wholesale',reseller:'Reseller',subReseller:'Sub-Reseller',childReseller:'Child Reseller',dealer:'Dealer'};
+const TYPE_LABELS={root:'BT Wholesale',reseller:'Partner',subReseller:'Partner Organisation',childReseller:'Partner Organisation',dealer:'Partner Organisation',partnerOrg:'Partner Organisation'};
 const TYPE_DESC={
-  reseller:'Direct contract with BT Wholesale. Full downstream control.',
-  subReseller:'No direct BT contract. Sells your services under your relationship.',
-  childReseller:'A reseller with selected restrictions — the broadest downstream role.',
-  dealer:'Most restricted. Inherits specific services and your branding only.',
+  reseller:'Direct commercial relationship with BT Wholesale. Can create and manage Partner Organisations.',
+  subReseller:'Operates beneath a Partner. Capability profile controlled through permissions.',
+  childReseller:'Operates beneath a Partner. Capability profile controlled through permissions.',
+  dealer:'Operates beneath a Partner. Capability profile controlled through permissions.',
+  partnerOrg:'Operates beneath a Partner. Capability profile controlled through permissions.',
 };
 const PERMISSION_SETS=[
   {key:'order.view',label:'Order View',group:'Orders',desc:'View orders, track status, and see order history.'},
@@ -433,21 +438,21 @@ const PERSONAS={
     desc:'You manage BT Wholesale\'s relationships with reseller partners. You view their entitlements, support their onboarding, and ensure their accounts are configured correctly — but platform-wide settings are handled by the Platform Administrator.',
     can:['View and manage reseller organisation profiles','Support reseller onboarding and account setup','Review entitlements across the reseller network','Assist resellers with user and role queries'],
     cannot:['Create new reseller organisations','Change platform-wide access rules','Modify BT Wholesale-level entitlement definitions']},
-  reseller:{key:'reseller',name:'Reseller Administrator',signedInAs:'Northgate Telecom Administrator',org:'Northgate Telecom',orgInitials:'NT',crumb:'Northgate Telecom · Reseller administration',title:'Dashboard',
+  reseller:{key:'reseller',name:'Partner Administrator',signedInAs:'Northgate Telecom Administrator',org:'Northgate Telecom',orgInitials:'NT',crumb:'Northgate Telecom · Partner administration',title:'Dashboard',
     person:{name:'Sarah Whitfield',meta:'Northgate Telecom · Admin',avatar:'SW',photo:'https://randomuser.me/api/portraits/women/44.jpg'},accent:'#5514B4',
-    desc:'You run the Northgate Telecom account. You manage your team, invite users, assign their roles, and build out your downstream network of sub-resellers, child resellers and dealers.',
-    can:['Create sub-reseller, child reseller & dealer organisations','Invite team members and assign them roles','Control what downstream organisations can access','Set permissions for your downstream network'],
+    desc:'You run the Northgate Telecom account. You manage your team, invite users, assign their roles, and build out your downstream network of Partner Organisations.',
+    can:['Create and manage Partner Organisations','Invite team members and assign them roles','Control what downstream organisations can access','Set permissions for your downstream network'],
     cannot:["Access products Northgate Telecom hasn't been granted","Change BT platform-level settings"]},
-  subReseller:{key:'subReseller',name:'Sub-Reseller Administrator',signedInAs:'Metro Connect Administrator',org:'Metro Connect',orgInitials:'MC',crumb:'Metro Connect · Sub-Reseller administration',title:'Dashboard',
+  subReseller:{key:'subReseller',name:'Partner Organisation Administrator',signedInAs:'Metro Connect Administrator',org:'Metro Connect',orgInitials:'MC',crumb:'Metro Connect · Partner Organisation administration',title:'Dashboard',
     person:{name:'Marcus Webb',meta:'Metro Connect · Admin',avatar:'MW',photo:'https://randomuser.me/api/portraits/men/41.jpg'},accent:'#5514B4',
     desc:'You run the Metro Connect account under Northgate Telecom. You manage your team, invite users, assign roles, and place orders on behalf of your customers.',
-    can:['Invite team members and assign them roles','Place and manage orders','Choose which services to expose to your users','Receive customer KCIs'],
-    cannot:['Create child organisations of any type','Manage entitlements or billing','Access Business Zone, hardware ordering, or FMS tools','Raise support tickets with BT']},
-  childReseller:{key:'childReseller',name:'Child Reseller Administrator',signedInAs:'Halo Networks Administrator',org:'Halo Networks',orgInitials:'HN',crumb:'Halo Networks · Child Reseller administration',title:'Dashboard',
+    can:['Invite team members and assign them roles','Place and manage orders','Choose which services to expose to your users','Receive provision KCIs'],
+    cannot:['Create child organisations of any type','Manage entitlements or billing','Raise support tickets with BT']},
+  childReseller:{key:'childReseller',name:'Partner Organisation Administrator',signedInAs:'Halo Networks Administrator',org:'Halo Networks',orgInitials:'HN',crumb:'Halo Networks · Partner Organisation administration',title:'Dashboard',
     person:{name:'Joanna Park',meta:'Halo Networks · Admin',avatar:'JP'},accent:'#5514B4',
     desc:'You run the Halo Networks account under Northgate Telecom. You manage your team, invite users, assign roles, and control what your downstream network can access.',
-    can:['Invite team members and assign them roles','Create dealer organisations','Control what downstream organisations can access','Manage entitlements for your organisation'],
-    cannot:['Raise support tickets directly to BT','Access Business Zone or FMS tools','Change Northgate Telecom platform settings']},
+    can:['Invite team members and assign them roles','Create Partner Organisations','Control what downstream organisations can access','Manage entitlements for your organisation'],
+    cannot:['Change Northgate Telecom platform settings']},
   user:{key:'user',name:'Standard User',signedInAs:'Northgate Telecom Order Manager',org:'Northgate Telecom',orgInitials:'NT',crumb:'Northgate Telecom · Standard user',title:'Dashboard',
     person:{name:'James Okafor',meta:'Northgate Telecom · Order Manager',avatar:'JO'},accent:'#357E3C',
     desc:'You work within the platform as an end user. Everything you can see and do is determined by the role your administrator has assigned to you.',
@@ -483,13 +488,13 @@ const ROLE_ROWS=[
   ['API access','y','n','n','n','n','n','y'],
 ];
 const INIT_ORGS=[
-  {id:'btw',name:'BT Wholesale',typeKey:'root',parentId:null,contact:'platform@btwholesale.com',primaryName:'Claire Ashton',primaryEmail:'claire.ashton@btwholesale.com',primaryPhone:'+44 800 345 6789',billingName:'Richard Fenn',billingEmail:'richard.fenn@btwholesale.com',billingPhone:'+44 800 345 6790',address:'81 Newgate Street, London, EC1A 7AJ',website:'www.btwholesale.com',entitlements:['broadband','digitalVoice','strategicBroadband','ukFabric','hardware','kci','businessZone','fmsEmpirix','support','branding']},
-  {id:'northgate',name:'Northgate Telecom',typeKey:'reseller',status:'Active',parentId:'btw',contact:'partners@northgate.co.uk',primaryName:'Sarah Whitfield',primaryEmail:'sarah.whitfield@northgate.co.uk',primaryPhone:'+44 1234 567 890',billingName:'Priya Nair',billingEmail:'priya.nair@northgate.co.uk',billingPhone:'+44 1234 567 891',address:'14 Commerce Park, Milton Keynes, MK9 2EA',website:'www.northgatetelecom.co.uk',entitlements:['broadband','digitalVoice','strategicBroadband','hardware','kci','businessZone','fmsEmpirix','support','branding']},
-  {id:'beacon',name:'Beacon Wholesale Ltd',typeKey:'reseller',parentId:'btw',contact:'admin@beaconwholesale.co.uk',primaryName:'Tom Elsworth',primaryEmail:'tom.elsworth@beaconwholesale.co.uk',primaryPhone:'+44 208 900 1122',billingName:'Anna Kovacs',billingEmail:'anna.kovacs@beaconwholesale.co.uk',billingPhone:'+44 208 900 1123',address:'6 Beacon House, Bristol, BS1 4RN',website:'www.beaconwholesale.co.uk',entitlements:['broadband','digitalVoice','hardware','kci','support','branding']},
-  {id:'metro',name:'Metro Connect',typeKey:'subReseller',status:'Active',parentId:'northgate',contact:'ops@metroconnect.co.uk',primaryName:'Marcus Webb',primaryEmail:'marcus.webb@metroconnect.co.uk',primaryPhone:'+44 161 234 5678',billingName:'Marcus Webb',billingEmail:'billing@metroconnect.co.uk',billingPhone:'+44 161 234 5679',address:'22 Northern Quarter, Manchester, M4 1HQ',website:'www.metroconnect.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
-  {id:'halo',name:'Halo Networks',typeKey:'childReseller',status:'Active',parentId:'northgate',contact:'support@halonetworks.co.uk',primaryName:'Joanna Park',primaryEmail:'joanna.park@halonetworks.co.uk',primaryPhone:'+44 113 456 7890',billingName:'Finance Team',billingEmail:'finance@halonetworks.co.uk',billingPhone:'+44 113 456 7891',address:'Halo House, 5 Innovation Drive, Leeds, LS1 5AE',website:'www.halonetworks.co.uk',entitlements:['broadband','digitalVoice','strategicBroadband','hardware','kci','businessZone','fmsEmpirix','branding']},
-  {id:'riverside',name:'Riverside Comms',typeKey:'subReseller',status:'Inactive',parentId:'northgate',contact:'hello@riverside-comms.co.uk',primaryName:'Dan Osei',primaryEmail:'dan.osei@riverside-comms.co.uk',primaryPhone:'+44 117 890 1234',billingName:'Dan Osei',billingEmail:'billing@riverside-comms.co.uk',billingPhone:'+44 117 890 1235',address:'Unit 3, Riverside Business Park, Bath, BA1 1RW',website:'www.riverside-comms.co.uk',entitlements:['broadband','digitalVoice','kci','support','branding']},
-  {id:'apex',name:'Apex Telecom',typeKey:'dealer',status:'Inactive',parentId:'northgate',contact:'sales@apextelecom.co.uk',primaryName:'Fatima Al-Rashid',primaryEmail:'fatima.alrashid@apextelecom.co.uk',primaryPhone:'+44 1908 123 456',billingName:'Accounts Dept',billingEmail:'accounts@apextelecom.co.uk',billingPhone:'+44 1908 123 457',address:'12 Apex Way, Northampton, NN1 2BP',website:'www.apextelecom.co.uk',entitlements:['broadband','digitalVoice','kci','branding']},
+  {id:'btw',name:'BT Wholesale',typeKey:'root',parentId:null,contact:'platform@btwholesale.com',primaryName:'Claire Ashton',primaryEmail:'claire.ashton@btwholesale.com',primaryPhone:'+44 800 345 6789',billingName:'Richard Fenn',billingEmail:'richard.fenn@btwholesale.com',billingPhone:'+44 800 345 6790',address:'81 Newgate Street, London, EC1A 7AJ',website:'www.btwholesale.com',brandingMode:'custom',entitlements:['broadband','digitalVoice','strategicBroadband','ukFabric','orderBtw','orderPortal','hardware','support','kci','diagnostics','fms','empirix','branding','createOrgs']},
+  {id:'northgate',name:'Northgate Telecom',typeKey:'reseller',status:'Active',parentId:'btw',contact:'partners@northgate.co.uk',primaryName:'Sarah Whitfield',primaryEmail:'sarah.whitfield@northgate.co.uk',primaryPhone:'+44 1234 567 890',billingName:'Priya Nair',billingEmail:'priya.nair@northgate.co.uk',billingPhone:'+44 1234 567 891',address:'14 Commerce Park, Milton Keynes, MK9 2EA',website:'www.northgatetelecom.co.uk',brandingMode:'custom',entitlements:['broadband','digitalVoice','strategicBroadband','orderBtw','orderPortal','hardware','kci','diagnostics','fms','empirix','support','branding','createOrgs']},
+  {id:'beacon',name:'Beacon Wholesale Ltd',typeKey:'reseller',parentId:'btw',contact:'admin@beaconwholesale.co.uk',primaryName:'Tom Elsworth',primaryEmail:'tom.elsworth@beaconwholesale.co.uk',primaryPhone:'+44 208 900 1122',billingName:'Anna Kovacs',billingEmail:'anna.kovacs@beaconwholesale.co.uk',billingPhone:'+44 208 900 1123',address:'6 Beacon House, Bristol, BS1 4RN',website:'www.beaconwholesale.co.uk',brandingMode:'custom',entitlements:['broadband','digitalVoice','orderBtw','orderPortal','hardware','kci','support','branding','createOrgs']},
+  {id:'metro',name:'Metro Connect',typeKey:'partnerOrg',status:'Active',parentId:'northgate',contact:'ops@metroconnect.co.uk',primaryName:'Marcus Webb',primaryEmail:'marcus.webb@metroconnect.co.uk',primaryPhone:'+44 161 234 5678',billingName:'Marcus Webb',billingEmail:'billing@metroconnect.co.uk',billingPhone:'+44 161 234 5679',address:'22 Northern Quarter, Manchester, M4 1HQ',website:'www.metroconnect.co.uk',brandingMode:'inherited',entitlements:['broadband','digitalVoice','orderPortal','kci','branding']},
+  {id:'halo',name:'Halo Networks',typeKey:'partnerOrg',status:'Active',parentId:'northgate',contact:'support@halonetworks.co.uk',primaryName:'Joanna Park',primaryEmail:'joanna.park@halonetworks.co.uk',primaryPhone:'+44 113 456 7890',billingName:'Finance Team',billingEmail:'finance@halonetworks.co.uk',billingPhone:'+44 113 456 7891',address:'Halo House, 5 Innovation Drive, Leeds, LS1 5AE',website:'www.halonetworks.co.uk',brandingMode:'custom',entitlements:['broadband','digitalVoice','strategicBroadband','orderBtw','orderPortal','hardware','kci','diagnostics','fms','empirix','branding','createOrgs']},
+  {id:'riverside',name:'Riverside Comms',typeKey:'partnerOrg',status:'Inactive',parentId:'northgate',contact:'hello@riverside-comms.co.uk',primaryName:'Dan Osei',primaryEmail:'dan.osei@riverside-comms.co.uk',primaryPhone:'+44 117 890 1234',billingName:'Dan Osei',billingEmail:'billing@riverside-comms.co.uk',billingPhone:'+44 117 890 1235',address:'Unit 3, Riverside Business Park, Bath, BA1 1RW',website:'www.riverside-comms.co.uk',brandingMode:'inherited',entitlements:['broadband','digitalVoice','orderPortal','kci','support','branding']},
+  {id:'apex',name:'Apex Telecom',typeKey:'partnerOrg',status:'Inactive',parentId:'northgate',contact:'sales@apextelecom.co.uk',primaryName:'Fatima Al-Rashid',primaryEmail:'fatima.alrashid@apextelecom.co.uk',primaryPhone:'+44 1908 123 456',billingName:'Accounts Dept',billingEmail:'accounts@apextelecom.co.uk',billingPhone:'+44 1908 123 457',address:'12 Apex Way, Northampton, NN1 2BP',website:'www.apextelecom.co.uk',brandingMode:'inherited',entitlements:['broadband','digitalVoice','orderPortal','branding']},
 ];
 const INIT_USERS=[
   {id:'u1',name:'Sarah Whitfield',email:'sarah.whitfield@northgate.co.uk',roleKey:'admin',orgId:'northgate',status:'Active',roleDate:'Jan 2024',photo:'https://randomuser.me/api/portraits/women/44.jpg',isPrimary:true,removedAt:null},
@@ -515,11 +520,11 @@ const CAP_COLORS={'Billing':['#036C01','#E6F4E5'],'Ordering':['#3F187F','#F3EBFE
 function initials(n){ return (n||'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
 function badgeSt(typeKey){
   const base='font-size:11px;font-weight:700;padding:2px 8px;border-radius:1000px;white-space:nowrap;';
-  const m={root:'background:#5514B4;color:#fff',reseller:'background:#F3EBFE;color:#3F187F',childReseller:'background:rgba(46,66,127,0.12);color:#2E427F',subReseller:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9',dealer:'background:#fff;color:#6B6B6B;border:1px solid #E3E3E3'};
+  const m={root:'background:#5514B4;color:#fff',reseller:'background:#F3EBFE;color:#3F187F',childReseller:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9',subReseller:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9',dealer:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9',partnerOrg:'background:#F7F7F7;color:#434343;border:1px solid #D9D9D9'};
   return base+(m[typeKey]||m.subReseller);
 }
 function dotSt(typeKey){
-  const c={root:'#2A2A2A',reseller:'#5514B4',childReseller:'#2E427F',subReseller:'#AAAAAA',dealer:'#C8C8C8'}[typeKey]||'#AAAAAA';
+  const c={root:'#2A2A2A',reseller:'#5514B4',childReseller:'#808080',subReseller:'#808080',dealer:'#808080',partnerOrg:'#808080'}[typeKey]||'#808080';
   return {width:'8px',height:'8px',borderRadius:'999px',flexShrink:0,background:c,display:'inline-block'};
 }
 function CellMark({v}){
@@ -591,7 +596,7 @@ function App(){
   function closeUserDrawer(){setUserDrawer(null);setDrawerPendingRole(null);}
   const isBt=persona==='bt'||persona==='btAccountMgr';
   const canAdmin=persona!=='user';
-  const canCreateOrg=persona==='bt'||persona==='reseller'||persona==='childReseller';
+  const canCreateOrg=persona==='bt'||persona==='reseller'||persona==='childReseller'||persona==='subReseller';
   const home=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
   const P=PERSONAS[persona];
 
@@ -600,10 +605,11 @@ function App(){
   const childrenOf=id=>orgs.filter(o=>o.parentId===id);
   const userCountFor=id=>users.filter(u=>u.orgId===id).length;
   const wizParent=()=>isBt?orgById('btw'):orgById(home);
-  const childTypes=()=>isBt?['reseller']:persona==='childReseller'?['dealer']:['subReseller','childReseller','dealer'];
+  const childTypes=()=>isBt?['reseller']:['partnerOrg'];
   const typeAllows=(tk,key)=>{
     if(tk==='reseller') return true;
-    if(tk==='subReseller') return PRODUCT_KEYS.includes(key)||key==='kci'||key==='branding';
+    if(tk==='partnerOrg') return key!=='support'&&key!=='createOrgs'&&key!=='orderBtw';
+    if(tk==='subReseller') return key!=='support'&&key!=='createOrgs'&&key!=='orderBtw';
     if(tk==='childReseller') return key!=='support';
     if(tk==='dealer') return PRODUCT_KEYS.includes(key)||key==='branding';
     return true;
@@ -629,10 +635,10 @@ function App(){
 
   function mkActionBtn(kind){
     const isOrg=kind==='org';
-    const label=isOrg?(isBt?'Create reseller':'Create organisation'):'Invite user';
+    const label=isOrg?(isBt?'Create partner':'Create organisation'):'Invite user';
     const hint=isOrg?(isBt?'Set up a new reseller organisation':'Delegate access to a downstream org'):(isBt?'Add a user & assign them a role':'Add a team member & assign a role');
     const onClick=isOrg
-      ?()=>{if(!canAdmin)return deny();const t=childTypes()[0];setOrgWiz({step:1,name:'',email:'',type:t,ent:defEnt(t)});}
+      ?()=>{if(!canAdmin)return deny();const t=childTypes()[0];setOrgWiz({step:1,name:'',email:'',type:t,ent:defEnt(t),brandingMode:'inherited'});}
       :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:home,profileType:'regular',role:'orderManager'});};
     return {label,hint,onClick,
       rowStyle:{display:'flex',alignItems:'center',gap:'12px',width:'100%',borderRadius:'12px',padding:'13px 14px',marginBottom:'12px',textAlign:'left',border:'1px solid #E3E3E3',background:canAdmin?'#fff':'#F7F7F7',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
@@ -662,11 +668,11 @@ function App(){
     {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller'},
     {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: Broadband added',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt',assisted:true,assistedOrg:'Metro Connect'},
     {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller'},
-    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Sub-Reseller) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
+    {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Partner Organisation) under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
     {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User)',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller'},
     {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller'},
     {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: UK Fabric removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
-    {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Dealer) under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller'},
+    {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Partner Organisation) under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller'},
     {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom primary contact changed',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom'},
     {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller'},
   ];
@@ -680,7 +686,7 @@ function App(){
         ?h('button',{key:c.label,onClick:c.onClick,style:{background:'none',border:'none',cursor:'pointer',padding:0,color:'#5514B4',fontSize:'16px',fontWeight:400,fontFamily:'inherit',textDecoration:'underline',textUnderlineOffset:'2px'}},c.label)
         :h('span',{key:c.label,style:{color:'#2A2A2A',fontSize:'16px',fontWeight:400}},c.label)
     ]));
-  const viewLabels={bt:'BT Wholesale Admin',btAccountMgr:'BT Account Manager',reseller:'Reseller Admin',subReseller:'Sub-Reseller Admin',childReseller:'Child Reseller Admin',user:'Standard User'};
+  const viewLabels={bt:'BT Wholesale Admin',btAccountMgr:'BT Account Manager',reseller:'Partner Admin',subReseller:'Partner Org Admin',childReseller:'Partner Org Admin',user:'Standard User'};
 
   return h('div',{style:{display:'flex',flexDirection:'column',height:'100vh',width:'100%',overflow:'hidden',fontFamily:"'BT Curve',system-ui,sans-serif",color:'#2A2A2A',background:'#fff',fontSize:'16px',lineHeight:1.4,WebkitFontSmoothing:'antialiased'}},
 
@@ -800,7 +806,7 @@ function App(){
               :h('div',{style:{display:'flex',alignItems:'center',gap:'10px',flex:1,flexWrap:'wrap'}},
                   h('select',{value:btOrgContext||'',onChange:e=>setBtOrgContext(e.target.value||null),style:{padding:'5px 10px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'13px',background:'#fff',fontFamily:'inherit',cursor:'pointer'}},
                     h('option',{value:''},'Select reseller…'),
-                    orgs.filter(o=>o.typeKey==='reseller'||o.typeKey==='subReseller').map(o=>h('option',{key:o.id,value:o.id},o.name))),
+                    orgs.filter(o=>o.typeKey==='reseller'||o.typeKey==='partnerOrg').map(o=>h('option',{key:o.id,value:o.id},o.name))),
                   h('span',{style:{fontSize:'12px',color:'#808080'}},'Select an org context before making changes on behalf of a reseller.'))),
 
           screen==='overview'&&persona==='user'&&(()=>{
@@ -885,7 +891,7 @@ function App(){
           screen==='overview'&&persona!=='user'&&h('div',{style:{maxWidth:'1120px'}},
             h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'32px',marginBottom:'32px'}},
               [
-                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:16,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Partner orgs.':'Downstream orgs.',sub:isBt?'Resellers, sub-resellers & dealers':'Sub-resellers, child & dealers'},
+                {icon:ic(['M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18','M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2','M10 6h4M10 10h4'],{s:16,c:'#5514B4'}),value:String(flat.length-1),label:isBt?'Partner orgs.':'Downstream orgs.',sub:isBt?'Partners & Partner Organisations':'Partner Organisations in your network'},
                 {icon:ic([{el:'circle',cx:9,cy:7,r:4},{el:'circle',cx:17,cy:9,r:3},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M22 21v-2a4 4 0 0 0-3-3.87'],{s:16,c:'#5514B4'}),value:String(visibleUsers.length),label:'Users',sub:isBt?'Across all reseller orgs':'In your network'},
                 {icon:ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:16,c:'#5514B4'}),value:String(isBt?ROLES.length+BT_ROLES.length:ROLES.length),label:isBt?'Role types':'Assignable roles',sub:isBt?'Reseller & BT-side roles':'Role-based access'},
                 {icon:ic(['M12 2 2 7l10 5 10-5-10-5Z','M2 17l10 5 10-5','M2 12l10 5 10-5'],{s:16,c:'#5514B4'}),value:isBt?String(ENT.length):String((orgById(home)||{entitlements:[]}).entitlements.length),label:'Products',sub:isBt?'Available to resellers':'Enabled for your org'},
@@ -953,7 +959,7 @@ function App(){
               const parentOrg=myOrg&&myOrg.parentId?orgById(myOrg.parentId):null;
               const myEnts=myOrg?myOrg.entitlements:[];
               const products=ENT.filter(e=>myEnts.includes(e.key)&&e.kind==='product');
-              const services=ENT.filter(e=>myEnts.includes(e.key)&&e.kind==='service');
+              const services=ENT.filter(e=>myEnts.includes(e.key)&&e.kind==='capability');
               return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'32px',marginBottom:'32px'}},
                 h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'20px 24px'}},
                   h('div',{style:{fontSize:'16px',fontWeight:700,color:'#2A2A2A',marginBottom:'16px'}},'Your enabled products & services'),
@@ -988,12 +994,12 @@ function App(){
                       h('div',null,
                         h('div',{style:{fontSize:'14px',fontWeight:700,color:'#2A2A2A'}},persona==='childReseller'?'Invite a team member':'Invite a team member'),
                         h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'1px'}},'Add a user and assign a role'))),
-                    persona==='childReseller'&&h('button',{onClick:createOrg.onClick,style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:'12px 14px',borderRadius:'10px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}},
+                    (persona==='childReseller'||persona==='subReseller')&&h('button',{onClick:createOrg.onClick,style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:'12px 14px',borderRadius:'10px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}},
                       h('span',{style:{width:'30px',height:'30px',borderRadius:'8px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
                         ic('M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2',{s:14,c:'#5514B4'})),
                       h('div',null,
-                        h('div',{style:{fontSize:'14px',fontWeight:700,color:'#2A2A2A'}},'Create a dealer org'),
-                        h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'1px'}},'Set up a downstream dealer organisation'))))));
+                        h('div',{style:{fontSize:'14px',fontWeight:700,color:'#2A2A2A'}},'Create a Partner Organisation'),
+                        h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'1px'}},'Set up a downstream Partner Organisation'))))));
             })(),
 
             overviewTab==='network'&&isBt&&(()=>{
@@ -1308,7 +1314,7 @@ function App(){
               const provColors={'Active':['#036C01','#E6F4E5','#A3D9A1'],'Pending':['#7C4A00','#FEF3E2','#F5CBA7'],'Failed':['#A0121B','#FEF5F5','#FAD4D4']};
               const owned=dSel.entitlements.includes(entKey);
               const parentHas=dParent?dParent.entitlements.includes(entKey):true;
-              const hwBlocked=(dSel.typeKey==='subReseller'||dSel.typeKey==='dealer')&&entKey==='hardware';
+              const hwBlocked=false;
               if(hwBlocked) return h('tr',null,
                 h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff'}},
                   h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
@@ -1346,10 +1352,8 @@ function App(){
                   h('select',{value:orgTypeFilter,onChange:e=>setOrgTypeFilter(e.target.value),
                     style:{width:'100%',padding:'6px 32px 6px 10px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'14px',background:'#fff',fontFamily:'inherit',cursor:'pointer',color:'#434343',appearance:'none',WebkitAppearance:'none',backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23808080%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m6 9 6 6 6-6%27/%3E%3C/svg%3E\")",backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center'}},
                     h('option',{value:''},'All types'),
-                    h('option',{value:'reseller'},'Reseller'),
-                    h('option',{value:'subReseller'},'Sub-Reseller'),
-                    h('option',{value:'childReseller'},'Child Reseller'),
-                    h('option',{value:'dealer'},'Dealer'))),
+                    h('option',{value:'reseller'},'Partner'),
+                    h('option',{value:'partnerOrg'},'Partner Organisation'))),
                 h('div',{style:{flex:1,overflowY:'auto'}},
                   visFlat.length===0
                     ?h('div',{style:{padding:'32px 14px',textAlign:'center',color:'#AAAAAA',fontSize:'14px'}},'No organisations match')
@@ -1389,11 +1393,14 @@ function App(){
                         h('button',{onClick:()=>{setSelOrgId(dSel.id);setScreen('orgDetail');},
                           style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#fff',border:'1.5px solid #5514B4',color:'#5514B4',fontWeight:700,fontSize:'14px',cursor:'pointer',padding:'8px 16px',borderRadius:'32px',fontFamily:'inherit',flexShrink:0}},
                           'View full profile'))),
-                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'24px'}},
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px',marginBottom:'16px'}},
                       [['Primary contact',dSel.primaryName||dSel.contact||'—'],['Users',String(userCountFor(dSel.id))],['Sub-orgs',String(childrenOf(dSel.id).length)]].map(([label,val])=>
                         h('div',{key:label,style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'12px'}},
                           h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'5px'}},label),
                           h('div',{style:{fontWeight:700,fontSize:'16px',color:'#5514B4'}},val)))),
+                    h('div',{style:{marginBottom:'20px',display:'flex',alignItems:'center',gap:'8px'}},
+                      h('span',{style:{fontSize:'12px',fontWeight:500,color:'#434343'}},'Branding mode:'),
+                      (()=>{const bm=dSel.brandingMode||'Inherited';const styles={'BT White Label':{background:'#F0F0F0',color:'#434343',border:'1px solid #D9D9D9'},'Inherited':{background:'#E8F1FB',color:'#1A4070',border:'1px solid #B8D0EC'},'Custom':{background:'#F3EBFE',color:'#3F187F',border:'1px solid #C4A0F0'}};const st=styles[bm]||styles['Inherited'];return h('span',{style:{...st,borderRadius:'1000px',padding:'3px 10px',fontSize:'12px',fontWeight:700}},bm);})()),
                     h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Product entitlements'),
                     h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'20px'}},
                       h('table',{style:{width:'100%',borderCollapse:'collapse'}},
@@ -1401,14 +1408,14 @@ function App(){
                           h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'left',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Product'),
                           h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'right',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',width:'120px'}},'Access'))),
                         h('tbody',null,PRODUCT_KEYS.map(k=>h(EntRow,{key:k,entKey:k}))))),
-                    h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Services & capabilities'),
+                    h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Capabilities'),
                     h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden'}},
                       h('table',{style:{width:'100%',borderCollapse:'collapse'}},
                         h('thead',null,h('tr',null,
-                          h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'left',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Service'),
+                          h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'left',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
                           h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'right',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',width:'120px'}},'Access'))),
-                        h('tbody',null,ENT.filter(e=>e.kind==='service').map(e=>h(EntRow,{key:e.key,entKey:e.key}))))),
-                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&dSel.typeKey!=='subReseller'&&dSel.typeKey!=='dealer'&&h('button',{
+                        h('tbody',null,ENT.filter(e=>e.kind==='capability').map(e=>h(EntRow,{key:e.key,entKey:e.key}))))),
+                    canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{
                       onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),
                       style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px'}},
                       ic('M12 5v14M5 12h14',{s:15,c:'#fff'}),'Assign entitlements'))
@@ -1543,9 +1550,9 @@ function App(){
                   h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'20px',marginBottom:'16px'}},
                     h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3'}},'Product entitlements'),
                     PROD_KEYS.map(k=>h(OdEntRow,{key:k,entKey:k})),
-                    h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Services & capabilities'),
-                    ENT.filter(e=>e.kind==='service').map(e=>h(OdEntRow,{key:e.key,entKey:e.key})),
-                    canAdmin&&od.id!=='btw'&&od.id!==home&&od.typeKey!=='subReseller'&&od.typeKey!=='dealer'&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
+                    h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3',marginTop:'20px'}},'Capabilities'),
+                    ENT.filter(e=>e.kind==='capability').map(e=>h(OdEntRow,{key:e.key,entKey:e.key})),
+                    canAdmin&&od.id!=='btw'&&od.id!==home&&h('button',{onClick:()=>showToast('info','Entitlements are edited with the same picker used when creating an organisation.'),style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic('M12 5v14M5 12h14',{s:14,c:'#fff'}),'Edit entitlements')))));
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
@@ -2248,7 +2255,7 @@ function App(){
             h('div',{style:{padding:'24px 28px',borderBottom:'1px solid #E3E3E3',flexShrink:0}},
               h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}},
                 h('div',null,
-                  h('div',{style:{fontSize:'20px',fontWeight:700}},isBt?'Create reseller':'Create organisation'),
+                  h('div',{style:{fontSize:'20px',fontWeight:700}},isBt?'Create partner':'Create organisation'),
                   h('div',{style:{fontSize:'14px',color:'#808080',marginTop:'2px'}},'Step '+orgWiz.step+' of 4 · '+['Details','Contacts','Entitlements','Review'][orgWiz.step-1])),
                 h('button',{onClick:()=>setOrgWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit'}},ic(['M18 6 6 18','M6 6l12 12'],{s:17}))),
               // Step progress bar
@@ -2270,13 +2277,17 @@ function App(){
                 h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},'Administrator email'),
                 h('input',{value:orgWiz.email,onChange:e=>setOrgWiz(w=>({...w,email:e.target.value})),placeholder:'admin@organisation.co.uk',style:{width:'100%',padding:'12px 14px',border:'1px solid #6B6B6B',borderRadius:'8px',fontSize:'16px',marginBottom:'24px',fontFamily:'inherit',boxSizing:'border-box'}}),
                 h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'12px'}},'Organisation type'),
-                h('div',{style:{display:'flex',flexDirection:'column',gap:'12px'}},
-                  childTypes().map(tk=>{
-                    const active=orgWiz.type===tk;
-                    return h('button',{key:tk,onClick:()=>setOrgWiz(w=>{const ent={};const p=wizParent();ENT.forEach(x=>{if(p.entitlements.includes(x.key)&&typeAllows(tk,x.key))ent[x.key]=true;});return{...w,type:tk,ent};}),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'13px 14px',borderRadius:'11px',textAlign:'left',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
-                      h('span',{style:{width:'20px',height:'20px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
-                      h('span',null,h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},TYPE_LABELS[tk]),h('span',{style:{display:'block',fontSize:'12px',color:'#808080'}},TYPE_DESC[tk])));
-                  }))),
+                childTypes().length===1
+                  ?h('div',{style:{padding:'13px 14px',borderRadius:'11px',border:'1px solid #E3E3E3',background:'#F7F7F7'}},
+                      h('div',{style:{fontWeight:700,fontSize:'14px',marginBottom:'4px'}},TYPE_LABELS[childTypes()[0]]),
+                      h('div',{style:{fontSize:'12px',color:'#808080'}},TYPE_DESC[childTypes()[0]]))
+                  :h('div',{style:{display:'flex',flexDirection:'column',gap:'12px'}},
+                      childTypes().map(tk=>{
+                        const active=orgWiz.type===tk;
+                        return h('button',{key:tk,onClick:()=>setOrgWiz(w=>{const ent={};const p=wizParent();ENT.forEach(x=>{if(p.entitlements.includes(x.key)&&typeAllows(tk,x.key))ent[x.key]=true;});return{...w,type:tk,ent};}),style:{display:'flex',alignItems:'flex-start',gap:'12px',width:'100%',padding:'13px 14px',borderRadius:'11px',textAlign:'left',cursor:'pointer',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),background:active?'#FAF6FF':'#fff',fontFamily:'inherit'}},
+                          h('span',{style:{width:'20px',height:'20px',borderRadius:'999px',flexShrink:0,marginTop:'1px',display:'flex',alignItems:'center',justifyContent:'center',background:active?'#5514B4':'#fff',border:'1px solid '+(active?'#5514B4':'#C8C8C8')}},active&&h('span',{style:{width:'10px',height:'10px',borderRadius:'999px',background:'#fff'}})),
+                          h('span',null,h('span',{style:{display:'block',fontWeight:700,fontSize:'14px'}},TYPE_LABELS[tk]),h('span',{style:{display:'block',fontSize:'12px',color:'#808080'}},TYPE_DESC[tk])));
+                      }))),
               orgWiz.step===2&&(()=>{
                 const fld=(label,key,placeholder,half)=>h('div',{style:{gridColumn:half?'span 1':'span 2'}},
                   h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},label),
@@ -2291,8 +2302,31 @@ function App(){
                 h('div',{style:{display:'flex',gap:'12px',background:'#F3EBFE',border:'1px solid #E4D3FA',borderRadius:'12px',padding:'13px 15px',marginBottom:'24px'}},
                   h('span',{style:{color:'#5514B4',flexShrink:0}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18})),
                   h('div',{style:{fontSize:'14px',color:'#3F187F',lineHeight:1.4}},'A ',h('b',null,TYPE_LABELS[orgWiz.type]),' can only inherit capabilities that ',h('b',null,wizParent().name),' already holds.')),
-                ['product','service'].map(kind=>h('div',{key:kind},
-                  h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},kind==='product'?'Products':'Services & capabilities'),
+                h('div',{style:{marginBottom:'16px'}},
+                  h('div',{style:{fontWeight:600,fontSize:'13px',color:'#434343',marginBottom:'8px'}},'Quick-start from a legacy profile'),
+                  h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}},
+                    [
+                      {label:'Partner (Full access)',keys:['orderBtw','orderPortal','hardware','support','kci','diagnostics','fms','empirix','branding','createOrgs']},
+                      {label:'Dealer profile',keys:['orderPortal','branding']},
+                      {label:'Sub-Reseller profile',keys:['orderPortal','kci','branding']},
+                      {label:'Child Reseller profile',keys:['orderBtw','orderPortal','hardware','kci','diagnostics','fms','empirix','branding','createOrgs']},
+                    ].map(preset=>
+                      h('button',{key:preset.label,
+                        onClick:()=>setOrgWiz(w=>{
+                          const p=wizParent();
+                          const ent={};
+                          ENT.forEach(x=>{
+                            if(PRODUCT_KEYS.includes(x.key)) ent[x.key]=!!w.ent[x.key];
+                            else ent[x.key]=p.entitlements.includes(x.key)&&preset.keys.includes(x.key);
+                          });
+                          return {...w,ent};
+                        }),
+                        style:{padding:'6px 14px',borderRadius:'32px',border:'1px solid #D9D9D9',background:'#F7F7F7',
+                          color:'#434343',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
+                          whiteSpace:'nowrap'}},
+                      preset.label)))),
+                ['product','capability'].map(kind=>h('div',{key:kind},
+                  h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},kind==='product'?'Products':'Capabilities'),
                   h('div',{style:{display:'flex',flexDirection:'column',gap:'8px',marginBottom:'24px'}},
                     ENT.filter(e=>e.kind===kind).map(e=>{
                       const p=wizParent();const held=p.entitlements.includes(e.key);const allowed=typeAllows(orgWiz.type,e.key);const locked=!held||!allowed;const checked=!!orgWiz.ent[e.key]&&!locked;
@@ -2301,10 +2335,20 @@ function App(){
                         h('span',{style:{fontWeight:700,fontSize:'14px',color:locked?'#AAAAAA':'#2A2A2A'}},e.label),
                         h('span',{style:{flex:1}}),
                         locked&&h('span',{style:{fontSize:'12px',color:'#808080',display:'flex',gap:'4px',alignItems:'center'}},lockEl('#808080'),!held?'Not held by '+p.name:'N/A for '+TYPE_LABELS[orgWiz.type]));
-                    }))))),
+                    })))),
+                h('div',{style:{marginTop:'20px'}},
+                  h('div',{style:{fontWeight:600,fontSize:'14px',marginBottom:'10px'}},'Branding mode'),
+                  h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}},
+                    ['BT White Label','Inherited','Custom'].map(mode=>{
+                      const active=orgWiz.brandingMode===mode;
+                      return h('button',{key:mode,onClick:()=>setOrgWiz(w=>({...w,brandingMode:mode})),
+                        style:{padding:'8px 16px',borderRadius:'32px',border:'1px solid '+(active?'#5514B4':'#E3E3E3'),
+                          background:active?'#FAF6FF':'#fff',color:active?'#5514B4':'#2A2A2A',
+                          fontWeight:active?700:400,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},mode);
+                    })))),
               orgWiz.step===4&&h('div',null,
                 h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'20px'}},
-                  [['Name',orgWiz.name||'(untitled)'],['Type',TYPE_LABELS[orgWiz.type]],['Admin email',orgWiz.email||'(none)'],['Parent',wizParent().name],['Primary contact',orgWiz.primaryName||(orgWiz.primaryEmail||'(none)')],['Billing contact',orgWiz.billingName||(orgWiz.billingEmail||'(none)')],['Website',orgWiz.website||'(none)']].map(([k,v],i,a)=>
+                  [['Name',orgWiz.name||'(untitled)'],['Type',TYPE_LABELS[orgWiz.type]],['Admin email',orgWiz.email||'(none)'],['Parent',wizParent().name],['Primary contact',orgWiz.primaryName||(orgWiz.primaryEmail||'(none)')],['Billing contact',orgWiz.billingName||(orgWiz.billingEmail||'(none)')],['Website',orgWiz.website||'(none)'],['Branding mode',orgWiz.brandingMode||'Inherited']].map(([k,v],i,a)=>
                     h('div',{key:k,style:{display:'flex',justifyContent:'space-between',padding:'12px 16px',borderBottom:i<a.length-1?'1px solid #F0F0F0':'none'}},
                       h('span',{style:{color:'#808080',fontSize:'14px'}},k),h('span',{style:{fontWeight:700,fontSize:'14px'}},v)))),
                 h('div',{style:{fontSize:'14px',fontWeight:500,color:'#434343',marginBottom:'12px'}},'Entitlements granted ('+Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]).length+')'),
@@ -2318,7 +2362,7 @@ function App(){
               h('button',{onClick:()=>{
                 if(orgWiz.step<4){setOrgWiz(w=>({...w,step:w.step+1}));return;}
                 const p=wizParent();const id='org'+seq;const ents=Object.keys(orgWiz.ent).filter(k=>orgWiz.ent[k]);
-                const org={id,name:orgWiz.name.trim()||'New organisation',typeKey:orgWiz.type,parentId:p.id,contact:orgWiz.email.trim()||'—',primaryName:orgWiz.primaryName||'',primaryEmail:orgWiz.primaryEmail||'',primaryPhone:orgWiz.primaryPhone||'',billingName:orgWiz.billingName||'',billingEmail:orgWiz.billingEmail||'',billingPhone:orgWiz.billingPhone||'',address:orgWiz.address||'',website:orgWiz.website||'',entitlements:ents};
+                const org={id,name:orgWiz.name.trim()||'New organisation',typeKey:orgWiz.type,parentId:p.id,contact:orgWiz.email.trim()||'—',primaryName:orgWiz.primaryName||'',primaryEmail:orgWiz.primaryEmail||'',primaryPhone:orgWiz.primaryPhone||'',billingName:orgWiz.billingName||'',billingEmail:orgWiz.billingEmail||'',billingPhone:orgWiz.billingPhone||'',address:orgWiz.address||'',website:orgWiz.website||'',brandingMode:orgWiz.brandingMode||'Inherited',entitlements:ents};
                 setOrgs(os=>[...os,org]);setSeq(n=>n+1);setOrgWiz(null);setSelOrgId(id);setScreen('orgs');
                 showToast('success',org.name+' created as a '+TYPE_LABELS[orgWiz.type]+' under '+p.name+'.');
               },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},orgWiz.step===4?'Create organisation':'Continue')))),
