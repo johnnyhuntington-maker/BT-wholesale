@@ -267,11 +267,11 @@
   <div class="nav-section">Built</div>
   <a class="nav-link" href="#built-pre" onclick="setActive(this)"><span class="dot dot-built"></span>Pre-analysis (14)</a>
   <a class="nav-link" href="#built-gaps" onclick="setActive(this)"><span class="dot dot-built"></span>Gap fixes (11)</a>
-  <a class="nav-link" href="#swim-lane" onclick="setActive(this)"><span class="dot dot-built"></span>Swim lane (16)</a>
+  <a class="nav-link" href="#swim-lane" onclick="setActive(this)"><span class="dot dot-built"></span>Swim lane (20)</a>
 
   <div class="nav-section">Not built</div>
   <a class="nav-link" href="#blocked" onclick="setActive(this)"><span class="dot dot-blocked"></span>Blocked (4)</a>
-  <a class="nav-link" href="#blind-spots" onclick="setActive(this)"><span class="dot dot-blind"></span>Blind spots (5)</a>
+  <a class="nav-link" href="#blind-spots" onclick="setActive(this)"><span class="dot dot-blind"></span>Blind spots (6)</a>
 
   <div class="nav-section">Reference</div>
   <a class="nav-link" href="#open-questions" onclick="setActive(this)"><span class="dot dot-accent"></span>Open questions</a>
@@ -734,6 +734,38 @@
         </div>
         <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
       </div>
+      <div class="card-row">
+        <div class="card-row-num">S17</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Partner Plus status</div>
+          <div class="card-row-desc">Both Hub As-Is and Hub To-Be show a "Check Partner Plus Status" step alongside SDS and FMS checks. The prototype now carries a <code>partnerPlusStatus</code> field on every org (Eligible / Not eligible / Pending). A coloured chip is surfaced in the org detail view for all BT personas, and a "Partner Plus status confirmed" item has been added as the 9th step in the btEstablishment setup checklist.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p1">P1</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">S18</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Primary Contact as second SVMP nominee</div>
+          <div class="card-row-desc">The swim lane states the Establishment Team identifies both the nominated Fault Diagnostics User AND the Primary Contact as requiring SVMP access. The SVMP / Fault Diagnostics section in the btEstablishment org detail now shows two named slots: Slot 1 (Fault Diagnostics User, from CRF) and Slot 2 (Primary Contact, from org data). Both are presented side by side with a note that credentials are sent separately at go-live.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">S19</div>
+        <div class="card-row-body">
+          <div class="card-row-title">SVMP credentials withheld until go-live</div>
+          <div class="card-row-desc">The swim lane specifies that SVMP URL and username are included in the Welcome Pack, but the password is sent separately for security — and nothing is released until full establishment completes. An amber info banner is now shown in the SVMP section with this detail. A secondary amber note is also shown below the "Promote to live" button: "Promoting to live releases SVMP credentials to nominated users via the Welcome Pack."</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">S20</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Training Users as distinct CRF contact category</div>
+          <div class="card-row-desc">The CRF validation step lists three named user categories: KCI contacts, Portal Admins, and Training Users. A <code>trainingContact</code> field has been added to org data, and a "Training Contact" panel is now shown in the btEstablishment org detail. If nominated, the contact is displayed with an "Nominated for ITEL training" badge and a note that training must be signed off by ITEL before go-live. If not nominated, a grey placeholder is shown.</div>
+        </div>
+        <div class="badges"><span class="badge badge-p2">P2</span><span class="badge badge-built">Done</span></div>
+      </div>
     </div>
   </div>
 
@@ -769,7 +801,7 @@
         <tr>
           <td>Onboarding / establishment swim lane</td>
           <td><span class="badge badge-built">Done</span></td>
-          <td><strong>Resolved 27 Jul:</strong> PDF received from Deepa. Full audit run — 16 findings, all implemented. See Swim lane section above.</td>
+          <td><strong>Resolved 27 Jul:</strong> PDF received from Deepa. Full audit run — 20 findings, all implemented. See Swim lane section above.</td>
           <td>—</td>
         </tr>
         <tr>
@@ -841,6 +873,14 @@
         <div class="card-row-body">
           <div class="card-row-title">Named-user vs role-based access model (Tollring / SVMP)</div>
           <div class="card-row-desc">The swim lane reveals that some system accesses (Tollring, SVMP/fault diagnostics) are assigned to specific named individuals from the CRF — not to whoever holds a given role. The prototype models access as purely role-based. This is an architectural model gap: the prototype needs a way to show user-specific, non-role-based access grants that are set at establishment and don't transfer when a user changes role.</div>
+        </div>
+        <span class="badge badge-blind">Blind spot</span>
+      </div>
+      <div class="card-row">
+        <div class="card-row-num">B7</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Duplicate org / company check at account creation</div>
+          <div class="card-row-desc">Hub To-Be shows an explicit "Check Duplicates" step before the customer account is created — verifying no existing account exists for the same legal entity (CRN / RID). The Strategic Portal has no modelled mechanism to surface or prevent duplicate accounts. This step happens during BT-led onboarding (out of scope for the admin portal) but the underlying data model question — how the system flags two orgs with the same CRN — has no design yet.</div>
         </div>
         <span class="badge badge-blind">Blind spot</span>
       </div>
@@ -936,6 +976,18 @@
           <td>Both are nominated at establishment via the CRF. If that person leaves, who re-nominates? Is this a BT Establishment Team action, a portal admin action, or a Salesforce-managed change? The re-nomination flow has no design.</td>
           <td>Deepa / Zoya Azar</td>
         </tr>
+        <tr>
+          <td>What entitlements or support tier does Partner Plus status gate?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
+          <td>The swim lane checks Partner Plus status alongside SDS and FMS. It is not yet clear what capabilities, pricing tier, or support SLA a partner gains or loses based on this status. The prototype shows the status chip but cannot model downstream effects until this is defined.</td>
+          <td>Neil / Commercial team</td>
+        </tr>
+        <tr>
+          <td>Do Training Users require a portal role or access grant, or are they a CRF contact list only?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
+          <td>The CRF lists Training Users as a distinct contact category alongside KCI contacts and Portal Admins. It is unclear whether nominated training contacts receive a specific portal role, an access grant, or are purely an administrative record for ITEL coordination with no system access.</td>
+          <td>Deepa / ITEL team</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -945,6 +997,10 @@
   <!-- CHANGELOG -->
   <div class="section" id="changelog">
     <h2>Changelog</h2>
+    <div class="log-entry">
+      <div class="log-date">27 Jul 2026 — swim lane gaps (S17–S20)</div>
+      <div class="log-text"><strong>5 remaining swim lane gaps implemented.</strong> S17: Partner Plus status — <code>partnerPlusStatus</code> field added to all orgs, coloured chip in org detail (BT personas), 9th checklist item added. S18: Primary Contact as second SVMP nominee — dual-slot SVMP panel added to btEstablishment org detail (Fault Diagnostics User + Primary Contact). S19: SVMP credentials withheld until go-live — amber info banner in SVMP section; note added below "Promote to live" button. S20: Training Users as CRF category — <code>trainingContact</code> field added to all orgs, Training Contact panel added to btEstablishment org detail. Gap E (duplicate org check) skipped in prototype as org creation is out of scope. B7 blind spot added (duplicate org/company check). 2 new open questions added (Partner Plus entitlements; Training Users portal access). Swim lane count updated to 20, blind spots to 6.</div>
+    </div>
     <div class="log-entry">
       <div class="log-date">27 Jul 2026</div>
       <div class="log-text"><strong>Swim lane audit — 16 findings implemented.</strong> Full audit of Customer Establishment swim lane PDF (Deepa Packirisamy). Findings: BT actor split (btSalesSpec + btEstablishment personas), EIM ordering gate, API account at org level, primary contact downstream systems, org lifecycle states, FMS sub-permissions, SDS/CDR/EDR entitlement, Fault Diagnostics User role, KCI notification contacts, org pending states, Permission Sets sequencing warning, org setup checklist, RAG billing status, RID/CRN identifiers, branding sub-capabilities, named-user Tollring access. Edit icon also fixed (pencil + square). 5 new open questions documented. Blocked count reduced from 6 to 4.</div>
