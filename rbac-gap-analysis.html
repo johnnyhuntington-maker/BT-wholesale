@@ -588,41 +588,47 @@
   <!-- BLOCKED -->
   <div class="section" id="blocked">
     <h2>Blocked items</h2>
-    <div class="section-desc">Cannot be built yet — each requires an open question to be resolved first.</div>
+    <div class="section-desc">Cannot be built yet — each requires an open question to be resolved first. Items marked <strong>Resolved</strong> were unblocked in the 27 Jul 2026 team meeting.</div>
     <table>
       <thead>
-        <tr><th>Item</th><th>Blocked on</th><th>Owner</th></tr>
+        <tr><th>Item</th><th>Status</th><th>Blocked on / Decision</th><th>Owner</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>Custom role creation</td>
-          <td>BT-fixed vs reseller-configurable roles not resolved. PRD Section 12 flags this as an open question.</td>
-          <td>Neil / PRD</td>
+          <td><span class="badge badge-p2" style="background:#D1FAE5;color:#065F46;border-color:#6EE7B7">In progress</span></td>
+          <td><strong>Direction confirmed 27 Jul:</strong> Roles ARE admin-configurable — admin creates roles, assigns capabilities, assigns roles to users. Exact technical model (fixed capability bundles vs fully flexible) still needs a Salesforce technical discussion. Deepa is finding the point of contact.</td>
+          <td>Deepa → tech contact</td>
         </tr>
         <tr>
           <td>SSO / identity screens (login, MFA, password set)</td>
-          <td>Salesforce RBAC chosen (21 Jul 2026). Identity flows not yet designed. Vanmathi to confirm approach.</td>
-          <td>Vanmathi</td>
+          <td><span class="badge badge-built">Out of scope</span></td>
+          <td><strong>Resolved 27 Jul:</strong> Do not build in the prototype. Portal calls a SAF2 authentication URL; the identity layer handles the rest. No design needed from this workstream. Contact is Zoya Azar (not Vanmathi).</td>
+          <td>Zoya Azar</td>
         </tr>
         <tr>
           <td>API Portal persona (API Consumer / Partner Developer)</td>
+          <td><span class="badge" style="background:#F3F4F6;color:#374151;border:1px solid #D1D5DB">Out of scope</span></td>
           <td>Separate product workstream. Matthew Lindley is product owner. Out of Nexus RBAC scope.</td>
           <td>Matthew Lindley</td>
         </tr>
         <tr>
           <td>Onboarding / establishment swim lane</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Blocked</span></td>
           <td>Deepa's 23-system CRF onboarding diagram is on Mural and cannot be exported. PDF needed to progress design.</td>
           <td>Deepa (chase for PDF)</td>
         </tr>
         <tr>
           <td>Permission catalogue (full granular list)</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Blocked</span></td>
           <td>PRD Section 14 says "to be defined in detailed design." No canonical permission list exists yet.</td>
           <td>PRD / detailed design</td>
         </tr>
         <tr>
           <td>Org establishment flow (BT creates new reseller)</td>
-          <td>Service Designer territory. BT Internal cannot self-register new orgs per PRD. Requires CRF onboarding intel first.</td>
-          <td>Service Designer</td>
+          <td><span class="badge badge-built">Confirmed out of scope</span></td>
+          <td><strong>Confirmed 27 Jul (Deepa):</strong> "Organisation, company creation is not something that we are going to offer to the admins." Happens during BT-led onboarding only — not a portal admin function.</td>
+          <td>Service Designer / Onboarding</td>
         </tr>
       </tbody>
     </table>
@@ -668,6 +674,14 @@
         </div>
         <span class="badge badge-blind">Blind spot</span>
       </div>
+      <div class="card-row">
+        <div class="card-row-num">B5</div>
+        <div class="card-row-body">
+          <div class="card-row-title">Org terminology changing — "Partner" and "Partner Organisation"</div>
+          <div class="card-row-desc"><strong>New — raised 27 Jul (Zoya Azar):</strong> The terms sub-reseller, child reseller, and dealer are being deprecated. The new simplified model uses just two terms: <em>Partner</em> and <em>Partner Organisation</em>. Permissions still differ between org types under the hood, but the UI labelling and language needs updating across the prototype. Impacts org type chips, type filter, type picker in invite wizard, and all copy referencing those terms.</div>
+        </div>
+        <span class="badge badge-blind">Action needed</span>
+      </div>
     </div>
   </div>
 
@@ -676,41 +690,65 @@
   <!-- OPEN QUESTIONS -->
   <div class="section" id="open-questions">
     <h2>Open questions</h2>
-    <div class="section-desc">Questions that need answers before the blocked items can move. Sourced from RBAC-intel.md Section 12 and the gap analysis.</div>
+    <div class="section-desc">Questions that need answers before the blocked items can move. Sourced from RBAC-intel.md Section 12 and the gap analysis. Items marked <strong>Answered</strong> were resolved in the 27 Jul 2026 team meeting.</div>
     <table>
       <thead>
-        <tr><th>Question</th><th>Why it matters</th><th>Who to ask</th></tr>
+        <tr><th>Question</th><th>Status</th><th>Answer / Why it matters</th><th>Who to ask</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>Can resellers create their own custom roles, or are roles BT-fixed?</td>
-          <td>Determines whether the "Create custom role" feature stays in the prototype or gets removed. Currently built but gated behind an info toast.</td>
-          <td>Neil</td>
+          <td><span class="badge badge-p2" style="background:#D1FAE5;color:#065F46;border-color:#6EE7B7">Answered</span></td>
+          <td><strong>Answered 27 Jul (Deepa):</strong> Roles ARE admin-configurable. Admin creates a role, assigns capabilities to it, assigns the role to users. Exact capability model still needs a Salesforce technical discussion (Deepa finding contact).</td>
+          <td>Deepa</td>
         </tr>
         <tr>
           <td>What is the exact invitation expiry window?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
           <td>Expired chip exists but the prototype doesn't show a countdown or expiry date. PRD is silent on the window (24h? 7 days?)</td>
           <td>PRD / Neil</td>
         </tr>
         <tr>
           <td>Do Salesforce permission sets map 1:1 to the RBAC permission sets in the PRD?</td>
-          <td>If yes, the permission set catalogue can be built directly. If not, there's a translation layer to design.</td>
-          <td>Vanmathi</td>
+          <td><span class="badge badge-p2" style="background:#D1FAE5;color:#065F46;border-color:#6EE7B7">Largely answered</span></td>
+          <td><strong>Answered 27 Jul (Deepa):</strong> "Ideally, it should" — 1:1 mapping in principle, no translation layer between them. Caveat: Johnny to verify that prototype fields match the fields available in Salesforce before detailed design.</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>What SSO / identity flows need to be designed?</td>
+          <td><span class="badge badge-built">Answered</span></td>
+          <td><strong>Answered 27 Jul (Deepa + Zoya):</strong> None needed from this workstream. Portal calls the SAF2 authentication URL; SAF2 handles login, MFA, password flows. Zoya Azar is the identity contact if questions arise.</td>
+          <td>Zoya Azar</td>
+        </tr>
+        <tr>
+          <td>Which role model will Salesforce support — fixed capability bundles or fully flexible admin-configured roles?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
+          <td><strong>New — raised 27 Jul:</strong> Direction is admin-configurable roles, but the technical model (are capabilities a fixed set BT defines, or can admins freely compose them?) needs a Salesforce capability discussion. Deepa to find the right technical contact to progress this.</td>
+          <td>Deepa → Salesforce tech contact</td>
         </tr>
         <tr>
           <td>What are the SLAs for primary contact changes?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
           <td>The contactChangeWiz says "confirmation email before change takes effect" but the actual SLA (instant? 24h? requires BT approval?) is unknown.</td>
           <td>PRD / Neil</td>
         </tr>
         <tr>
           <td>Does remove require BT approval or is it self-service?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
           <td>Prototype now says "contact BT Wholesale support" to reverse — but the actual removal action is self-service. Confirm this split is correct.</td>
           <td>Neil / Service Owner</td>
         </tr>
         <tr>
           <td>What data does a sub-reseller admin see from their parent?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
           <td>Sub-reseller data visibility UI is built with three toggles, but the actual default state (open / closed) and what BT controls vs reseller controls isn't defined.</td>
           <td>Neil / PRD Section 17.2</td>
+        </tr>
+        <tr>
+          <td>What are the exact terms replacing sub-reseller / child reseller / dealer?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
+          <td><strong>New — raised 27 Jul (Zoya):</strong> Direction is "Partner" and "Partner Organisation" replacing the current 3 lower-tier terms. Exact mapping (which old type becomes which new term), and whether permission differences are surfaced to users, still needs confirmation.</td>
+          <td>Zoya Azar</td>
         </tr>
       </tbody>
     </table>
@@ -721,6 +759,10 @@
   <!-- CHANGELOG -->
   <div class="section" id="changelog">
     <h2>Changelog</h2>
+    <div class="log-entry">
+      <div class="log-date">27 Jul 2026</div>
+      <div class="log-text"><strong>Meeting decisions applied.</strong> Attendees: Johnny Huntington, Deepa Packirisamy, Neil Ballinger, Zoya Azar, Jason Grant. Custom role creation unblocked in principle — roles are admin-configurable (Deepa confirmed). SSO / identity confirmed out of scope — SAF2 handles auth, Zoya Azar is contact (not Vanmathi). Salesforce permission sets largely confirmed as 1:1. Org creation confirmed out of scope for admin portal — onboarding only. New blind spot added: org terminology changing to "Partner" / "Partner Organisation" (Zoya). New open question: which Salesforce role model (fixed bundles vs fully flexible) — Deepa finding tech contact.</div>
+    </div>
     <div class="log-entry">
       <div class="log-date">24 Jul 2026</div>
       <div class="log-text"><strong>All 11 gaps implemented.</strong> Remove = permanent, sub-reseller scope banner, deactivate modal updated, Expired status chip, duplicate email guard, bulk Change Role, three-layer RBAC diagram, sub-reseller data visibility UI, dealer note, Transfer primary contact button. RBAC-intel.md Section 18 updated.</div>
