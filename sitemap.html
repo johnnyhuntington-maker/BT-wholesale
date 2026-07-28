@@ -1,0 +1,465 @@
+<title>BT Nexus RBAC Prototype — Sitemap</title>
+<style>
+:root {
+  --bg: #EDEAF6;
+  --card: #FFFFFF;
+  --border: #DAD4EF;
+  --line: #BDB5D8;
+  --ink: #2A1C4A;
+  --ink2: #7268A0;
+  --purple: #5514B4;
+  --purple-bg: #F3EBFE;
+  --amber: #FFF9EE;
+  --amber-bd: #DDB94A;
+  --amber-ink: #6A3E00;
+  --green-bg: #EBF6EB;
+  --green-bd: #4FA34F;
+  --green-ink: #1A521A;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg:#100C1E;--card:#1A1530;--border:#36295A;--line:#4A3F6A;
+  --ink:#EAE2FF;--ink2:#9A8EC8;--purple:#9B6FE8;--purple-bg:#251842;
+  --amber:#1E1506;--amber-bd:#7A5C00;--amber-ink:#F5D878;
+  --green-bg:#0A180A;--green-bd:#2A6A2A;--green-ink:#7ACC7A;
+}}
+:root[data-theme="dark"]{
+  --bg:#100C1E;--card:#1A1530;--border:#36295A;--line:#4A3F6A;
+  --ink:#EAE2FF;--ink2:#9A8EC8;--purple:#9B6FE8;--purple-bg:#251842;
+  --amber:#1E1506;--amber-bd:#7A5C00;--amber-ink:#F5D878;
+  --green-bg:#0A180A;--green-bd:#2A6A2A;--green-ink:#7ACC7A;
+}
+:root[data-theme="light"]{
+  --bg:#EDEAF6;--card:#FFFFFF;--border:#DAD4EF;--line:#BDB5D8;
+  --ink:#2A1C4A;--ink2:#7268A0;--purple:#5514B4;--purple-bg:#F3EBFE;
+  --amber:#FFF9EE;--amber-bd:#DDB94A;--amber-ink:#6A3E00;
+  --green-bg:#EBF6EB;--green-bd:#4FA34F;--green-ink:#1A521A;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);padding:32px 40px 72px;}
+
+/* ── HEADER ── */
+.hd{margin-bottom:24px;}
+.hd h1{font-size:19px;font-weight:700;letter-spacing:-0.3px;}
+.hd .meta{font-size:12px;color:var(--ink2);margin-top:4px;}
+
+/* ── PERSONA TABS ── */
+.tab-bar{
+  display:flex;flex-wrap:wrap;
+  border-bottom:2px solid var(--border);
+  margin-bottom:12px;gap:0;
+}
+.tab{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 16px;
+  font-size:12.5px;font-weight:500;cursor:pointer;
+  border:none;border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+  background:transparent;color:var(--ink2);
+  transition:color 0.15s, border-color 0.15s;
+  font-family:inherit;white-space:nowrap;
+}
+.tab:hover{color:var(--ink);}
+.tab.active{color:var(--ink);font-weight:700;}
+.tab[data-persona="bt"].active   {border-bottom-color:#2A1C4A;}
+.tab[data-persona="btam"].active {border-bottom-color:#4A4200;}
+.tab[data-persona="bts"].active  {border-bottom-color:#1A3E6E;}
+.tab[data-persona="bte"].active  {border-bottom-color:#1B5000;}
+.tab[data-persona="pa"].active   {border-bottom-color:#5514B4;}
+.tab[data-persona="poa"].active  {border-bottom-color:#8450D4;}
+.tab[data-persona="su"].active   {border-bottom-color:#4A4A4A;}
+
+.tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-bt   {background:#2A1C4A;}
+.dot-btam {background:#4A4200;}
+.dot-bts  {background:#1A3E6E;}
+.dot-bte  {background:#1B5000;}
+.dot-pa   {background:#5514B4;}
+.dot-poa  {background:#8450D4;}
+.dot-su   {background:#4A4A4A;}
+
+/* ── PERSONA DESCRIPTION ── */
+.persona-desc{
+  font-size:12px;color:var(--ink2);
+  min-height:20px;margin-bottom:24px;
+  padding:8px 14px;border-radius:8px;
+  background:var(--card);border:1px solid var(--border);
+  display:inline-block;
+}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink2);}
+.sw{width:30px;height:12px;border-radius:3px;flex-shrink:0;}
+.sw.screen  {background:var(--purple);}
+.sw.sub-scr {background:#7B3DD9;}
+.sw.tab-sw  {background:var(--purple-bg);border:1.5px solid var(--purple);}
+.sw.panel   {background:var(--card);border:1.5px solid var(--border);}
+.sw.drawer  {background:var(--card);border:1.5px dashed var(--purple);}
+.sw.wizard  {background:var(--amber);border:1.5px solid var(--amber-bd);}
+.sw.cond    {background:var(--green-bg);border:1.5px solid var(--green-bd);}
+.sw.soon    {background:var(--card);border:1.5px dashed var(--border);opacity:.5;}
+
+/* ── ROOT NODE ── */
+.root-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:0;}
+.root-node{background:var(--purple);color:#fff;font-size:13px;font-weight:700;padding:9px 22px;border-radius:8px;letter-spacing:-0.2px;}
+.root-vline{width:2px;height:14px;background:var(--line);}
+
+/* ── TREE ── */
+.tree-scroll{overflow-x:auto;padding-bottom:20px;}
+.tree{
+  display:flex;align-items:flex-start;
+  min-width:max-content;gap:0;position:relative;
+}
+.tree::before{
+  content:'';position:absolute;top:0;left:74px;right:74px;
+  height:2px;background:var(--line);pointer-events:none;
+}
+
+/* ── COLUMN ── */
+.col{
+  display:flex;flex-direction:column;align-items:center;
+  width:164px;flex-shrink:0;position:relative;
+}
+.col-vstub{width:2px;height:14px;background:var(--line);flex-shrink:0;}
+
+/* ── NODES ── */
+.node{
+  width:148px;padding:7px 10px;border-radius:7px;
+  font-size:11.5px;font-weight:600;line-height:1.35;
+  text-align:center;position:relative;flex-shrink:0;
+}
+.node .pt{margin-top:3px;font-size:9px;padding:1px 4px;}
+
+.node.n-screen {background:var(--purple);color:#fff;font-size:13px;font-weight:700;}
+.node.n-sub    {background:#7B3DD9;color:#fff;font-size:12px;font-weight:700;}
+.node.n-tab    {background:var(--purple-bg);color:var(--purple);border:1.5px solid var(--purple);}
+.node.n-panel  {background:var(--card);color:var(--ink);border:1.5px solid var(--border);font-weight:500;}
+.node.n-drawer {background:var(--card);color:var(--ink);border:1.5px dashed var(--purple);font-weight:500;}
+.node.n-wizard {background:var(--amber);color:var(--amber-ink);border:1.5px solid var(--amber-bd);}
+.node.n-step   {background:var(--bg);color:var(--ink2);border:1.5px solid var(--border);font-weight:400;font-size:10.5px;}
+.node.n-cond   {background:var(--green-bg);color:var(--green-ink);border:1.5px solid var(--green-bd);font-weight:500;}
+.node.n-soon   {background:var(--card);color:var(--ink2);border:1.5px dashed var(--border);font-weight:400;font-style:italic;opacity:.65;}
+
+/* ── PERSONA INLINE TAGS ── */
+.pt{display:inline-flex;align-items:center;padding:2px 6px;border-radius:3px;font-size:9.5px;font-weight:700;letter-spacing:0.2px;white-space:nowrap;}
+.pt.bt   {background:#2A1C4A;color:#fff;}
+.pt.btam {background:#4A4200;color:#fff;}
+.pt.bts  {background:#1A3E6E;color:#fff;}
+.pt.bte  {background:#1B5000;color:#fff;}
+.pt.pa   {background:#5514B4;color:#fff;}
+.pt.poa  {background:#8450D4;color:#fff;}
+.pt.su   {background:#4A4A4A;color:#fff;}
+
+/* ── CONNECTORS ── */
+.vl{width:2px;height:8px;background:var(--line);flex-shrink:0;}
+.sect-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--ink2);margin:8px 0 3px;opacity:.7;}
+</style>
+
+<!-- HEADER -->
+<div class="hd">
+  <h1>BT Nexus RBAC Prototype — Sitemap</h1>
+  <p class="meta">wholesale.html · 28 Jul 2026</p>
+</div>
+
+<!-- PERSONA TABS -->
+<div class="tab-bar">
+  <button class="tab active" data-persona="bt"   onclick="selectPersona('bt')">   <span class="tab-dot dot-bt"></span>BT Wholesale Admin</button>
+  <button class="tab"        data-persona="btam" onclick="selectPersona('btam')"> <span class="tab-dot dot-btam"></span>BT Account Manager</button>
+  <button class="tab"        data-persona="bts"  onclick="selectPersona('bts')">  <span class="tab-dot dot-bts"></span>BT Sales Specialist</button>
+  <button class="tab"        data-persona="bte"  onclick="selectPersona('bte')">  <span class="tab-dot dot-bte"></span>BT Establishment</button>
+  <button class="tab"        data-persona="pa"   onclick="selectPersona('pa')">   <span class="tab-dot dot-pa"></span>Partner Admin</button>
+  <button class="tab"        data-persona="poa"  onclick="selectPersona('poa')">  <span class="tab-dot dot-poa"></span>Partner Org Admin</button>
+  <button class="tab"        data-persona="su"   onclick="selectPersona('su')">   <span class="tab-dot dot-su"></span>Standard User</button>
+</div>
+
+<div class="persona-desc" id="persona-desc">Showing all screens and panels across every persona.</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><span class="sw screen"></span>Main screen</div>
+  <div class="legend-item"><span class="sw sub-scr"></span>Sub-screen</div>
+  <div class="legend-item"><span class="sw tab-sw"></span>Tab / section</div>
+  <div class="legend-item"><span class="sw panel"></span>Panel / view</div>
+  <div class="legend-item"><span class="sw drawer"></span>Drawer / slide-out</div>
+  <div class="legend-item"><span class="sw wizard"></span>Wizard (multi-step)</div>
+  <div class="legend-item"><span class="sw cond"></span>Persona-conditional</div>
+  <div class="legend-item"><span class="sw soon"></span>Out of scope / coming soon</div>
+</div>
+
+<!-- ROOT -->
+<div class="root-wrap">
+  <div class="root-node">BT Nexus RBAC Prototype</div>
+  <div class="root-vline"></div>
+</div>
+
+<!-- TREE -->
+<div class="tree-scroll"><div class="tree">
+
+  <!-- ═══ LOGIN ═══ -->
+  <div class="col" data-col="all">
+    <div class="col-vstub"></div>
+    <div class="node n-screen" data-p="all">Login</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-step"   data-p="all">1 — Email address</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-step"   data-p="all">2 — Password</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-step"   data-p="all">3 — MFA code</div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="col" data-col="all">
+    <div class="col-vstub"></div>
+    <div class="node n-screen" data-p="all">Dashboard</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Alerts bar</div>
+    <div class="vl" data-p="bt btam bts bte pa"></div>
+    <div class="node n-tab"    data-p="bt btam bts bte pa">Network / Reseller snapshot</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte">Product adoption</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte">User health</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte">Billing overview</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte">Knowledge Hub tile</div>
+    <div class="vl" data-p="pa"></div>
+    <div class="node n-cond"   data-p="pa">Invite user tab (inline wizard)<br><span class="pt pa">PA</span></div>
+    <div class="vl" data-p="su"></div>
+    <div class="node n-cond"   data-p="su">Standard user view<br><span class="pt su">SU</span></div>
+    <div class="vl" data-p="poa"></div>
+    <div class="node n-cond"   data-p="poa">Sub-org context banner<br><span class="pt poa">POA</span></div>
+    <div class="sect-label"    data-p="all">Switch View</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-drawer" data-p="all">Persona selector<br>(7 personas)</div>
+  </div>
+
+  <!-- ═══ ORGANISATIONS ═══ -->
+  <div class="col" data-col="bt btam bts bte pa poa">
+    <div class="col-vstub" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-screen" data-p="bt btam bts bte pa poa">Organisations</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-cond"   data-p="bt btam bts bte">BT org context selector<br><span class="pt bt">BT</span></div>
+    <div class="vl" data-p="poa"></div>
+    <div class="node n-cond"   data-p="poa">Sub-org context banner<br><span class="pt poa">POA</span></div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-tab"    data-p="bt btam bts bte pa poa">Org list</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Search + type filter</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Sidebar preview panel</div>
+    <div class="sect-label"    data-p="bt pa poa">Wizard</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-wizard" data-p="bt pa poa">Create org wizard (4 steps)</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">1 — Details &amp; type</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">2 — Contacts</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">3 — Entitlements</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">4 — Review</div>
+  </div>
+
+  <!-- ═══ ORG DETAIL ═══ -->
+  <div class="col" data-col="bt btam bts bte pa poa">
+    <div class="col-vstub" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-sub"    data-p="bt btam bts bte pa poa">Org Detail</div>
+    <div class="sect-label"    data-p="bt btam bts bte pa poa">Left column</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Org header card</div>
+    <div class="vl" data-p="bt btam bte"></div>
+    <div class="node n-panel"  data-p="bt btam bte">CRF / credit pending banner</div>
+    <div class="vl" data-p="bt btam bte"></div>
+    <div class="node n-panel"  data-p="bt btam bte">EIM status banner</div>
+    <div class="vl" data-p="bt btam"></div>
+    <div class="node n-panel"  data-p="bt btam">RAG billing banner</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Contact details</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Users list</div>
+    <div class="vl" data-p="bt btam bts bte pa"></div>
+    <div class="node n-cond"   data-p="bt btam bts bte pa">Sub-orgs<br><span class="pt bt">BT</span><span class="pt pa">PA</span></div>
+    <div class="vl" data-p="bt bte"></div>
+    <div class="node n-panel"  data-p="bt bte">API account</div>
+    <div class="vl" data-p="bte"></div>
+    <div class="node n-cond"   data-p="bte">Tollring access<br><span class="pt bte">BTE</span></div>
+    <div class="vl" data-p="bte"></div>
+    <div class="node n-cond"   data-p="bte">Training contact<br><span class="pt bte">BTE</span></div>
+    <div class="vl" data-p="bt btam"></div>
+    <div class="node n-cond"   data-p="bt btam">Dealer note<br><span class="pt bt">BT</span></div>
+    <div class="vl" data-p="bt btam"></div>
+    <div class="node n-cond"   data-p="bt btam">Sub-reseller visibility<br><span class="pt bt">BT</span></div>
+    <div class="sect-label"    data-p="bt btam bts bte pa poa">Right column</div>
+    <div class="vl" data-p="bte"></div>
+    <div class="node n-cond"   data-p="bte">Promote to live<br><span class="pt bte">BTE</span></div>
+    <div class="vl" data-p="bte"></div>
+    <div class="node n-cond"   data-p="bte">Setup checklist (9 items)<br><span class="pt bte">BTE</span></div>
+    <div class="vl" data-p="bte"></div>
+    <div class="node n-cond"   data-p="bte">SVMP / Fault Diagnostics<br><span class="pt bte">BTE</span></div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Product entitlements</div>
+    <div class="sect-label"    data-p="bt pa">Wizard</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-wizard" data-p="bt pa">Transfer primary contact</div>
+  </div>
+
+  <!-- ═══ USERS ═══ -->
+  <div class="col" data-col="bt btam bts bte pa poa">
+    <div class="col-vstub" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-screen" data-p="bt btam bts bte pa poa">Users</div>
+    <div class="vl" data-p="bt btam bts bte"></div>
+    <div class="node n-cond"   data-p="bt btam bts bte">BT org context selector<br><span class="pt bt">BT</span></div>
+    <div class="vl" data-p="poa"></div>
+    <div class="node n-cond"   data-p="poa">Sub-org context banner<br><span class="pt poa">POA</span></div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-tab"    data-p="bt btam bts bte pa poa">Users list</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-panel"  data-p="bt btam bts bte pa poa">Search + status / org filters</div>
+    <div class="vl" data-p="bt btam bts bte pa poa"></div>
+    <div class="node n-drawer" data-p="bt btam bts bte pa poa">User drawer</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-panel"  data-p="bt pa poa">Role assignment / preview</div>
+    <div class="vl" data-p="bt btam"></div>
+    <div class="node n-cond"   data-p="bt btam">KCI notification toggles<br><span class="pt bt">BT</span></div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-panel"  data-p="bt pa poa">Deactivate / Remove</div>
+    <div class="sect-label"    data-p="bt pa poa">Wizard</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-wizard" data-p="bt pa poa">Invite user wizard (3 steps)</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">1 — Name, email, org</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">2 — Profile type &amp; role</div>
+    <div class="vl" data-p="bt pa poa"></div>
+    <div class="node n-step"   data-p="bt pa poa">3 — Review &amp; send</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-wizard" data-p="bt pa">Transfer primary contact</div>
+    <div class="vl" data-p="bt btam pa"></div>
+    <div class="node n-tab"    data-p="bt btam pa">Audit log</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-tab"    data-p="bt pa">Roles &amp; permissions</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-panel"  data-p="bt pa">Roles list + capability grants</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-wizard" data-p="bt pa">Create custom role (3 steps)</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-step"   data-p="bt pa">1 — Name &amp; description</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-step"   data-p="bt pa">2 — Permission sets</div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-step"   data-p="bt pa">3 — Review</div>
+  </div>
+
+  <!-- ═══ KNOWLEDGE HUB ═══ -->
+  <div class="col" data-col="all">
+    <div class="col-vstub"></div>
+    <div class="node n-screen" data-p="all">Knowledge Hub</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-soon"   data-p="all">Coming soon</div>
+  </div>
+
+  <!-- ═══ BILLING SUPPORT ═══ -->
+  <div class="col" data-col="bt pa">
+    <div class="col-vstub" data-p="bt pa"></div>
+    <div class="node n-screen" data-p="bt pa">Billing Support<br><span class="pt bt">BT</span><span class="pt pa">PA</span></div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-soon"   data-p="bt pa">Out of scope</div>
+  </div>
+
+  <!-- ═══ API PORTAL ═══ -->
+  <div class="col" data-col="bt pa">
+    <div class="col-vstub" data-p="bt pa"></div>
+    <div class="node n-screen" data-p="bt pa">API Portal<br><span class="pt bt">BT</span><span class="pt pa">PA</span></div>
+    <div class="vl" data-p="bt pa"></div>
+    <div class="node n-soon"   data-p="bt pa">Separate workstream<br>(Matthew Lindley)</div>
+  </div>
+
+  <!-- ═══ ACCOUNT SETTINGS ═══ -->
+  <div class="col" data-col="all">
+    <div class="col-vstub"></div>
+    <div class="node n-screen" data-p="all">Account Settings</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-tab"    data-p="all">My profile</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-tab"    data-p="all">Help &amp; support</div>
+  </div>
+
+  <!-- ═══ HELP & SUPPORT ═══ -->
+  <div class="col" data-col="all">
+    <div class="col-vstub"></div>
+    <div class="node n-screen" data-p="all">Help &amp; Support</div>
+    <div class="vl" data-p="all"></div>
+    <div class="node n-soon"   data-p="all">Coming soon</div>
+  </div>
+
+</div></div><!-- .tree / .tree-scroll -->
+
+<script>
+const DESCRIPTIONS = {
+  all:  'Showing all screens and panels across every persona.',
+  bt:   'BT Wholesale Admin (Preethi) — full platform access. Manages all reseller orgs, users, roles, entitlements, billing, and API portal.',
+  btam: 'BT Account Manager — views orgs, users, and billing health. No provisioning controls or establishment-specific panels.',
+  bts:  'BT Sales Specialist — read-only view of orgs and users. No platform config, no establishment controls.',
+  bte:  'BT Establishment (Preethi) — provisioning operator. Sees setup checklists, EIM/CRF approvals, SVMP, Tollring, and lifecycle controls.',
+  pa:   'Partner Admin (Sarah) — manages their own reseller network. Creates sub-orgs, invites users, manages roles, billing, and API portal.',
+  poa:  'Partner Org Admin — manages a single sub-org. Can invite users and assign roles within their own org only.',
+  su:   'Standard User — access to Dashboard and Knowledge Hub only. No org or user management.',
+};
+
+function selectPersona(p) {
+  // Update tabs
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.persona === p)
+  );
+
+  // Update description
+  document.getElementById('persona-desc').textContent = DESCRIPTIONS[p] || '';
+
+  // Show/hide columns
+  document.querySelectorAll('.col').forEach(col => {
+    const colP = col.dataset.col || 'all';
+    const visible = colP === 'all' || p === 'all' || colP.split(' ').includes(p);
+    col.style.display = visible ? '' : 'none';
+  });
+
+  // Show/hide nodes and labels
+  document.querySelectorAll('[data-p]').forEach(el => {
+    const ps = el.dataset.p;
+    const visible = ps === 'all' || ps.split(' ').includes(p);
+    el.style.display = visible ? '' : 'none';
+  });
+
+  // Clean up orphaned .vl connectors — hide a .vl if the next sibling is hidden
+  // Run twice to handle back-to-back hidden items
+  for (let pass = 0; pass < 2; pass++) {
+    document.querySelectorAll('.vl').forEach(vl => {
+      // Skip if in a hidden column
+      const col = vl.closest('.col');
+      if (col && col.style.display === 'none') return;
+
+      let next = vl.nextElementSibling;
+      // Skip over other hidden .vl elements
+      while (next && next.classList.contains('vl') && next.style.display === 'none') {
+        next = next.nextElementSibling;
+      }
+      if (!next || next.style.display === 'none') {
+        vl.style.display = 'none';
+      }
+    });
+  }
+
+  // Also clean up col-vstub if its column is visible but the first node is gone
+  document.querySelectorAll('.col-vstub').forEach(stub => {
+    if (stub.dataset.p) {
+      const ps = stub.dataset.p;
+      const visible = ps === 'all' || ps.split(' ').includes(p);
+      stub.style.display = visible ? '' : 'none';
+    }
+  });
+}
+
+// Initialise on BT Wholesale Admin
+selectPersona('bt');
+</script>
