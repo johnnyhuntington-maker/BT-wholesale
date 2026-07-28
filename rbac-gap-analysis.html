@@ -367,6 +367,7 @@
         <tr><td>Multi-tenant data isolation</td><td><span class="badge badge-blind">Blind spot</span></td><td>Prototype doesn't show how data leaks between orgs are prevented at the API/data layer</td></tr>
         <tr><td>Role inheritance across org tiers</td><td><span class="badge badge-blind">Blind spot</span></td><td>PRD Section 17.5 mentions inheritance — not yet visible in prototype</td></tr>
         <tr><td>Offboarding / user removal cascade</td><td><span class="badge badge-blind">Blind spot</span></td><td>What happens to open orders/faults when a user is permanently removed?</td></tr>
+        <tr><td>Org cessation / deactivation</td><td><span class="badge badge-blind">Blind spot</span></td><td>No mechanism for ceasing or deactivating an org exists in the intel for any admin type (BT Establishment, Partner Admin, or Partner Org Admin). Prototype shows inactive orgs but no flow for triggering that state.</td></tr>
         <tr><td>Org terminology (Partner / Partner Organisation)</td><td><span class="badge badge-blind">Action needed</span></td><td>Zoya flagged sub-reseller/child-reseller/dealer terms deprecated. UI labels need updating across prototype.</td></tr>
       </tbody>
     </table>
@@ -799,12 +800,6 @@
           <td>Matthew Lindley</td>
         </tr>
         <tr>
-          <td>Onboarding / establishment swim lane</td>
-          <td><span class="badge badge-built">Done</span></td>
-          <td><strong>Resolved 27 Jul:</strong> PDF received from Deepa. Full audit run — 20 findings, all implemented. See Swim lane section above.</td>
-          <td>—</td>
-        </tr>
-        <tr>
           <td>Permission catalogue (full granular list)</td>
           <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Blocked</span></td>
           <td>PRD Section 14 says "to be defined in detailed design." No canonical permission list exists yet.</td>
@@ -813,8 +808,8 @@
         <tr>
           <td>Org establishment flow (BT creates new reseller)</td>
           <td><span class="badge badge-built">Confirmed out of scope</span></td>
-          <td><strong>Confirmed 27 Jul (Deepa):</strong> "Organisation, company creation is not something that we are going to offer to the admins." Happens during BT-led onboarding only — not a portal admin function.</td>
-          <td>Service Designer / Onboarding</td>
+          <td><strong>Confirmed 27 Jul (Deepa):</strong> "Organisation, company creation is not something that we are going to offer to the admins." Not a portal admin function.</td>
+          <td>Deepa</td>
         </tr>
       </tbody>
     </table>
@@ -880,7 +875,7 @@
         <div class="card-row-num">B7</div>
         <div class="card-row-body">
           <div class="card-row-title">Duplicate org / company check at account creation</div>
-          <div class="card-row-desc">Hub To-Be shows an explicit "Check Duplicates" step before the customer account is created — verifying no existing account exists for the same legal entity (CRN / RID). The Strategic Portal has no modelled mechanism to surface or prevent duplicate accounts. This step happens during BT-led onboarding (out of scope for the admin portal) but the underlying data model question — how the system flags two orgs with the same CRN — has no design yet.</div>
+          <div class="card-row-desc">Hub To-Be shows an explicit "Check Duplicates" step before the customer account is created — verifying no existing account exists for the same legal entity (CRN / RID). The Strategic Portal has no modelled mechanism to surface or prevent duplicate accounts. The underlying data model question — how the system flags two orgs with the same CRN — has no design yet.</div>
         </div>
         <span class="badge badge-blind">Blind spot</span>
       </div>
@@ -988,6 +983,12 @@
           <td>The CRF lists Training Users as a distinct contact category alongside KCI contacts and Portal Admins. It is unclear whether nominated training contacts receive a specific portal role, an access grant, or are purely an administrative record for ITEL coordination with no system access.</td>
           <td>Deepa / ITEL team</td>
         </tr>
+        <tr>
+          <td>How is an org ceased or deactivated, and who can trigger it?</td>
+          <td><span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A">Open</span></td>
+          <td>The intel covers user deactivation/removal in detail but is entirely silent on org-level cessation for all admin types. Orgs appear in an "Inactive" state in the prototype but there is no defined flow for how that state is reached, whether it is self-service or BT-only, and what happens to active services, users, and billing when an org is deactivated. Given that reseller orgs have contracts and active services attached, hard-delete is almost certainly not self-service — but the deactivation model (reversible vs permanent, who can trigger it, what it blocks) is undefined.</td>
+          <td>Neil / Service Owner</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -998,6 +999,10 @@
   <div class="section" id="changelog">
     <h2>Changelog</h2>
     <div class="log-entry">
+      <div class="log-date">27 Jul 2026</div>
+      <div class="log-text"><strong>New blind spot + open question added: org cessation / deactivation.</strong> The intel covers user deactivation and removal in detail but is entirely silent on how orgs are ceased or deactivated across all admin types. Blind spot B8 added to summary table. Open question added: who can trigger org deactivation, is it self-service, and what happens to active services, users, and billing when an org is deactivated. Raised to Neil / Service Owner.</div>
+    </div>
+    <div class="log-entry">
       <div class="log-date">27 Jul 2026 — swim lane gaps (S17–S20)</div>
       <div class="log-text"><strong>5 remaining swim lane gaps implemented.</strong> S17: Partner Plus status — <code>partnerPlusStatus</code> field added to all orgs, coloured chip in org detail (BT personas), 9th checklist item added. S18: Primary Contact as second SVMP nominee — dual-slot SVMP panel added to btEstablishment org detail (Fault Diagnostics User + Primary Contact). S19: SVMP credentials withheld until go-live — amber info banner in SVMP section; note added below "Promote to live" button. S20: Training Users as CRF category — <code>trainingContact</code> field added to all orgs, Training Contact panel added to btEstablishment org detail. Gap E (duplicate org check) skipped in prototype as org creation is out of scope. B7 blind spot added (duplicate org/company check). 2 new open questions added (Partner Plus entitlements; Training Users portal access). Swim lane count updated to 20, blind spots to 6.</div>
     </div>
@@ -1007,7 +1012,7 @@
     </div>
     <div class="log-entry">
       <div class="log-date">27 Jul 2026</div>
-      <div class="log-text"><strong>Meeting decisions applied.</strong> Attendees: Johnny Huntington, Deepa Packirisamy, Neil Ballinger, Zoya Azar, Jason Grant. Custom role creation unblocked in principle — roles are admin-configurable (Deepa confirmed). SSO / identity confirmed out of scope — SAF2 handles auth, Zoya Azar is contact (not Vanmathi). Salesforce permission sets largely confirmed as 1:1. Org creation confirmed out of scope for admin portal — onboarding only. New blind spot added: org terminology changing to "Partner" / "Partner Organisation" (Zoya). New open question: which Salesforce role model (fixed bundles vs fully flexible) — Deepa finding tech contact.</div>
+      <div class="log-text"><strong>Meeting decisions applied.</strong> Attendees: Johnny Huntington, Deepa Packirisamy, Neil Ballinger, Zoya Azar, Jason Grant. Custom role creation unblocked in principle — roles are admin-configurable (Deepa confirmed). SSO / identity confirmed out of scope — SAF2 handles auth, Zoya Azar is contact (not Vanmathi). Salesforce permission sets largely confirmed as 1:1. Org creation confirmed out of scope for admin portal.New blind spot added: org terminology changing to "Partner" / "Partner Organisation" (Zoya). New open question: which Salesforce role model (fixed bundles vs fully flexible) — Deepa finding tech contact.</div>
     </div>
     <div class="log-entry">
       <div class="log-date">24 Jul 2026</div>

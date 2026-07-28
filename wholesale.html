@@ -1536,9 +1536,9 @@ function App(){
             return h('div',{style:{maxWidth:'1120px'}},
               h('button',{onClick:()=>{setScreen('orgs');setSelOrgId(null);},style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'none',border:0,color:'#5514B4',fontWeight:700,fontSize:'14px',cursor:'pointer',padding:'0 0 20px 0',fontFamily:'inherit'}},
                 ic('m15 18-6-6 6-6',{s:15,c:'#5514B4'}),'Organisations'),
-              h('div',{style:{display:'grid',gridTemplateColumns:'1fr 320px',gap:'32px',alignItems:'start'}},
+              h('div',{style:{display:'flex',gap:'32px',alignItems:'flex-start'}},
 
-                h('div',null,
+                h('div',{style:{flex:1,minWidth:0}},
                   h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'24px',marginBottom:'20px'}},
                     h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}},
                       h('div',{style:{width:'48px',height:'48px',borderRadius:'12px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
@@ -1569,7 +1569,8 @@ function App(){
                     ic('M12 9v4M12 17h.01',{s:18,c:'#8A5A00'}),
                     h('div',null,
                       h('div',{style:{fontWeight:700,fontSize:'14px',color:'#8A5A00',marginBottom:'4px'}},'EIM attributes '+(od.eimStatus==='pending'?'pending confirmation':'failed')),
-                      h('div',{style:{fontSize:'13px',color:'#8A5A00',lineHeight:1.5}},'This org cannot place orders until EIM attributes are confirmed.'))),
+                      h('div',{style:{fontSize:'13px',color:'#8A5A00',lineHeight:1.5}},'This org cannot place orders until EIM attributes are confirmed.'),
+                      h('a',{href:'#',onClick:(e)=>{e.preventDefault();},style:{display:'inline-block',marginTop:'8px',fontSize:'13px',fontWeight:700,color:'#8A5A00',textDecoration:'underline',cursor:'pointer'}},'Manage EIM attributes →'))),
                   // F13: RAG billing banner
                   isBt&&od.ragStatus==='red'&&h('div',{style:{background:'#FEF5F5',border:'1px solid #FAD4D4',borderRadius:'16px',padding:'16px 20px',marginBottom:'16px',display:'flex',gap:'12px',alignItems:'flex-start'}},
                     ic('M12 9v4M12 17h.01',{s:18,c:'#A0121B'}),
@@ -1660,7 +1661,7 @@ function App(){
                       h('div',{style:{width:'34px',height:'34px',borderRadius:'999px',background:'#F3EBFE',color:'#5514B4',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'12px',flexShrink:0}},initials(u.name)),
                       h('div',{style:{flex:1,minWidth:0}},
                         h('div',{style:{fontWeight:700,fontSize:'14px'}},u.name),
-                        h('div',{style:{fontSize:'12px',color:'#808080'}},roleLabel(u.roleKey))))))),
+                        h('div',{style:{fontSize:'12px',color:'#808080'}},roleLabel(u.roleKey)))))),
 
                   odChildren.length>0&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',marginBottom:'20px'}},
                     h('div',{style:{padding:'20px 24px',borderBottom:'1px solid #E3E3E3',display:'flex',alignItems:'center',justifyContent:'space-between'}},
@@ -1673,17 +1674,6 @@ function App(){
                         h('div',{style:{fontSize:'12px',color:'#808080'}},TYPE_LABELS[c.typeKey])),
                       h('div',{style:{fontSize:'14px',color:'#808080'}},userCountFor(c.id),' users')))),
 
-                  // F3: Org lifecycle state — Promote to live
-                  isBtEstablishment&&od.orgStatus==='testing'&&h('div',{style:{background:'#F3EBFE',border:'1px solid #C4A0F0',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
-                    h('div',{style:{display:'flex',gap:'12px',alignItems:'flex-start'}},
-                      h('div',{style:{width:'36px',height:'36px',borderRadius:'10px',background:'#EBE6F4',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
-                        ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18,c:'#5514B4'})),
-                      h('div',{style:{flex:1}},
-                        h('div',{style:{fontWeight:700,fontSize:'15px',color:'#3F187F',marginBottom:'4px'}},'Organisation is in testing'),
-                        h('div',{style:{fontSize:'13px',color:'#3F187F',lineHeight:1.55,marginBottom:'12px'}},'Complete all setup checklist items before promoting this organisation to live. Once live, the org can place production orders.'),
-                        h('button',{onClick:()=>{setOrgs(os=>os.map(o=>o.id===od.id?{...o,orgStatus:'live'}:o));showToast('success',od.name+' promoted to live. Production ordering is now enabled.');},style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'10px 18px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},ic('M20 6 9 17l-5-5',{s:14,c:'#fff'}),'Promote to live'),
-                        h('div',{style:{marginTop:'10px',fontSize:'12px',color:'#8A5A00',lineHeight:1.5}},'Promoting to live releases SVMP credentials to nominated users via the Welcome Pack.')))),
-
                   // F4: API account provisioning
                   isBt&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
                     h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'12px'}},
@@ -1691,32 +1681,6 @@ function App(){
                       h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',background:od.apiAccountProvisioned?'#E6F4E5':'#F7F7F7',color:od.apiAccountProvisioned?'#036C01':'#808080',borderRadius:'6px',padding:'3px 10px',fontSize:'12px',fontWeight:700,border:'1px solid '+(od.apiAccountProvisioned?'#A3D9A1':'#D9D9D9')}},od.apiAccountProvisioned?ic('M20 6 9 17l-5-5',{s:11,c:'#036C01',w:2.5}):ic('M5 12h14',{s:11,c:'#808080',w:2}),od.apiAccountProvisioned?'Provisioned':'Not provisioned')),
                     h('div',{style:{fontSize:'13px',color:'#808080',lineHeight:1.5,marginBottom:'12px'}},'API access is an org-level entitlement set at establishment. Individual API Developer role grants follow.'),
                     isBtEstablishment&&!od.apiAccountProvisioned&&h('button',{onClick:()=>{setOrgs(os=>os.map(o=>o.id===od.id?{...o,apiAccountProvisioned:true}:o));showToast('success','API account provisioned for '+od.name+'.');},style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'8px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},ic('M12 5v14M5 12h14',{s:13,c:'#fff'}),'Provision API account')),
-
-                  // F12: Org setup checklist (btEstablishment only)
-                  isBtEstablishment&&(()=>{
-                    const checklistKey=od.id;
-                    const items=['Billing account created','EIM attributes uploaded','FMS account created','SDS access enabled','Tollring account created','VEL access verified','Training completed','Test order placed','Partner Plus status confirmed'];
-                    const checked=setupChecklist[checklistKey]||{};
-                    const doneCount=items.filter((_,i)=>checked[i]).length;
-                    const allDone=doneCount===items.length;
-                    return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',overflow:'hidden',marginBottom:'20px'}},
-                      h('div',{style:{padding:'20px 24px',borderBottom:'1px solid #E3E3E3'}},
-                        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}},
-                          h('div',{style:{fontWeight:700,fontSize:'15px'}},'Setup checklist'),
-                          h('span',{style:{fontSize:'13px',fontWeight:600,color:allDone?'#036C01':'#5514B4'}},''+doneCount+'/'+items.length+' complete')),
-                        h('div',{style:{height:'6px',borderRadius:'3px',background:'#F0F0F0',overflow:'hidden'}},
-                          h('div',{style:{height:'100%',background:allDone?'#357E3C':'#5514B4',width:(doneCount/items.length*100)+'%',transition:'width 300ms ease'}})),
-                        allDone&&h('div',{style:{marginTop:'12px',background:'#E6F4E5',border:'1px solid #A3D9A1',borderRadius:'10px',padding:'10px 14px',display:'flex',alignItems:'center',gap:'8px',fontSize:'13px',fontWeight:700,color:'#036C01'}},ic('M20 6 9 17l-5-5',{s:14,c:'#036C01',w:2.5}),'Ready for go-live')),
-                      h('div',{style:{padding:'8px 24px 16px'}},
-                        items.map((item,i)=>{
-                          const done=!!checked[i];
-                          return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:'12px',padding:'10px 0',borderBottom:i<items.length-1?'1px solid #F3F3F3':'none'}},
-                            h('div',{onClick:()=>setSetupChecklist(prev=>{const c={...prev,[checklistKey]:{...(prev[checklistKey]||{}),[i]:!done}};return c;}),
-                              style:{width:'20px',height:'20px',borderRadius:'6px',border:'2px solid '+(done?'#357E3C':'#C8C8C8'),background:done?'#357E3C':'#fff',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0}},
-                              done&&ic('M20 6 9 17l-5-5',{s:12,c:'#fff',w:2.8})),
-                            h('span',{style:{fontSize:'14px',color:done?'#434343':'#2A2A2A',textDecoration:done?'line-through':'none',fontWeight:done?400:500}},item));
-                        })));
-                  })(),
 
                   // F16: Tollring access (btEstablishment only)
                   isBtEstablishment&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
@@ -1730,30 +1694,6 @@ function App(){
                             ['View Customers','Customer Portal Access Management'].map(p=>h('span',{key:p,style:{background:'#F3EBFE',color:'#3F187F',borderRadius:'6px',padding:'3px 9px',fontSize:'12px',fontWeight:600}},p))),
                           h('div',{style:{marginTop:'10px',fontSize:'12px',color:'#808080',lineHeight:1.5}},'Tollring access is assigned to a specific named individual, not to a role.'))
                       :h('div',{style:{fontSize:'14px',color:'#AAAAAA'}},'No Tollring nominee assigned for this organisation.')),
-
-                  // F17: SVMP access — dual nominees (btEstablishment only)
-                  isBtEstablishment&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
-                    h('div',{style:{fontWeight:700,fontSize:'15px',marginBottom:'4px'}},'SVMP / Fault Diagnostics Access'),
-                    h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'16px'}},'Two named individuals receive SVMP system access. Both are nominated at establishment — one from the CRF, one is the primary contact.'),
-                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'14px'}},
-                      h('div',{style:{background:'#F9F9FB',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px'}},
-                        h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'8px'}},'Slot 1 — Fault Diagnostics User'),
-                        od.tollringNominee
-                          ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
-                              h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',color:'#5514B4'}},initials(od.tollringNominee)),
-                              h('span',{style:{fontWeight:600,fontSize:'13px'}},od.tollringNominee))
-                          :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'Not nominated')),
-                      h('div',{style:{background:'#F9F9FB',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px'}},
-                        h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'8px'}},'Slot 2 — Primary Contact'),
-                        od.primaryName
-                          ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
-                              h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',background:'#EBF6EB',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',color:'#036C01'}},initials(od.primaryName)),
-                              h('span',{style:{fontWeight:600,fontSize:'13px'}},od.primaryName))
-                          :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'No primary contact'))),
-                    h('div',{style:{fontSize:'12px',color:'#808080',marginBottom:'12px',lineHeight:1.5}},'Both receive SVMP system access. Credentials sent separately — see go-live step.'),
-                    h('div',{style:{background:'#FFF8E7',border:'1px solid #F5D878',borderRadius:'8px',padding:'12px 16px',fontSize:'12px',color:'#8A5A00',lineHeight:1.5}},
-                      ic('M13 16h-1v-4h-1m1-4h.01',{s:14,c:'#8A5A00'}),
-                      h('span',{style:{marginLeft:'6px'}},'Credentials are withheld until go-live. SVMP URL and username are included in the Welcome Pack. Password is delivered separately for security.'))),
 
                   // F18: Training contact (btEstablishment only)
                   isBtEstablishment&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
@@ -1793,11 +1733,71 @@ function App(){
                             h('div',{style:{fontSize:'13px',color:'#808080'}},desc)),
                           h('div',{onClick:()=>showToast('info','Data visibility controls will be configurable in the full implementation.'),
                             style:{width:'40px',height:'22px',borderRadius:'11px',background:defaultOn?'#5514B4':'#E3E3E3',cursor:'pointer',flexShrink:0,position:'relative',transition:'background 150ms'}},
-                            h('div',{style:{position:'absolute',top:'3px',left:defaultOn?'21px':'3px',width:'16px',height:'16px',borderRadius:'999px',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 150ms'}})))))),
+                            h('div',{style:{position:'absolute',top:'3px',left:defaultOn?'21px':'3px',width:'16px',height:'16px',borderRadius:'999px',background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,0.2)',transition:'left 150ms'}}))))))),
 
-                  // ← this comma closes the left column div array
+                h('div',{style:{width:'320px',flexShrink:0}},
+                  // F3: Org lifecycle state — Promote to live
+                  isBtEstablishment&&od.orgStatus==='testing'&&h('div',{style:{background:'#F3EBFE',border:'1px solid #C4A0F0',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
+                    h('div',{style:{display:'flex',gap:'12px',alignItems:'flex-start'}},
+                      h('div',{style:{width:'36px',height:'36px',borderRadius:'10px',background:'#EBE6F4',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                        ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:18,c:'#5514B4'})),
+                      h('div',{style:{flex:1}},
+                        h('div',{style:{fontWeight:700,fontSize:'15px',color:'#3F187F',marginBottom:'4px'}},'Organisation is in testing'),
+                        h('div',{style:{fontSize:'13px',color:'#3F187F',lineHeight:1.55,marginBottom:'12px'}},'Complete all setup checklist items before promoting this organisation to live. Once live, the org can place production orders.'),
+                        h('button',{onClick:()=>{setOrgs(os=>os.map(o=>o.id===od.id?{...o,orgStatus:'live'}:o));showToast('success',od.name+' promoted to live. Production ordering is now enabled.');},style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'10px 18px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},ic('M20 6 9 17l-5-5',{s:14,c:'#fff'}),'Promote to live'),
+                        h('div',{style:{marginTop:'10px',fontSize:'12px',color:'#8A5A00',lineHeight:1.5}},'Promoting to live releases SVMP credentials to nominated users via the Welcome Pack.')))),
 
-                h('div',null,
+                  // F12: Org setup checklist (btEstablishment only)
+                  isBtEstablishment&&(()=>{
+                    const checklistKey=od.id;
+                    const items=['Billing account created','EIM attributes uploaded','FMS account created','SDS access enabled','Tollring account created','VEL access verified','Training completed','Test order placed','Partner Plus status confirmed'];
+                    const checked=setupChecklist[checklistKey]||{};
+                    const doneCount=items.filter((_,i)=>checked[i]).length;
+                    const allDone=doneCount===items.length;
+                    return h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',overflow:'hidden',marginBottom:'20px'}},
+                      h('div',{style:{padding:'20px 24px',borderBottom:'1px solid #E3E3E3'}},
+                        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}},
+                          h('div',{style:{fontWeight:700,fontSize:'15px'}},'Setup checklist'),
+                          h('span',{style:{fontSize:'13px',fontWeight:600,color:allDone?'#036C01':'#5514B4'}},''+doneCount+'/'+items.length+' complete')),
+                        h('div',{style:{height:'6px',borderRadius:'3px',background:'#F0F0F0',overflow:'hidden'}},
+                          h('div',{style:{height:'100%',background:allDone?'#357E3C':'#5514B4',width:(doneCount/items.length*100)+'%',transition:'width 300ms ease'}})),
+                        allDone&&h('div',{style:{marginTop:'12px',background:'#E6F4E5',border:'1px solid #A3D9A1',borderRadius:'10px',padding:'10px 14px',display:'flex',alignItems:'center',gap:'8px',fontSize:'13px',fontWeight:700,color:'#036C01'}},ic('M20 6 9 17l-5-5',{s:14,c:'#036C01',w:2.5}),'Ready for go-live')),
+                      h('div',{style:{padding:'8px 24px 16px'}},
+                        items.map((item,i)=>{
+                          const done=!!checked[i];
+                          return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:'12px',padding:'10px 0',borderBottom:i<items.length-1?'1px solid #F3F3F3':'none'}},
+                            h('div',{onClick:()=>setSetupChecklist(prev=>{const c={...prev,[checklistKey]:{...(prev[checklistKey]||{}),[i]:!done}};return c;}),
+                              style:{width:'20px',height:'20px',borderRadius:'6px',border:'2px solid '+(done?'#357E3C':'#C8C8C8'),background:done?'#357E3C':'#fff',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0}},
+                              done&&ic('M20 6 9 17l-5-5',{s:12,c:'#fff',w:2.8})),
+                            h('span',{style:{fontSize:'14px',color:done?'#434343':'#2A2A2A',textDecoration:done?'line-through':'none',fontWeight:done?400:500}},item));
+                        })));
+                  })(),
+
+                  // F17: SVMP access — dual nominees (btEstablishment only)
+                  isBtEstablishment&&h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'20px',padding:'20px 24px',marginBottom:'20px'}},
+                    h('div',{style:{fontWeight:700,fontSize:'15px',marginBottom:'4px'}},'SVMP / Fault Diagnostics Access'),
+                    h('div',{style:{fontSize:'13px',color:'#808080',marginBottom:'16px'}},'Two named individuals receive SVMP system access. Both are nominated at establishment — one from the CRF, one is the primary contact.'),
+                    h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'14px'}},
+                      h('div',{style:{background:'#F9F9FB',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px'}},
+                        h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'8px'}},'Slot 1 — Fault Diagnostics User'),
+                        od.tollringNominee
+                          ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                              h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',background:'#F3EBFE',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',color:'#5514B4'}},initials(od.tollringNominee)),
+                              h('span',{style:{fontWeight:600,fontSize:'13px'}},od.tollringNominee))
+                          :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'Not nominated')),
+                      h('div',{style:{background:'#F9F9FB',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px'}},
+                        h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'8px'}},'Slot 2 — Primary Contact'),
+                        od.primaryName
+                          ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                              h('div',{style:{width:'28px',height:'28px',borderRadius:'999px',background:'#EBF6EB',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'11px',color:'#036C01'}},initials(od.primaryName)),
+                              h('span',{style:{fontWeight:600,fontSize:'13px'}},od.primaryName))
+                          :h('div',{style:{fontSize:'13px',color:'#AAAAAA'}},'No primary contact'))),
+                    h('div',{style:{fontSize:'12px',color:'#808080',marginBottom:'12px',lineHeight:1.5}},'Both receive SVMP system access. Credentials sent separately — see go-live step.'),
+                    h('div',{style:{background:'#FFF8E7',border:'1px solid #F5D878',borderRadius:'8px',padding:'12px 16px',fontSize:'12px',color:'#8A5A00',lineHeight:1.5}},
+                      ic('M13 16h-1v-4h-1m1-4h.01',{s:14,c:'#8A5A00'}),
+                      h('span',{style:{marginLeft:'6px'}},'Credentials are withheld until go-live. SVMP URL and username are included in the Welcome Pack. Password is delivered separately for security.'))),
+
+
                   h('div',{style:{background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',padding:'20px',marginBottom:'16px'}},
                     h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'4px',paddingBottom:'8px',borderBottom:'1px solid #E3E3E3'}},'Product entitlements'),
                     PROD_KEYS.map(k=>h(OdEntRow,{key:k,entKey:k})),
