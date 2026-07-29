@@ -845,8 +845,7 @@ function App(){
               screen==='apiPortal'?'API Portal':
               screen==='accountSettings'?'Profile & settings':
               screen==='overview'?('Welcome back, '+P.person.name.split(' ')[0]):P.title),
-            (screen==='orgs'&&canCreateOrg||screen==='overview'&&persona==='bt')&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,screen==='overview'?'Create reseller':createOrg.label)),
-            screen==='overview'&&persona==='reseller'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,'Invite user')),
+            screen==='orgs'&&canCreateOrg&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,createOrg.label)),
             screen==='users'&&usersTab==='users'&&h('button',{onClick:inviteUser.onClick,style:inviteUser.ctaStyle},canAdmin?ic('M12 5v14M5 12h14',{s:16,c:'#fff'}):lockEl('#AAAAAA'),h('span',null,inviteUser.label)),
             screen==='users'&&usersTab==='auditLog'&&h('div',{style:{display:'inline-flex',alignItems:'center',gap:'6px',background:'#F3EBFE',border:'1px solid #C4A0F0',color:'#5514B4',borderRadius:'999px',padding:'5px 12px',fontSize:'12px',fontWeight:700}},ic(['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z'],{s:13,c:'#5514B4'}),'Immutable — read-only')),
           screen==='knowledgeHub'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
