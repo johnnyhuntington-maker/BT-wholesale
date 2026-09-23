@@ -424,6 +424,15 @@ const ROLES=[
   {key:'billingReporting',label:'Billing & Reporting',desc:'Views invoices, raises billing queries and exports reports.',grants:['View and download invoices','Raise billing queries','Dashboards and report exports','View orders'],caps:[],permSets:['billing.view','billing.download','billing.query','reporting.view','reporting.export','order.view']},
   {key:'readonly',label:'Read Only',desc:'Can view but never change anything.',grants:['View orders, faults and products','View dashboards','No create, edit or delete'],caps:[],permSets:['order.view','fault.view','reporting.view']},
 ];
+const PARITY_ACTIONS=[
+  {key:'order',label:'Place a Voice (DV4B) order',product:'digitalVoice',caps:['orderPortal','orderBtw'],perm:'order.create',method:'POST',path:'/v1/orders',body:{product:'DV4B',site:'MK9 2EA',seats:12},ok:'201 Created',okBody:{orderId:'DV-20944',status:'accepted'},portal:'Place order',area:'Orders'},
+  {key:'hardware',label:'Order hardware',product:'digitalVoice',caps:['hardware'],perm:'order.create',method:'POST',path:'/v1/hardware-orders',body:{sku:'DV4B-HANDSET-W73P',qty:4},ok:'201 Created',okBody:{orderId:'HW-3310',status:'accepted'},portal:'Order hardware',area:'Orders'},
+  {key:'ethernet',label:'Place an Ethernet / Data order',product:'ukFabric',caps:['orderPortal','orderBtw'],perm:'order.create',method:'POST',path:'/v1/orders',body:{product:'ETHERNET',bandwidth:'1Gbps'},ok:'201 Created',okBody:{orderId:'ET-0412',status:'accepted'},portal:'Place order',area:'Orders'},
+  {key:'diagnostics',label:'Run line diagnostics',caps:['diagnostics'],perm:'fault.view',method:'POST',path:'/v1/services/SVC-88121/diagnostics',body:{test:'line-sync'},ok:'202 Accepted',okBody:{testId:'DG-5521',status:'running'},portal:'Run diagnostics',area:'Service'},
+  {key:'ticket',label:'Raise a support ticket with BT',caps:['support'],perm:'support.raise',method:'POST',path:'/v1/support-tickets',body:{summary:'Porting delay',priority:'P3'},ok:'201 Created',okBody:{ticketId:'SR-77120'},portal:'Raise ticket',area:'Support'},
+  {key:'invoices',label:'View invoices',perm:'billing.view',billing:true,method:'GET',path:'/v1/invoices?period=2026-08',ok:'200 OK',okBody:{invoices:[{id:'INV-2026-08-114',total:'£18,420.00'}]},portal:'View invoices',area:'Billing'},
+  {key:'invite',label:'Invite a user',perm:'users.invite',users:true,method:'POST',path:'/v1/users',body:{email:'new.user@example.co.uk',role:'salesOrdering'},ok:'201 Created',okBody:{userId:'usr_9f31',status:'invited'},portal:'Invite user',area:'Users'},
+];
 const ADMIN_KEYS=['admin','orgAdmin'];
 const isAdminKey=k=>ADMIN_KEYS.includes(k);
 const ROLE_COL_MAP={admin:0,orgAdmin:1,salesOrdering:2,serviceOps:3,billingReporting:4,readonly:5};
@@ -611,6 +620,7 @@ function App(){
   const [delegWiz,setDelegWiz]=useState(null);
   const [subUserPolicy,setSubUserPolicy]=useState('consent');
   const [consents,setConsents]=useState({metro:'12 Jun 2026'});
+  const [parity,setParity]=useState({userId:'u2',action:'order',actingFor:''});
   useEffect(()=>{const t=setTimeout(()=>setUsersLoading(false),900);return()=>clearTimeout(t);},[]);
 
   function openUserDrawer(id){setUserDrawer(id);setDrawerPendingRole(null);}
@@ -623,6 +633,27 @@ function App(){
   const canCreateOrg=(persona==='bt'||persona==='reseller')&&!onBehalf;
   const ownOrg=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
   const home=onBehalf||ownOrg;
+  function effCaps(u){const r=ROLES.find(x=>x.key===u.roleKey)||{caps:[]};const o=orgs.find(x=>x.id===u.orgId)||{entitlements:[]};return [...new Set([...(r.caps||[]),...(u.caps||[])])].filter(k=>o.entitlements.includes(k));}
+  function authorise(u,actionKey,actingFor){
+    const a=PARITY_ACTIONS.find(x=>x.key===actionKey);
+    const home=orgs.find(o=>o.id===u.orgId);
+    const target=actingFor?orgs.find(o=>o.id===actingFor):home;
+    const role=ROLES.find(r=>r.key===u.roleKey)||{permSets:[]};
+    const lbl=k=>(ENT.find(e=>e.key===k)||{label:k}).label;
+    const checks=[];
+    const add=(label,pass,why)=>checks.push({label,pass,why});
+    add('User is active',u.status==='Active',u.name+' is '+u.status.toLowerCase()+'.');
+    if(actingFor){
+      add('Delegation',isAdminKey(u.roleKey)&&target&&target.parentId===u.orgId&&!a.billing&&(!a.users||subUserPolicy==='allowed'||(subUserPolicy==='consent'&&!!consents[target.id])),
+        a.billing?'Billing is never delegated.':a.users?(subUserPolicy==='notAllowed'?'Policy stops Partners managing Partner Organisation users.':target.name+' hasn\'t given consent.'):'Only a Partner administrator can act for its own Partner Organisations.');
+    }
+    if(a.product) add('Product entitlement',target.entitlements.includes(a.product),target.name+' isn\'t entitled to '+lbl(a.product)+'.');
+    if(a.caps){const ok=a.caps.some(k=>effCaps(u).includes(k)&&target.entitlements.includes(k));add('Capability',ok,ok?'':(a.caps.some(k=>!target.entitlements.includes(k))&&!a.caps.some(k=>target.entitlements.includes(k))?target.name+' doesn\'t hold '+lbl(a.caps[0])+'.':u.name+'\'s role doesn\'t include '+lbl(a.caps[0])+'.'));}
+    if(!a.caps) add('Role permission',(role.permSets||[]).includes(a.perm),roleLabel(u.roleKey)+' doesn\'t include '+((PERMISSION_SETS.find(p=>p.key===a.perm)||{label:a.perm}).label)+'.');
+    if(a.billing) add('Billing visibility',target.typeKey==='reseller',target.name+' is a Partner Organisation. BT billing is hidden by default.');
+    const fail=checks.find(c=>!c.pass);
+    return {allowed:!fail,reason:fail?fail.why:'All checks passed.',checks,action:a,target,decisionId:'dec_'+(u.id+actionKey+(actingFor||'')).split('').reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7).toString(16).slice(0,8)};
+  }
   function canManageUsersOf(orgId){
     if(!canAdmin) return false;
     if(isBt||orgId===ownOrg) return true;
@@ -860,7 +891,7 @@ function App(){
               screen==='helpSupport'?'Help & support':
               screen==='knowledgeHub'?'Knowledge Hub':
               screen==='billingSupport'?'Billing Support':
-              screen==='apiPortal'?'API Portal':
+              screen==='apiPortal'?'Portal and API parity':
               screen==='accountSettings'?'Profile & settings':
               screen==='overview'?('Welcome back, '+P.person.name.split(' ')[0]):P.title),
             screen==='orgs'&&canCreateOrg&&h('button',{onClick:createOrg.onClick,style:createOrg.ctaStyle},ic('M12 5v14M5 12h14',{s:16,c:'#fff'}),h('span',null,createOrg.label)),
@@ -872,12 +903,98 @@ function App(){
                 ic(['M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20'],{s:26})),
               h('div',{style:{fontWeight:700,fontSize:'20px',color:'#2A2A2A',marginBottom:'12px'}},'Coming soon'),
               h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The Knowledge Hub is on its way. You\'ll find guides, best practices and platform documentation here.'))),
-          screen==='apiPortal'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
-            h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',textAlign:'center',maxWidth:'440px',width:'100%'}},
-              h('div',{style:{width:'56px',height:'56px',borderRadius:'20px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
-                ic(['M10 20l4-16','M4 9l-3 3 3 3','M20 9l3 3-3 3'],{s:26})),
-              h('div',{style:{fontWeight:700,fontSize:'20px',color:'#2A2A2A',marginBottom:'12px'}},'Coming soon'),
-              h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The API Portal is on its way. You\'ll be able to manage API keys, explore documentation and test integrations here.'))),
+          screen==='apiPortal'&&(()=>{
+            const pool=users.filter(u=>u.status!=='Removed'&&(isBt||orgs.some(o=>o.id===u.orgId&&(o.id===ownOrg||o.parentId===ownOrg))));
+            const u=pool.find(x=>x.id===parity.userId)||pool[0];
+            const uOrg=orgById(u.orgId);
+            const kids=isAdminKey(u.roleKey)?childrenOf(u.orgId):[];
+            const actingFor=kids.some(k=>k.id===parity.actingFor)?parity.actingFor:'';
+            const d=authorise(u,parity.action,actingFor);
+            const A=d.action;
+            const card={background:'#fff',border:'1px solid #E3E3E3',borderRadius:'16px',padding:'20px'};
+            const lab={fontSize:'12px',fontWeight:600,color:'#434343',marginBottom:'6px'};
+            const sel={width:'100%',padding:'10px 12px',border:'1px solid #C8C8C8',borderRadius:'10px',fontSize:'14px',fontFamily:'inherit',background:'#fff'};
+            const verdict=(ok,sz)=>h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:sz||'12px',fontWeight:700,color:ok?'#036C01':'#A0121B',background:ok?'#E6F4E5':'#FEF5F5',border:'1px solid '+(ok?'#A3D9A1':'#FAD4D4'),borderRadius:'1000px',padding:'3px 10px'}},ic(ok?'M20 6 9 17l-5-5':'M18 6 6 18M6 6l12 12',{s:11,c:ok?'#036C01':'#A0121B',w:2.8}),ok?'Allowed':'Denied');
+            const req=A.method+' '+A.path+' HTTP/1.1\nHost: api.nexus.btwholesale.com\nAuthorization: Bearer <token for '+u.email+'>'+(actingFor?'\nX-Acting-For-Org: '+actingFor:'')+(A.body?'\nContent-Type: application/json\n\n'+JSON.stringify(A.body,null,2):'');
+            const res=d.allowed
+              ?'HTTP/1.1 '+A.ok+'\nX-Decision-Id: '+d.decisionId+'\n\n'+JSON.stringify(A.okBody,null,2)
+              :'HTTP/1.1 403 Forbidden\nX-Decision-Id: '+d.decisionId+'\n\n'+JSON.stringify({error:'forbidden',reason:d.reason,failedCheck:(d.checks.find(c=>!c.pass)||{}).label},null,2);
+            const code=t=>h('pre',{style:{margin:0,background:'#1E1433',color:'#E9E2F7',borderRadius:'10px',padding:'14px',fontSize:'12px',lineHeight:1.55,fontFamily:"ui-monospace,SFMono-Regular,Menlo,monospace",whiteSpace:'pre-wrap',wordBreak:'break-word'}},t);
+            function runBoth(){
+              ['Nexus Portal','Experience API'].forEach(ch=>setAuditExtra(x=>[{id:'x'+Date.now()+ch,who:u.name,whoRole:roleLabel(u.roleKey),org:uOrg.name,actorType:'reseller',outcome:d.allowed?'success':'denied',ts:nowTs(),action:(d.allowed?'Allowed: ':'Denied: ')+A.label,detail:ch+' · decision '+d.decisionId+(d.allowed?'':' · '+d.reason),category:'Access decisions',...(actingFor?{assisted:true,assistedOrg:orgById(actingFor).name}:{})},...x]));
+              showToast(d.allowed?'success':'info','Both channels returned '+(d.allowed?'Allowed':'Denied')+' with decision '+d.decisionId+'. Two entries added to the audit log.');
+            }
+            const scen=[];
+            pool.filter(x=>x.status==='Active').forEach(x=>{
+              scen.push({u:x,af:''});
+              if(isAdminKey(x.roleKey)) childrenOf(x.orgId).filter(k=>k.status==='Active').slice(0,1).forEach(k=>scen.push({u:x,af:k.id}));
+            });
+            const total=scen.length*PARITY_ACTIONS.length;
+            return h('div',{style:{maxWidth:'1180px'}},
+              h('p',{style:{fontSize:'15px',color:'#434343',lineHeight:1.6,margin:'0 0 20px',maxWidth:'820px'}},'The Nexus Portal and the Experience APIs send every request to the same authorisation service. It uses the same hierarchy, roles, entitlements and delegation rules, so both channels always reach the same decision. Pick a user and an action to see both side by side.'),
+              h('div',{style:{...card,display:'grid',gridTemplateColumns:'1.2fr 1.4fr 1fr auto',gap:'14px',alignItems:'end',marginBottom:'16px'}},
+                h('div',null,h('div',{style:lab},'User'),
+                  h('select',{value:u.id,onChange:e=>setParity(pp=>({...pp,userId:e.target.value,actingFor:''})),style:sel},
+                    pool.map(x=>h('option',{key:x.id,value:x.id},x.name+' · '+roleLabel(x.roleKey)+' · '+(orgById(x.orgId)||{}).name)))),
+                h('div',null,h('div',{style:lab},'Action'),
+                  h('select',{value:parity.action,onChange:e=>setParity(pp=>({...pp,action:e.target.value})),style:sel},
+                    PARITY_ACTIONS.map(x=>h('option',{key:x.key,value:x.key},x.label)))),
+                h('div',null,h('div',{style:lab},'Acting for'),
+                  h('select',{value:actingFor,disabled:!kids.length,onChange:e=>setParity(pp=>({...pp,actingFor:e.target.value})),style:{...sel,background:kids.length?'#fff':'#F7F7F7',color:kids.length?'#1A1A1A':'#A0A0A0'}},
+                    h('option',{value:''},kids.length?uOrg.name+' (own organisation)':'Own organisation only'),
+                    kids.map(k=>h('option',{key:k.id,value:k.id},k.name)))),
+                h('button',{onClick:runBoth,style:{padding:'11px 20px',border:0,borderRadius:'32px',background:'#5514B4',color:'#fff',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}},'Run in both channels')),
+              h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'16px'}},
+                h('div',{style:card},
+                  h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}},
+                    h('div',{style:{fontWeight:700,fontSize:'16px'}},'Nexus Portal'),verdict(d.allowed)),
+                  h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden'}},
+                    h('div',{style:{background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',padding:'8px 12px',fontSize:'12px',color:'#6B6B6B'}},(actingFor?'Acting for '+orgById(actingFor).name+' · ':'')+d.target.name+' · '+A.area),
+                    h('div',{style:{padding:'18px'}},
+                      h('div',{style:{fontSize:'13px',color:'#6B6B6B',marginBottom:'12px'}},'Signed in as '+u.name+', '+roleLabel(u.roleKey)),
+                      d.allowed
+                        ?h('div',null,
+                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',borderRadius:'32px',padding:'10px 18px',fontWeight:700,fontSize:'14px'}},A.portal),
+                            h('div',{style:{marginTop:'14px',display:'flex',gap:'8px',alignItems:'center',fontSize:'13px',color:'#036C01'}},ic('M20 6 9 17l-5-5',{s:14,c:'#036C01',w:2.6}),'Done. Reference '+(A.okBody.orderId||A.okBody.testId||A.okBody.ticketId||A.okBody.userId||'INV-2026-08-114')))
+                        :h('div',null,
+                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#EDEDED',color:'#A0A0A0',borderRadius:'32px',padding:'10px 18px',fontWeight:700,fontSize:'14px'}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:13,c:'#A0A0A0'}),A.portal),
+                            h('div',{style:{marginTop:'14px',fontSize:'13px',color:'#434343',lineHeight:1.5}},h('b',null,'You don\'t have access. '),d.reason))))),
+                h('div',{style:card},
+                  h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}},
+                    h('div',{style:{fontWeight:700,fontSize:'16px'}},'Experience API'),verdict(d.allowed)),
+                  h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'6px'}},'Request'),
+                  code(req),
+                  h('div',{style:{fontSize:'11px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',margin:'12px 0 6px'}},'Response'),
+                  code(res))),
+              h('div',{style:{...card,marginBottom:'24px'}},
+                h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px',flexWrap:'wrap',gap:'8px'}},
+                  h('div',{style:{fontWeight:700,fontSize:'16px'}},'One decision, evaluated once'),
+                  h('span',{style:{fontSize:'12px',color:'#6B6B6B',fontFamily:"ui-monospace,Menlo,monospace"}},'decision '+d.decisionId+' · deny by default')),
+                h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}},
+                  d.checks.map((c,i)=>{const skipped=!d.allowed&&d.checks.findIndex(x=>!x.pass)<i;return h('div',{key:c.label,style:{display:'flex',alignItems:'center',gap:'8px',border:'1px solid '+(skipped?'#E3E3E3':c.pass?'#A3D9A1':'#FAD4D4'),background:skipped?'#FAFAFA':c.pass?'#F3FAF3':'#FEF5F5',borderRadius:'10px',padding:'8px 12px',fontSize:'13px',color:skipped?'#A0A0A0':'#2A2A2A'}},
+                    h('span',{style:{fontSize:'11px',fontWeight:700,color:'#808080'}},String(i+1)),
+                    skipped?ic('M5 12h14',{s:13,c:'#C8C8C8'}):ic(c.pass?'M20 6 9 17l-5-5':'M18 6 6 18M6 6l12 12',{s:13,c:c.pass?'#036C01':'#A0121B',w:2.6}),c.label);})),
+                !d.allowed&&h('div',{style:{marginTop:'12px',fontSize:'13px',color:'#A0121B'}},'Stopped at "'+(d.checks.find(c=>!c.pass)||{}).label+'": '+d.reason)),
+              h('div',{style:card},
+                h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:'4px',flexWrap:'wrap',gap:'8px'}},
+                  h('div',{style:{fontWeight:700,fontSize:'16px'}},'Representative scenarios'),
+                  h('span',{style:{display:'inline-flex',alignItems:'center',gap:'6px',fontSize:'13px',fontWeight:700,color:'#036C01'}},ic('M20 6 9 17l-5-5',{s:13,c:'#036C01',w:2.6}),total+' of '+total+' scenarios match across Portal and API')),
+                h('div',{style:{fontSize:'13px',color:'#6B6B6B',marginBottom:'14px'}},'Each cell shows the Portal result, then the API result. Click a cell to open it above.'),
+                h('div',{style:{overflowX:'auto'}},
+                  h('table',{style:{borderCollapse:'collapse',width:'100%',fontSize:'13px'}},
+                    h('thead',null,h('tr',null,
+                      h('th',{style:{textAlign:'left',padding:'10px 12px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontWeight:600,minWidth:'210px'}},'User'),
+                      PARITY_ACTIONS.map(x=>h('th',{key:x.key,style:{padding:'10px 8px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',fontWeight:600,fontSize:'12px',textAlign:'center',minWidth:'92px'}},x.label)))),
+                    h('tbody',null,scen.map(({u:x,af})=>h('tr',{key:x.id+af},
+                      h('td',{style:{padding:'10px 12px',borderBottom:'1px solid #F0F0F0'}},
+                        h('div',{style:{fontWeight:600}},x.name),
+                        h('div',{style:{fontSize:'11px',color:'#808080'}},roleLabel(x.roleKey)+' · '+(orgById(x.orgId)||{}).name),
+                        af&&h('div',{style:{fontSize:'11px',color:'#92400E',fontWeight:600,marginTop:'2px'}},'Acting for '+orgById(af).name)),
+                      PARITY_ACTIONS.map(ac=>{const pd=authorise(x,ac.key,af),ad=authorise(x,ac.key,af);const same=pd.allowed===ad.allowed;const on=x.id===u.id&&ac.key===parity.action&&af===actingFor;
+                        const dot=ok=>h('span',{style:{width:'20px',height:'20px',borderRadius:'999px',display:'inline-flex',alignItems:'center',justifyContent:'center',background:ok?'#E6F4E5':'#FEF5F5'}},ic(ok?'M20 6 9 17l-5-5':'M18 6 6 18M6 6l12 12',{s:11,c:ok?'#036C01':'#A0121B',w:3}));
+                        return h('td',{key:ac.key,onClick:()=>setParity({userId:x.id,action:ac.key,actingFor:af}),title:pd.reason,style:{padding:'8px',borderBottom:'1px solid #F0F0F0',textAlign:'center',cursor:'pointer',background:on?'#F3EBFE':'transparent',outline:on?'2px solid #5514B4':'none',outlineOffset:'-2px'}},
+                          h('span',{style:{display:'inline-flex',gap:'4px',alignItems:'center'}},dot(pd.allowed),dot(ad.allowed),!same&&h('b',{style:{color:'#A0121B'}},'!')));}))))))));
+          })(),
           onBehalf&&(()=>{const ob=orgById(onBehalf);return h('div',{style:{display:'flex',alignItems:'center',gap:'14px',marginBottom:'16px',background:'#2A1C4A',color:'#fff',borderRadius:'12px',padding:'12px 16px',flexWrap:'wrap'}},
             ic('M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7',{s:16,c:'#fff'}),
             h('div',{style:{flex:1,minWidth:'240px',fontSize:'13px',lineHeight:1.45}},
