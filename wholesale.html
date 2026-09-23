@@ -606,6 +606,11 @@ function App(){
   const [setupChecklist,setSetupChecklist]=useState({});
   const [kciPrefs,setKciPrefs]=useState({});
   const [entWiz,setEntWiz]=useState(null);
+  const [auditExtra,setAuditExtra]=useState([]);
+  const [onBehalf,setOnBehalf]=useState(null);
+  const [delegWiz,setDelegWiz]=useState(null);
+  const [subUserPolicy,setSubUserPolicy]=useState('consent');
+  const [consents,setConsents]=useState({metro:'12 Jun 2026'});
   useEffect(()=>{const t=setTimeout(()=>setUsersLoading(false),900);return()=>clearTimeout(t);},[]);
 
   function openUserDrawer(id){setUserDrawer(id);setDrawerPendingRole(null);}
@@ -615,8 +620,18 @@ function App(){
   const isBtSalesSpec=persona==='btSalesSpec';
   const canEditEntitlements=persona==='bt';
   const canAdmin=persona!=='user';
-  const canCreateOrg=persona==='bt'||persona==='reseller';
-  const home=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
+  const canCreateOrg=(persona==='bt'||persona==='reseller')&&!onBehalf;
+  const ownOrg=isBt?'btw':persona==='subReseller'?'metro':persona==='childReseller'?'halo':'northgate';
+  const home=onBehalf||ownOrg;
+  function canManageUsersOf(orgId){
+    if(!canAdmin) return false;
+    if(isBt||orgId===ownOrg) return true;
+    const o=orgs.find(x=>x.id===orgId);
+    if(!o||o.parentId!==ownOrg) return false;
+    if(subUserPolicy==='allowed') return true;
+    if(subUserPolicy==='notAllowed') return false;
+    return onBehalf===orgId&&!!consents[orgId];
+  }
   const P=PERSONAS[persona];
 
   const orgById=id=>orgs.find(o=>o.id===id);
@@ -636,8 +651,10 @@ function App(){
   };
   const defEnt=type=>{const p=wizParent(),e={};ENT.forEach(x=>{if(p.entitlements.includes(x.key)&&typeAllows(type,x.key))e[x.key]=true;});return e;};
 
-  function setPsn(p){setPersonaState(p);setOrgWiz(null);setUserWiz(null);setSelOrgId(null);setSelRole(null);setUserDrawer(null);setPersonaCardOpen(false);setOverviewTab('network');setUsersTab('users');}
+  function setPsn(p){setPersonaState(p);setOnBehalf(null);setDelegWiz(null);setBtOrgContext(null);setOrgWiz(null);setUserWiz(null);setSelOrgId(null);setSelRole(null);setUserDrawer(null);setPersonaCardOpen(false);setOverviewTab('network');setUsersTab('users');}
   function showToast(kind,msg){setToast({kind,msg});}
+  function nowTs(){const d=new Date();return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+', '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+  function logAudit(e){const rep=onBehalf||btOrgContext;const ctx=rep?{assisted:true,assistedOrg:(orgs.find(o=>o.id===rep)||{}).name}:{};setAuditExtra(a=>[{id:'x'+Date.now()+Math.random(),who:P.person.name,whoRole:P.name,org:P.org,actorType:isBt?'bt':'reseller',outcome:'success',ts:nowTs(),...ctx,...e},...a]);}
   function deny(){showToast('error','That action needs an Administrator role.');}
 
   function flatten(rootId,depth=0,out=[]){
@@ -684,19 +701,21 @@ function App(){
   const drawerRole=drawerUser?ROLES.find(r=>r.key===drawerUser.roleKey):null;
   const drawerOrg=drawerUser?orgById(drawerUser.orgId):null;
 
-  const AUDIT_LOG=[
-    {id:'a1',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Order Manager → Billing Manager',before:'Order Manager',after:'Billing Manager',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller',outcome:'success'},
+  const AUDIT_LOG=[...auditExtra,
+    {id:'a0',who:'Tom Reeves',whoRole:'Service Operations',org:'Metro Connect',action:'Access denied',detail:'Tried to open Billing. Metro Connect has no billing entitlement.',category:'Access decisions',ts:'23 Jul 2026, 09:41',actorType:'reseller',outcome:'denied'},
+    {id:'a00',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Placed order',detail:'Voice (DV4B) order DV-20931 for a Metro Connect customer',category:'Delegated administration',ts:'23 Jul 2026, 09:12',actorType:'reseller',outcome:'success',assisted:true,assistedOrg:'Metro Connect'},
+    {id:'a1',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Changed role',detail:'James Okafor: Billing & Reporting → Sales & Ordering',before:'Billing & Reporting',after:'Sales & Ordering',category:'User administration',ts:'23 Jul 2026, 09:14',actorType:'reseller',outcome:'success'},
     {id:'a2',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Granted entitlement',detail:'Metro Connect: None → Broadband',before:'None',after:'Broadband',category:'Organisation management',ts:'23 Jul 2026, 08:55',actorType:'bt',assisted:true,assistedOrg:'Metro Connect',outcome:'success'},
-    {id:'a3',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen invited as Reporting Analyst',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller',outcome:'success'},
+    {id:'a3',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Invited user',detail:'Lucy Chen invited as Billing & Reporting',category:'User administration',ts:'22 Jul 2026, 16:32',actorType:'reseller',outcome:'success'},
     {id:'a4',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Created organisation',detail:'Metro Connect (Partner Organisation) created under Northgate Telecom',category:'Organisation management',ts:'22 Jul 2026, 14:10',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
-    {id:'a5',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read-only User) deactivated',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller',outcome:'success'},
-    {id:'a6',who:'Marcus Webb',whoRole:'Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Support Agent → Order Manager',before:'Support Agent',after:'Order Manager',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller',outcome:'success'},
+    {id:'a5',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Deactivated user',detail:'Aisha Bello (Read Only) deactivated',category:'User administration',ts:'21 Jul 2026, 11:20',actorType:'reseller',outcome:'success'},
+    {id:'a6',who:'Marcus Webb',whoRole:'Partner Organisation Administrator',org:'Metro Connect',action:'Changed role',detail:'Tom Reeves: Sales & Ordering → Service Operations',before:'Sales & Ordering',after:'Service Operations',category:'User administration',ts:'20 Jul 2026, 10:05',actorType:'reseller',outcome:'success'},
     {id:'a7',who:'Alex Morgan',whoRole:'Platform Administrator',org:'BT Wholesale',action:'Updated entitlements',detail:'Northgate Telecom: Ethernet / Data included → removed',before:'Ethernet / Data included',after:'Ethernet / Data removed',category:'Organisation management',ts:'18 Jul 2026, 15:45',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
-    {id:'a8',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Partner Organisation) created under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller',outcome:'failed'},
+    {id:'a8',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Created organisation',detail:'Apex Telecom (Partner Organisation) created under Northgate Telecom',category:'Organisation management',ts:'15 Jul 2026, 09:30',actorType:'reseller',outcome:'failed'},
     {id:'a9',who:'Claire Ashton',whoRole:'Account Manager',org:'BT Wholesale',action:'Updated contact',detail:'Northgate Telecom: David Holt → Sarah Whitfield (primary contact)',before:'David Holt',after:'Sarah Whitfield',category:'Organisation management',ts:'14 Jul 2026, 13:22',actorType:'bt',assisted:true,assistedOrg:'Northgate Telecom',outcome:'success'},
-    {id:'a10',who:'Sarah Whitfield',whoRole:'Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller',outcome:'success'},
+    {id:'a10',who:'Sarah Whitfield',whoRole:'Partner Administrator',org:'Northgate Telecom',action:'Removed user',detail:'Former contractor removed from platform',category:'User administration',ts:'12 Jul 2026, 09:00',actorType:'reseller',outcome:'success'},
   ];
-  const AUDIT_CATEGORIES=['All categories','User administration','Organisation management','Product management','Billing','API access'];
+  const AUDIT_CATEGORIES=['All categories','User administration','Organisation management','Product entitlements','Delegated administration','Access decisions','Billing','API access'];
 
   const navItem=(label,active,onClick)=>h('button',{onClick,style:{height:'100%',padding:'0 16px',border:'none',borderBottom:active?'2px solid #5514B4':'2px solid transparent',background:'transparent',cursor:'pointer',fontSize:'14px',fontWeight:active?600:400,color:active?'#5514B4':'#1A1A1A',fontFamily:'inherit',whiteSpace:'nowrap',transition:'color 150ms'}},label);
   const Breadcrumb=({crumbs})=>h('nav',{style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'16px',flexWrap:'wrap'}},
@@ -763,7 +782,7 @@ function App(){
       h('nav',{style:{display:'flex',alignItems:'stretch',height:'100%',flex:1,gap:0}},
         navItem('Dashboard',screen==='overview',()=>setScreen('overview')),
         persona!=='user'&&navItem('Organisations',screen==='orgs'||screen==='orgDetail',()=>setScreen('orgs')),
-        (persona==='bt'||persona==='reseller')&&navItem('Billing',screen==='billingSupport',()=>setScreen('billingSupport')),
+        (persona==='bt'||persona==='reseller')&&navItem('Billing',screen==='billingSupport',()=>{if(onBehalf)logAudit({action:'Access denied',detail:'Tried to open Billing while acting on behalf of '+orgById(onBehalf).name+'. Billing is never delegated.',category:'Access decisions',outcome:'denied'});setScreen('billingSupport');}),
         persona!=='user'&&navItem('Users',screen==='users',()=>{setScreen('users');setUsersTab('users');}),
         navItem('Knowledge Hub',screen==='knowledgeHub',()=>setScreen('knowledgeHub')),
         (persona==='bt'||persona==='reseller')&&navItem('API Portal',screen==='apiPortal',()=>setScreen('apiPortal'))),
@@ -786,7 +805,15 @@ function App(){
             h('div',{style:{height:'1px',background:'#E3E3E3',margin:'4px 4px'}}),
             h('button',{onClick:()=>{setScreen('login');setLoginStep(1);setLoginEmail('');setLoginPass('');setLoginCode('');setSwitchViewOpen(false);},
               style:{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',padding:'8px 12px',border:0,borderRadius:'8px',cursor:'pointer',fontSize:'14px',fontWeight:screen==='login'?700:500,background:screen==='login'?'#F3EBFE':'transparent',color:screen==='login'?'#5514B4':'#2A2A2A',fontFamily:'inherit'}},
-              h('span',null,'Login / SSO screen ↗')))),
+              h('span',null,'Login / SSO screen ↗')),
+            h('div',{style:{height:'1px',background:'#E3E3E3',margin:'4px 4px'}}),
+            h('div',{style:{padding:'8px 12px 4px',maxWidth:'260px'}},
+              h('div',{style:{fontSize:'11px',fontWeight:700,color:'#B45309',textTransform:'uppercase',letterSpacing:'0.06em'}},'Open decision'),
+              h('div',{style:{fontSize:'12px',color:'#434343',lineHeight:1.4,marginTop:'3px'}},'Can a Partner manage its Partner Organisations\' users?')),
+            [['allowed','Allowed'],['consent','Allowed with consent and audit'],['notAllowed','Not allowed']].map(([k,label])=>
+              h('button',{key:k,onClick:()=>{setSubUserPolicy(k);setSwitchViewOpen(false);showToast('info','Policy set to: '+label+'.');},
+                style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px',width:'100%',padding:'7px 12px',border:0,borderRadius:'8px',cursor:'pointer',fontSize:'13px',fontWeight:subUserPolicy===k?700:500,background:subUserPolicy===k?'#FFF8E7':'transparent',color:'#2A2A2A',fontFamily:'inherit',textAlign:'left'}},
+                h('span',null,label),subUserPolicy===k&&ic('M20 6L9 17l-5-5',{s:13,c:'#B45309'}))))),
 
         // Avatar + dropdown
         h('div',{style:{position:'relative',flexShrink:0},onMouseEnter:()=>setAvatarMenuOpen(true),onMouseLeave:()=>setAvatarMenuOpen(false)},
@@ -851,14 +878,26 @@ function App(){
                 ic(['M10 20l4-16','M4 9l-3 3 3 3','M20 9l3 3-3 3'],{s:26})),
               h('div',{style:{fontWeight:700,fontSize:'20px',color:'#2A2A2A',marginBottom:'12px'}},'Coming soon'),
               h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'The API Portal is on its way. You\'ll be able to manage API keys, explore documentation and test integrations here.'))),
-          screen==='billingSupport'&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
+          screen==='billingSupport'&&onBehalf&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
+            h('div',{style:{maxWidth:'420px',textAlign:'center'}},
+              h('div',{style:{width:'56px',height:'56px',borderRadius:'999px',background:'#FEF5F5',display:'inline-flex',alignItems:'center',justifyContent:'center',marginBottom:'16px'}},ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:24,c:'#A0121B'})),
+              h('div',{style:{fontWeight:700,fontSize:'20px',color:'#2A2A2A',marginBottom:'10px'}},'Billing isn\'t available here'),
+              h('div',{style:{fontSize:'14px',color:'#6B6B6B',lineHeight:1.6}},'You\'re acting on behalf of '+orgById(onBehalf).name+'. Billing is never delegated, and Partner Organisations have no BT billing. This attempt has been recorded in the audit log.'))),
+          screen==='billingSupport'&&!onBehalf&&h('div',{style:{display:'flex',justifyContent:'center',paddingTop:'60px'}},
             h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 40px',background:'#fff',border:'1px solid #E3E3E3',borderRadius:'32px',textAlign:'center',maxWidth:'440px',width:'100%'}},
               h('div',{style:{width:'56px',height:'56px',borderRadius:'20px',background:'#F0EBF9',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'20px',color:'#5514B4'}},
                 ic(['M12 2v20','M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],{s:26})),
               h('div',{style:{fontWeight:700,fontSize:'20px',color:'#2A2A2A',marginBottom:'12px'}},'Coming soon'),
               h('div',{style:{fontSize:'14px',color:'#808080',lineHeight:1.6,maxWidth:'340px'}},'Billing Support is on its way. You\'ll be able to manage invoices, billing queries and financial support here.'))),
 
-          isBt&&(screen==='orgs'||screen==='users')&&h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',background:btOrgContext?'#F3EBFE':'#FAFAFA',border:'1px solid '+(btOrgContext?'#C4A0F0':'#E3E3E3'),borderRadius:'10px',padding:'10px 14px',flexWrap:'wrap'}},
+          onBehalf&&(()=>{const ob=orgById(onBehalf);return h('div',{style:{display:'flex',alignItems:'center',gap:'14px',marginBottom:'16px',background:'#2A1C4A',color:'#fff',borderRadius:'12px',padding:'12px 16px',flexWrap:'wrap'}},
+            ic('M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7',{s:16,c:'#fff'}),
+            h('div',{style:{flex:1,minWidth:'240px',fontSize:'13px',lineHeight:1.45}},
+              h('div',{style:{fontWeight:700,fontSize:'14px'}},'Acting on behalf of '+ob.name),
+              h('div',{style:{color:'#D9CCF2'}},'Signed in as '+P.person.name+', '+orgById(ownOrg).name+'. Every action is logged against both organisations. Billing is never delegated.')),
+            h('button',{onClick:()=>{logAudit({action:'Ended act-on-behalf session',detail:ob.name,category:'Delegated administration'});setOnBehalf(null);setSelOrgId(ob.id);setScreen('orgs');showToast('success','You\'re back in '+orgById(ownOrg).name+'.');},
+              style:{background:'#fff',color:'#2A1C4A',border:0,borderRadius:'32px',padding:'8px 16px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},'End session'));})(),
+          isBt&&(btOrgContext||screen==='orgs'||screen==='users')&&h('div',{style:{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px',background:btOrgContext?'#F3EBFE':'#FAFAFA',border:'1px solid '+(btOrgContext?'#C4A0F0':'#E3E3E3'),borderRadius:'10px',padding:'10px 14px',flexWrap:'wrap'}},
             h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flexShrink:0}},
               ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:14,c:btOrgContext?'#5514B4':'#808080'}),
               h('span',{style:{fontSize:'13px',fontWeight:700,color:btOrgContext?'#5514B4':'#434343'}},btOrgContext?'Acting in context of:':'Organisation context')),
@@ -866,10 +905,10 @@ function App(){
               ?h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flex:1,flexWrap:'wrap'}},
                   h('span',{style:{fontSize:'13px',fontWeight:700,color:'#2A2A2A',background:'#fff',border:'1px solid #C4A0F0',borderRadius:'6px',padding:'3px 10px'}},(orgById(btOrgContext)||{name:'—'}).name),
                   h('span',{style:{fontSize:'12px',color:'#808080'}},'All actions are logged with your BT identity and this org context.'),
-                  h('button',{onClick:()=>setBtOrgContext(null),style:{background:'none',border:'none',color:'#5514B4',fontSize:'12px',fontWeight:700,cursor:'pointer',padding:0,fontFamily:'inherit'}},'Clear context'))
+                  h('button',{onClick:()=>{logAudit({action:'Ended assisted session',detail:(orgById(btOrgContext)||{}).name,category:'Delegated administration'});setBtOrgContext(null);},style:{background:'none',border:'none',color:'#5514B4',fontSize:'12px',fontWeight:700,cursor:'pointer',padding:0,fontFamily:'inherit'}},'Clear context'))
               :h('div',{style:{display:'flex',alignItems:'center',gap:'10px',flex:1,flexWrap:'wrap'}},
                   h('div',{style:{position:'relative',display:'inline-flex',alignItems:'center'}},
-                    h('select',{value:btOrgContext||'',onChange:e=>setBtOrgContext(e.target.value||null),style:{padding:'5px 28px 5px 10px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'13px',background:'#fff',fontFamily:'inherit',cursor:'pointer'}},
+                    h('select',{value:btOrgContext||'',onChange:e=>{const v=e.target.value||null;if(v)setAuditExtra(a=>[{id:'x'+Date.now(),who:P.person.name,whoRole:P.name,org:P.org,actorType:'bt',outcome:'success',ts:nowTs(),action:'Started assisted session',detail:'Acting in the context of '+orgById(v).name,category:'Delegated administration',assisted:true,assistedOrg:orgById(v).name},...a]);setBtOrgContext(v);},style:{padding:'5px 28px 5px 10px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'13px',background:'#fff',fontFamily:'inherit',cursor:'pointer'}},
                       h('option',{value:''},'Select reseller…'),
                       orgs.filter(o=>o.typeKey==='reseller'||o.typeKey==='partnerOrg').map(o=>h('option',{key:o.id,value:o.id},o.name))),
                     h('span',{style:{position:'absolute',right:'7px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:12,c:'#808080'}))),
@@ -1287,7 +1326,7 @@ function App(){
                         h('div',{style:{fontWeight:row.depth===0?700:600,fontSize:'14px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:isSelected?'#5514B4':'#2A2A2A'}},o.name))),
                     h('div',{style:{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}},
                       h('span',{style:s(badgeSt(o.typeKey))},TYPE_LABELS[o.typeKey]),
-                      o.id===home&&h('span',{style:{fontSize:'12px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 7px',borderRadius:'1000px'}},'You'),
+                      o.id===ownOrg&&h('span',{style:{fontSize:'12px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 7px',borderRadius:'1000px'}},'You'),
                       isBt&&o.orgApprovalStatus&&o.orgApprovalStatus!=='approved'&&h('span',{style:{fontSize:'11px',fontWeight:700,background:'#FFF8E7',color:'#8A5A00',border:'1px solid #F5D878',padding:'2px 7px',borderRadius:'1000px'}},o.orgApprovalStatus==='pending_credit'?'Credit pending':'CRF pending')),
                     h('div',{style:{fontSize:'14px',color:'#434343',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.primaryName||o.contact),
                     h('div',{style:{fontSize:'14px',fontWeight:700,color:'#5514B4'}},String(userCountFor(o.id))),
@@ -1320,7 +1359,7 @@ function App(){
                   h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},'Organisation'),
                   h('div',{style:{position:'relative'}},
                     h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 40px 12px 14px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'16px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
-                      [orgById(home),...childrenOf(home)].map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
+                      [orgById(home),...childrenOf(home)].filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
                     h('span',{style:{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:14,c:'#808080'})))),
                 userWiz.step===2&&h('div',null,
                   h('div',{style:{marginBottom:'20px'}},
@@ -1373,7 +1412,7 @@ function App(){
                   const o=orgById(userWiz.orgId);const id='nu'+seq;
                   const rk=userWiz.profileType==='admin'?adminKeyFor(userWiz.orgId):userWiz.role;
                   const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
-                  setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setOverviewTab('network');
+                  setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setOverviewTab('network');logAudit({action:'Invited user',detail:user.name+' invited as '+roleLabel(rk),category:'User administration',subjectOrg:o&&o.name});
                   showToast('success','Invitation sent to '+user.name+' as '+roleLabel(rk)+' at '+(o?o.name:'Northgate Telecom')+'.');
                 },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue')))),
 
@@ -1396,7 +1435,8 @@ function App(){
               const provStatus=(ENT_PROV[dSel.id]||{})[entKey];
               const provColors={'Active':['#036C01','#E6F4E5','#A3D9A1'],'Pending':['#7C4A00','#FEF3E2','#F5CBA7'],'Failed':['#A0121B','#FEF5F5','#FAD4D4']};
               const owned=dSel.entitlements.includes(entKey);
-              const parentHas=dParent?dParent.entitlements.includes(entKey):true;
+              const parentHas=(dParent?dParent.entitlements.includes(entKey):true)&&typeAllows(dSel.typeKey,entKey);
+              const inherits=dParent&&dParent.typeKey!=='root';
               const hwBlocked=false;
               if(hwBlocked) return h('tr',null,
                 h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff'}},
@@ -1418,10 +1458,10 @@ function App(){
                     h('span',{style:{fontSize:'14px',fontWeight:owned?600:400,color:!parentHas?'#CCCCCC':owned?'#1A1A1A':'#808080'}},e.label))),
                 h('td',{style:{padding:'12px 14px',borderBottom:'1px solid #F0F0F0',background:'#fff',textAlign:'right',whiteSpace:'nowrap'}},
                   h('div',{style:{display:'inline-flex',flexDirection:'column',alignItems:'flex-end',gap:'4px'}},
-                    parentHas&&owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#036C01',fontWeight:600,background:'#E6F4E5',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #A3D9A1'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#036C01',display:'inline-block'}}),'Granted'),
-                    parentHas&&!owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#FDF0C4',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #E8D870'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#D97706',display:'inline-block'}}),'Available'),
-                    !parentHas&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#F0F0F0',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #D0D0D0'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#CCCCCC',display:'inline-block'}}),'Not in parent'),
-                    provStatus&&(()=>{const[fc,bg,bd]=provColors[provStatus]||['#444','#F5F5F5','#D0D0D0'];return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11px',color:fc,fontWeight:700,background:bg,padding:'2px 8px',borderRadius:'1000px',border:'1px solid '+bd}},h('span',{style:{width:'5px',height:'5px',borderRadius:'50%',background:fc,display:'inline-block'}}),provStatus);})())));
+                    parentHas&&owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#036C01',fontWeight:600,background:'#E6F4E5',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #A3D9A1'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#036C01',display:'inline-block'}}),inherits?'Inherited':'Granted'),
+                    parentHas&&!owned&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#FDF0C4',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #E8D870'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#D97706',display:'inline-block'}}),inherits?'Overridden':'Available'),
+                    !parentHas&&h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'#2A2A2A',fontWeight:600,background:'#F0F0F0',padding:'3px 9px',borderRadius:'1000px',border:'1px solid #D0D0D0'}},h('span',{style:{width:'6px',height:'6px',borderRadius:'50%',background:'#CCCCCC',display:'inline-block'}}),'Denied'),
+                    owned&&parentHas&&provStatus&&(()=>{const[fc,bg,bd]=provColors[provStatus]||['#444','#F5F5F5','#D0D0D0'];return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',fontSize:'11px',color:fc,fontWeight:700,background:bg,padding:'2px 8px',borderRadius:'1000px',border:'1px solid '+bd}},h('span',{style:{width:'5px',height:'5px',borderRadius:'50%',background:fc,display:'inline-block'}}),provStatus);})())));
             }
             return h('div',{style:{maxWidth:'1120px',display:'flex',height:'calc(100vh - 140px)',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',background:'#fff'}},
               // LEFT PANEL — org tree
@@ -1461,7 +1501,7 @@ function App(){
                             }},o.status)),
                           h('div',{style:{display:'flex',alignItems:'center',gap:'5px',marginTop:'3px'}},
                             h('span',{style:{...s(badgeSt(o.typeKey)),fontSize:'12px',padding:'2px 6px'}},TYPE_LABELS[o.typeKey]),
-                            o.id===home&&h('span',{style:{fontSize:'12px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 6px',borderRadius:'1000px'}},'You'))));
+                            o.id===ownOrg&&h('span',{style:{fontSize:'12px',fontWeight:700,color:'#5514B4',background:'#F3EBFE',padding:'2px 6px',borderRadius:'1000px'}},'You'))));
                     }))),
               // RIGHT PANEL — org detail
               dSel
@@ -1485,6 +1525,8 @@ function App(){
                       h('span',{style:{fontSize:'12px',fontWeight:500,color:'#434343'}},'Branding mode:'),
                       (()=>{const bm=dSel.brandingMode||'Inherited';const styles={'BT White Label':{background:'#F0F0F0',color:'#434343',border:'1px solid #D9D9D9'},'Inherited':{background:'#E8F1FB',color:'#1A4070',border:'1px solid #B8D0EC'},'Custom':{background:'#F3EBFE',color:'#3F187F',border:'1px solid #C4A0F0'}};const st=styles[bm]||styles['Inherited'];return h('span',{style:{...st,borderRadius:'1000px',padding:'3px 10px',fontSize:'12px',fontWeight:700}},bm);})()),
                     h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Product entitlements'),
+                    dParent&&dParent.typeKey!=='root'&&h('div',{style:{fontSize:'12px',color:'#6B6B6B',lineHeight:1.5,marginBottom:'10px'}},
+                      h('b',null,'Inherited'),' from '+dParent.name+' by default. ',h('b',null,'Overridden'),' means '+dParent.name+' removed it for this organisation. ',h('b',null,'Denied'),' means '+dParent.name+' doesn\'t hold it, or Partner Organisations can\'t have it.'),
                     h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden',marginBottom:'20px'}},
                       h('table',{style:{width:'100%',borderCollapse:'collapse'}},
                         h('thead',null,h('tr',null,
@@ -1498,6 +1540,9 @@ function App(){
                           h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'left',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3'}},'Capability'),
                           h('th',{style:{fontSize:'12px',fontWeight:600,color:'#434343',textAlign:'right',padding:'12px 14px',background:'#F7F7F7',borderBottom:'1px solid #E3E3E3',width:'120px'}},'Access'))),
                         h('tbody',null,ENT.filter(e=>e.kind==='capability').map(e=>h(EntRow,{key:e.key,entKey:e.key}))))),
+                    persona==='reseller'&&!onBehalf&&dSel.parentId===ownOrg&&h('button',{onClick:()=>setDelegWiz({orgId:dSel.id}),
+                      style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#fff',color:'#5514B4',border:'1px solid #5514B4',borderRadius:'32px',padding:'11px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px',marginRight:'10px'}},
+                      ic('M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7',{s:15,c:'#5514B4'}),'Act on behalf'),
                     canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{
                       onClick:()=>{const ent={};dSel.entitlements.forEach(k=>ent[k]=true);setEntWiz({orgId:dSel.id,mode:'assign',step:1,ent});},
                       style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px'}},
@@ -1842,6 +1887,7 @@ function App(){
             const du=userDrawer?users.find(u=>u.id===userDrawer):null;
             const dr=du?ROLES.find(r=>r.key===du.roleKey):null;
             const dOrg=du?orgById(du.orgId):null;
+            const canManageDu=du?canManageUsersOf(du.orgId):false;
             return h('div',{style:{maxWidth:'1120px',display:'flex',height:'calc(100vh - 190px)',border:'1px solid #E3E3E3',borderRadius:'32px',overflow:'hidden',background:'#fff'}},
               // LEFT PANEL — user list
               h('div',{style:{width:'292px',flexShrink:0,borderRight:'1px solid #E3E3E3',display:'flex',flexDirection:'column',background:'#fff'}},
@@ -1963,6 +2009,10 @@ function App(){
                         h('div',{key:lbl,style:{background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'12px'}},
                           h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'5px'}},lbl),
                           h('div',{style:{fontWeight:700,fontSize:'14px',color:'#2A2A2A'}},val)))),
+                    // Policy notice: Partner can't manage this Partner Organisation's users right now
+                    du&&!canManageDu&&canAdmin&&dOrg&&dOrg.parentId===ownOrg&&h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#434343',lineHeight:1.5}},
+                      ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:15,c:'#808080'}),
+                      h('div',null,h('strong',null,dOrg.name+' manages this user. '),subUserPolicy==='notAllowed'?'Partners can\'t manage Partner Organisation users under the current policy.':'To make changes, act on behalf of '+dOrg.name+' from Organisations. '+(consents[dOrg.id]?dOrg.name+' has given consent.':dOrg.name+' hasn\'t given consent yet.'))),
                     // Pending invite notice
                     du.status==='Invited'&&h('div',{style:{display:'flex',alignItems:'flex-start',gap:'10px',background:'#FDF8E8',border:'1px solid #F5DFA0',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#78350F',lineHeight:1.5}},
                       ic('M12 16v-4M12 8h.01',{s:15,c:'#B45309'}),
@@ -1972,7 +2022,7 @@ function App(){
                       const role=ROLES.find(r=>r.key===du.roleKey)||{caps:[]};
                       const uOrg=orgById(du.orgId)||{entitlements:[],name:''};
                       const extra=du.caps||[];
-                      const canEdit=canAdmin&&!isAdminKey(du.roleKey)&&du.status!=='Removed';
+                      const canEdit=canManageDu&&!isAdminKey(du.roleKey)&&du.status!=='Removed';
                       const toggle=k=>setUsers(us=>us.map(u=>u.id===du.id?{...u,caps:extra.includes(k)?extra.filter(x=>x!==k):[...extra,k]}:u));
                       const rows=ENT.filter(e=>e.kind==='capability').map(e=>{
                         const entitled=uOrg.entitlements.includes(e.key);
@@ -1989,7 +2039,7 @@ function App(){
                           rows.map(({e,state},i)=>{
                             const on=state==='role'||state==='extra';
                             const clickable=canEdit&&(state==='extra'||state==='off');
-                            return h('div',{key:e.key,onClick:clickable?()=>{toggle(e.key);showToast('success',e.label+(state==='extra'?' removed from ':' added to ')+du.name+'.');}:undefined,
+                            return h('div',{key:e.key,onClick:clickable?()=>{toggle(e.key);logAudit({action:state==='extra'?'Removed capability':'Added capability',detail:du.name+': '+e.label,category:'User administration',subjectOrg:dOrg&&dOrg.name});showToast('success',e.label+(state==='extra'?' removed from ':' added to ')+du.name+'.');}:undefined,
                               style:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 12px',borderTop:i?'1px solid #F3F3F3':'none',cursor:clickable?'pointer':'default',background:state==='unavailable'?'#FAFAFA':'#fff'}},
                               h('span',{style:{width:'16px',height:'16px',borderRadius:'4px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',border:'1px solid '+(on?(state==='role'?'#9B7ACC':'#5514B4'):'#C8C8C8'),background:on?(state==='role'?'#9B7ACC':'#5514B4'):'#fff'}},
                                 on&&ic('M20 6 9 17l-5-5',{s:11,c:'#fff',w:3})),
@@ -2019,7 +2069,7 @@ function App(){
                       const isPreviewing=previewKey!==du.roleKey;
                       return h('div',{style:{marginBottom:'24px'}},
                         h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},isPreviewing?'Role preview':'Current role'),
-                        h('div',{style:{background:'#FAF6FF',border:'2px solid '+(isPreviewing?'#8B44D4':'#5514B4'),borderRadius:'12px',padding:'16px',marginBottom:canAdmin?'14px':'0'}},
+                        h('div',{style:{background:'#FAF6FF',border:'2px solid '+(isPreviewing?'#8B44D4':'#5514B4'),borderRadius:'12px',padding:'16px',marginBottom:canManageDu?'14px':'0'}},
                           h('div',{style:{display:'flex',gap:'12px',alignItems:'center',marginBottom:'12px'}},
                             h('span',{style:{width:'34px',height:'34px',borderRadius:'8px',background:'#5514B4',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
                               ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:17})),
@@ -2029,7 +2079,7 @@ function App(){
                           h('div',{style:{display:'flex',flexDirection:'column',gap:'5px'}},
                             previewRole.grants.map((g,i)=>h('div',{key:i,style:{display:'flex',gap:'8px',alignItems:'center',fontSize:'12px',color:'#3F187F'}},
                               ic('M20 6 9 17l-5-5',{s:12,c:'#5514B4',w:2.4}),g)))),
-                        canAdmin&&h('div',null,
+                        canManageDu&&h('div',null,
                           h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'8px'}},'Change role'),
                           h('div',{style:{display:'flex',flexDirection:'column',gap:'6px',marginBottom:'12px'}},
                             ROLES.map(r=>h('button',{key:r.key,
@@ -2045,13 +2095,13 @@ function App(){
                               if(!isPreviewing)return;
                               setUsers(us=>us.map(u=>u.id===du.id?{...u,roleKey:previewKey}:u));
                               setDrawerPendingRole(null);
-                              showToast('success',du.name+' changed to '+previewRole.label+'.');
+                              logAudit({action:'Changed role',detail:du.name+': '+(dr?dr.label:'')+' → '+previewRole.label,category:'User administration',subjectOrg:dOrg&&dOrg.name});showToast('success',du.name+' changed to '+previewRole.label+'.');
                             },
                             style:{padding:'10px 24px',background:isPreviewing?'#5514B4':'#D9C9F5',color:'#fff',border:0,borderRadius:'32px',fontWeight:700,fontSize:'14px',cursor:isPreviewing?'pointer':'default',fontFamily:'inherit',opacity:isPreviewing?1:0.55}},
                             'Confirm role change')));
                     })(),
                     // Actions
-                    canAdmin&&(()=>{
+                    canManageDu&&(()=>{
                       const selfId=persona==='reseller'?'u1':persona==='subReseller'?'u3':null;
                       const isSelf=selfId&&du.id===selfId;
                       return h('div',{style:{borderTop:'1px solid #F0F0F0',paddingTop:'18px'}},
@@ -2107,12 +2157,12 @@ function App(){
                     h('div',{style:{fontSize:'14px',color:'#AAAAAA'}},'Choose from the list on the left to view their profile')));
           })(),
             usersTab==='auditLog'&&(()=>{
-              const catColors={'User administration':['#3F187F','#F3EBFE'],'Organisation management':['#036C01','#E6F4E5'],'Product management':['#7C4A00','#FEF3E2'],'Billing':['#0A4D8C','#E6F0FD'],'API access':['#444444','#F5F5F5']};
+              const catColors={'User administration':['#3F187F','#F3EBFE'],'Organisation management':['#036C01','#E6F4E5'],'Product entitlements':['#7C4A00','#FEF3E2'],'Delegated administration':['#92400E','#FEF3E2'],'Access decisions':['#A0121B','#FEF5F5'],'Billing':['#0A4D8C','#E6F0FD'],'API access':['#444444','#F5F5F5']};
               const auditOrgOptions=[...new Set(AUDIT_LOG.map(r=>r.org))];
               const filtered=AUDIT_LOG.filter(r=>{
                 if(auditCat&&auditCat!=='All categories'&&r.category!==auditCat) return false;
                 if(auditFilter&&!r.who.toLowerCase().includes(auditFilter.toLowerCase())&&!r.action.toLowerCase().includes(auditFilter.toLowerCase())&&!r.detail.toLowerCase().includes(auditFilter.toLowerCase())) return false;
-                if(!isBt&&!(r.org===P.org||(r.assisted&&r.assistedOrg===P.org))) return false;
+                if(!isBt&&!(r.org===P.org||r.subjectOrg===P.org||(r.assisted&&r.assistedOrg===P.org))) return false;
                 if(isBt&&auditOrgFilter&&r.org!==auditOrgFilter) return false;
                 return true;
               });
@@ -2154,16 +2204,16 @@ function App(){
                             h('div',{style:{fontSize:'11px',color:'#808080',marginTop:'2px'}},r.whoRole),
                             h('div',{style:{fontSize:'11px',color:'#808080'}},r.org),
                             h('span',{style:{display:'inline-block',marginTop:'4px',background:r.actorType==='bt'?'#E8F0FE':'#F3EBFE',color:r.actorType==='bt'?'#1A56DB':'#5514B4',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},r.actorType==='bt'?'BT Internal':'Reseller'),
-                            r.assisted&&h('span',{style:{display:'inline-block',marginTop:'4px',marginLeft:'4px',background:'#FEF3E2',color:'#92400E',border:'1px solid #F5CBA7',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},ic('M13 2 3 14h9l-1 8 10-12h-9l1-8',{s:9,c:'#92400E',w:2.5}),' Assisted · '+r.assistedOrg)),
+                            r.assisted&&h('span',{style:{display:'inline-block',marginTop:'4px',marginLeft:'4px',background:'#FEF3E2',color:'#92400E',border:'1px solid #F5CBA7',borderRadius:'999px',padding:'2px 8px',fontSize:'10px',fontWeight:700}},ic('M13 2 3 14h9l-1 8 10-12h-9l1-8',{s:9,c:'#92400E',w:2.5}),(r.actorType==='bt'?' Assisted · ':' On behalf of ')+r.assistedOrg)),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
                             h('div',{style:{fontWeight:600}},r.action),
                             h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},r.detail)),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
                             (()=>{const[tc,bg]=catColors[r.category]||['#444','#F5F5F5'];return h('span',{style:{background:bg,color:tc,borderRadius:'999px',padding:'3px 10px',fontSize:'11px',fontWeight:700,whiteSpace:'nowrap'}},r.category)})()),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top'}},
-                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',background:r.outcome==='failed'?'#FEF2F2':'#F0FDF4',color:r.outcome==='failed'?'#B91C1C':'#15803D',border:'1px solid '+(r.outcome==='failed'?'#FECACA':'#BBF7D0'),borderRadius:'999px',padding:'3px 10px',fontSize:'11px',fontWeight:700,whiteSpace:'nowrap'}},
-                              ic(r.outcome==='failed'?'M18 6 6 18M6 6l12 12':'M20 6 9 17l-5-5',{s:10,c:r.outcome==='failed'?'#B91C1C':'#15803D',w:2.5}),
-                              r.outcome==='failed'?'Failed':'Success')),
+                            h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px',background:r.outcome!=='success'?'#FEF2F2':'#F0FDF4',color:r.outcome!=='success'?'#B91C1C':'#15803D',border:'1px solid '+(r.outcome!=='success'?'#FECACA':'#BBF7D0'),borderRadius:'999px',padding:'3px 10px',fontSize:'11px',fontWeight:700,whiteSpace:'nowrap'}},
+                              ic(r.outcome!=='success'?'M18 6 6 18M6 6l12 12':'M20 6 9 17l-5-5',{s:10,c:r.outcome!=='success'?'#B91C1C':'#15803D',w:2.5}),
+                              r.outcome==='denied'?'Denied':r.outcome==='failed'?'Failed':'Success')),
                           h('td',{style:{padding:'12px 16px',verticalAlign:'top',color:'#808080',whiteSpace:'nowrap'}},r.ts)))))));
             })(),
             usersTab==='roles'&&(()=>{
@@ -2426,7 +2476,7 @@ function App(){
                 h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},'Organisation'),
                 h('div',{style:{position:'relative'}},
                   h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 40px 12px 14px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'16px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
-                    [orgById('northgate'),...childrenOf('northgate')].map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
+                    [orgById(home),...childrenOf(home)].filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
                   h('span',{style:{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:14,c:'#808080'})))),
               userWiz.step===2&&h('div',null,
                 h('div',{style:{marginBottom:'20px'}},
@@ -2471,7 +2521,7 @@ function App(){
                 const o=orgById(userWiz.orgId);const id='nu'+seq;
                 const rk=userWiz.profileType==='admin'?adminKeyFor(userWiz.orgId):userWiz.role;
                 const user={id,name:userWiz.name.trim()||'New user',email:userWiz.email.trim()||'—',phone:userWiz.phone.trim()||'',roleKey:rk,orgId:userWiz.orgId,status:'Invited'};
-                setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setScreen('users');
+                setUsers(us=>[...us,user]);setSeq(n=>n+1);setUserWiz(null);setScreen('users');logAudit({action:'Invited user',detail:user.name+' invited as '+roleLabel(rk),category:'User administration',subjectOrg:o&&o.name});
                 showToast('success','Invitation sent to '+user.name+' as '+roleLabel(rk)+' at '+(o?o.name:'Northgate Telecom')+'.');
               },style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 24px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},userWiz.step===3?'Send invitation':'Continue')))),
 
@@ -2615,6 +2665,48 @@ function App(){
         })(),
 
         // Entitlements wizard (Assign / Edit)
+        delegWiz&&(()=>{
+          const o=orgById(delegWiz.orgId), me=orgById(ownOrg);
+          const both=k=>o.entitlements.includes(k)&&me.entitlements.includes(k);
+          const consented=consents[o.id];
+          const rows=[
+            ['Ordering','Place and manage orders for '+o.name+'\'s customers',(both('orderPortal')||both('orderBtw'))?'yes':'noEnt'],
+            ['Service operations','Faults, diagnostics and fault tools',(both('diagnostics')||both('fms'))?'yes':'noEnt'],
+            ['Notifications','Provision KCIs and service alerts',both('kci')?'yes':'noEnt'],
+            ['Support tickets','Raise tickets with BT for '+o.name,both('support')?'yes':'noEnt'],
+            ['User administration','Invite users, change roles and capabilities',subUserPolicy==='allowed'?'yes':subUserPolicy==='notAllowed'?'policy':consented?'consent':'needsConsent'],
+            ['Billing','Invoices and billing queries','never'],
+          ];
+          const meta={yes:['Delegated','#036C01','#E6F4E5'],consent:['Delegated with consent','#036C01','#E6F4E5'],needsConsent:['Needs consent','#92400E','#FEF3E2'],noEnt:['Not entitled','#808080','#F0F0F0'],policy:['Not allowed by policy','#A0121B','#FEF5F5'],never:['Never delegated','#A0121B','#FEF5F5']};
+          const why={noEnt:'Needs to be held by both '+me.name+' and '+o.name+'.',policy:'Current policy stops Partners managing Partner Organisation users.',never:'Partner Organisations have no BT billing, and billing is never delegated.',consent:o.name+' gave consent on '+consented+'.',needsConsent:o.name+' has to agree before '+me.name+' can manage its users.'};
+          function start(){
+            setAuditExtra(a=>[{id:'x'+Date.now(),who:P.person.name,whoRole:P.name,org:P.org,actorType:'reseller',outcome:'success',ts:nowTs(),action:'Started act-on-behalf session',detail:'Delegated: '+rows.filter(r=>r[2]==='yes'||r[2]==='consent').map(r=>r[0]).join(', '),category:'Delegated administration',assisted:true,assistedOrg:o.name},...a]);
+            setOnBehalf(o.id);setSelOrgId(o.id);setDelegWiz(null);setScreen('overview');
+            showToast('success','You\'re now acting on behalf of '+o.name+'.');
+          }
+          return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex'}},
+            h('div',{onClick:()=>setDelegWiz(null),style:{flex:1,background:'rgba(20,10,40,0.42)'}}),
+            h('div',{style:{width:'540px',background:'#fff',display:'flex',flexDirection:'column',boxShadow:'-16px 0 40px rgba(20,10,40,0.18)'}},
+              h('div',{style:{padding:'24px 28px',borderBottom:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
+                h('div',null,
+                  h('div',{style:{fontSize:'18px',fontWeight:700}},'Act on behalf of '+o.name),
+                  h('div',{style:{fontSize:'13px',color:'#808080',marginTop:'3px'}},'Partner Organisation of '+me.name)),
+                h('button',{onClick:()=>setDelegWiz(null),style:{width:'34px',height:'34px',borderRadius:'999px',border:'1px solid #E3E3E3',background:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}},ic('M18 6 6 18M6 6l12 12',{s:15,c:'#434343'}))),
+              h('div',{style:{flex:1,overflowY:'auto',padding:'24px 28px'}},
+                h('div',{style:{fontSize:'14px',color:'#434343',lineHeight:1.6,marginBottom:'20px'}},'You\'ll see '+o.name+'\'s users, services and orders. You can only do what has been delegated, and never more than '+me.name+' or '+o.name+' holds. Everything is logged against both organisations.'),
+                h('div',{style:{fontSize:'12px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'10px'}},'What you can do'),
+                h('div',{style:{border:'1px solid #E3E3E3',borderRadius:'12px',overflow:'hidden'}},
+                  rows.map(([label,desc,st],i)=>{const [t,fg,bg]=meta[st];return h('div',{key:label,style:{display:'flex',gap:'12px',alignItems:'flex-start',padding:'12px 14px',borderTop:i?'1px solid #F0F0F0':'none'}},
+                    h('div',{style:{flex:1}},
+                      h('div',{style:{fontSize:'14px',fontWeight:600,color:st==='yes'||st==='consent'?'#1A1A1A':'#808080'}},label),
+                      h('div',{style:{fontSize:'12px',color:'#808080',marginTop:'2px'}},why[st]||desc),
+                      st==='needsConsent'&&h('button',{onClick:()=>{setConsents(c=>({...c,[o.id]:nowTs().split(',')[0]}));setAuditExtra(a=>[{id:'x'+Date.now(),who:o.primaryName,whoRole:'Partner Organisation Administrator',org:o.name,actorType:'reseller',outcome:'success',ts:nowTs(),action:'Gave consent',detail:me.name+' can manage '+o.name+' users',category:'Delegated administration',subjectOrg:me.name},...a]);showToast('success',o.primaryName+' gave consent for '+o.name+'.');},
+                        style:{marginTop:'8px',background:'none',border:'1px solid #C4A0F0',color:'#5514B4',borderRadius:'32px',padding:'5px 12px',fontSize:'12px',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},'Simulate '+o.name+' giving consent')),
+                    h('span',{style:{fontSize:'11px',fontWeight:700,color:fg,background:bg,borderRadius:'1000px',padding:'3px 9px',whiteSpace:'nowrap'}},t));}))),
+              h('div',{style:{padding:'20px 28px',borderTop:'1px solid #E3E3E3',display:'flex',justifyContent:'space-between'}},
+                h('button',{onClick:()=>setDelegWiz(null),style:{padding:'12px 20px',border:'1px solid #E3E3E3',borderRadius:'32px',background:'#fff',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},'Cancel'),
+                h('button',{onClick:start,style:{padding:'12px 24px',border:0,borderRadius:'32px',background:'#5514B4',color:'#fff',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},'Start acting on behalf'))));
+        })(),
         entWiz&&(()=>{
           const ewOrg=orgById(entWiz.orgId);
           const ewParent=ewOrg&&ewOrg.parentId?orgById(ewOrg.parentId):orgById('btw');
@@ -2633,7 +2725,9 @@ function App(){
             const allowed=typeAllows(ewOrg.typeKey,e.key);
             const locked=!parentHas||!allowed;
             const checked=!!entWiz.ent[e.key]&&!locked;
-            const lockReason=!parentHas?'Not held by parent org':!allowed?'Not available for this org type':null;
+            const lockReason=!parentHas?'Not held by '+(ewParent?ewParent.name:'the parent'):!allowed?'Not available to '+TYPE_LABELS[ewOrg.typeKey]+'s':null;
+            const inherits=ewParent&&ewParent.typeKey!=='root';
+            const st=locked?['Denied','#A0121B','#FEF5F5']:!inherits?null:checked?['Inherited','#5514B4','#F3EBFE']:['Overridden','#92400E','#FEF3E2'];
             return h('button',{key:e.key,onClick:()=>toggleEnt(e.key),
               style:{display:'flex',alignItems:'center',gap:'12px',width:'100%',padding:'13px 14px',borderRadius:'10px',
                 border:'1px solid '+(checked?'#5514B4':locked?'#E3E3E3':'#E3E3E3'),
@@ -2645,13 +2739,29 @@ function App(){
               h('div',{style:{flex:1}},
                 h('div',{style:{fontSize:'14px',fontWeight:600,color:locked?'#AAAAAA':'#1A1A1A'}}),
                 h('div',{style:{fontSize:'14px',fontWeight:600,color:locked?'#AAAAAA':'#1A1A1A'}},e.label),
-                lockReason&&h('div',{style:{fontSize:'12px',color:'#AAAAAA',marginTop:'2px'}},lockReason)));
+                lockReason&&h('div',{style:{fontSize:'12px',color:'#AAAAAA',marginTop:'2px'}},lockReason),
+                st&&st[0]==='Overridden'&&h('div',{style:{fontSize:'12px',color:'#92400E',marginTop:'2px'}},'Removed for this organisation, although '+ewParent.name+' holds it')),
+              st&&h('span',{style:{fontSize:'11px',fontWeight:700,color:st[1],background:st[2],borderRadius:'1000px',padding:'2px 9px',flexShrink:0}},st[0]));
           }
+          const newEnts=ENT.filter(e=>entWiz.ent[e.key]&&(!ewParent||ewParent.entitlements.includes(e.key))&&typeAllows(ewOrg.typeKey,e.key)).map(e=>e.key);
+          const removed=ewOrg.entitlements.filter(k=>!newEnts.includes(k)&&ENT.some(e=>e.key===k));
+          const added=newEnts.filter(k=>!ewOrg.entitlements.includes(k));
+          const labelOf=k=>(ENT.find(e=>e.key===k)||{label:k}).label;
+          const cascade=flatten(ewOrg.id).slice(1).map(x=>x.org).map(o=>({org:o,lose:o.entitlements.filter(k=>removed.includes(k))})).filter(x=>x.lose.length);
+          const cascadeUsers=users.filter(u=>u.status!=='Removed'&&cascade.some(c=>c.org.id===u.orgId)).length;
+          const needsAck=cascade.length>0;
           function confirmSave(){
-            const newEnts=ENT.filter(e=>entWiz.ent[e.key]).map(e=>e.key);
-            setOrgs(prev=>prev.map(o=>o.id===entWiz.orgId?{...o,entitlements:newEnts}:o));
+            if(needsAck&&!entWiz.ack) return;
+            setOrgs(prev=>prev.map(o=>{
+              if(o.id===ewOrg.id) return {...o,entitlements:newEnts};
+              const c=cascade.find(x=>x.org.id===o.id);
+              return c?{...o,entitlements:o.entitlements.filter(k=>!removed.includes(k))}:o;
+            }));
+            if(added.length) logAudit({action:'Granted entitlements',detail:ewOrg.name+': '+added.map(labelOf).join(', '),category:'Product entitlements',subjectOrg:ewOrg.name});
+            if(removed.length) logAudit({action:'Removed entitlements',detail:ewOrg.name+': '+removed.map(labelOf).join(', '),category:'Product entitlements',subjectOrg:ewOrg.name});
+            cascade.forEach(c=>logAudit({action:'Entitlements removed by cascade',detail:c.org.name+': '+c.lose.map(labelOf).join(', ')+' (removed from '+ewOrg.name+')',category:'Product entitlements',subjectOrg:c.org.name}));
             setEntWiz(null);
-            showToast('success',(isEdit?'Entitlements updated':'Entitlements assigned')+' for '+ewOrg.name+'.');
+            showToast('success',(isEdit?'Entitlements updated':'Entitlements assigned')+' for '+ewOrg.name+(cascade.length?'. '+cascade.length+' Partner Organisation'+(cascade.length>1?'s':'')+' updated too.':'.'));
           }
           return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex'}},
             h('div',{onClick:()=>setEntWiz(null),style:{flex:1,background:'rgba(20,10,40,0.42)'}}),
@@ -2686,7 +2796,17 @@ function App(){
                   caps.map(e=>entryRow(e))),
                 entWiz.step===3&&h('div',null,
                   h('div',{style:{fontSize:'13px',color:'#434343',marginBottom:'20px',lineHeight:1.6}},
-                    'Review the entitlements for ',h('b',null,ewOrg?ewOrg.name:''),'. Changes take effect immediately.'),
+                    'Review the entitlements for ',h('b',null,ewOrg?ewOrg.name:''),'. Changes take effect immediately, in the Portal and the API.'),
+                  needsAck&&h('div',{style:{background:'#FFF8E7',border:'1px solid #F5D878',borderRadius:'12px',padding:'14px 16px',marginBottom:'20px'}},
+                    h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start'}},
+                      ic('M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z',{s:17,c:'#B45309'}),
+                      h('div',{style:{fontSize:'13px',color:'#5C3A00',lineHeight:1.55}},
+                        h('div',{style:{fontWeight:700,marginBottom:'4px'}},'This also changes '+cascade.length+' Partner Organisation'+(cascade.length>1?'s':'')),
+                        'A Partner Organisation can never hold more than its Partner, so these will be removed from them too. '+cascadeUsers+' user'+(cascadeUsers!==1?'s':'')+' will lose access.',
+                        h('ul',{style:{margin:'8px 0 0',paddingLeft:'18px'}},cascade.map(c=>h('li',{key:c.org.id},h('b',null,c.org.name),': '+c.lose.map(labelOf).join(', ')))))),
+                    h('label',{style:{display:'flex',gap:'8px',alignItems:'center',marginTop:'12px',fontSize:'13px',fontWeight:600,color:'#5C3A00',cursor:'pointer'}},
+                      h('input',{type:'checkbox',checked:!!entWiz.ack,onChange:()=>setEntWiz(w=>({...w,ack:!w.ack})),style:{accentColor:'#5514B4',width:'16px',height:'16px'}}),
+                      'I understand this removes access for these organisations')),
                   h('div',{style:{marginBottom:'16px'}},
                     h('div',{style:{fontSize:'12px',fontWeight:700,color:'#808080',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'10px'}},'Products'),
                     products.map(e=>{
@@ -2707,9 +2827,9 @@ function App(){
                 h('button',{onClick:()=>entWiz.step>1?setEntWiz(w=>({...w,step:w.step-1})):setEntWiz(null),
                   style:{padding:'12px 20px',border:'1px solid #E3E3E3',borderRadius:'32px',background:'#fff',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',color:'#434343'}},
                   entWiz.step>1?'Back':'Cancel'),
-                h('button',{onClick:()=>entWiz.step<3?setEntWiz(w=>({...w,step:w.step+1})):confirmSave(),
-                  style:{padding:'12px 24px',border:0,borderRadius:'32px',background:'#5514B4',color:'#fff',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit'}},
-                  entWiz.step===3?(isEdit?'Save changes':'Assign entitlements'):'Continue'))));
+                h('button',{onClick:()=>entWiz.step<3?setEntWiz(w=>({...w,step:w.step+1})):confirmSave(),disabled:entWiz.step===3&&needsAck&&!entWiz.ack,
+                  style:{padding:'12px 24px',border:0,borderRadius:'32px',background:entWiz.step===3&&needsAck&&!entWiz.ack?'#C8C8C8':'#5514B4',color:'#fff',fontWeight:700,fontSize:'14px',cursor:entWiz.step===3&&needsAck&&!entWiz.ack?'not-allowed':'pointer',fontFamily:'inherit'}},
+                  entWiz.step===3?(needsAck?'Save and update '+cascade.length+' org'+(cascade.length>1?'s':''):isEdit?'Save changes':'Assign entitlements'):'Continue'))));
         })(),
 
         // Org wizard drawer
