@@ -437,14 +437,14 @@ const ADMIN_KEYS=['admin','orgAdmin'];
 const isAdminKey=k=>ADMIN_KEYS.includes(k);
 const ROLE_COL_MAP={admin:0,orgAdmin:1,salesOrdering:2,serviceOps:3,billingReporting:4,readonly:5};
 const BT_ROLES=[
-  {key:'btAdmin',label:'Platform Administrator',persona:'bt',desc:'Configures the platform, sets up Resellers and defines network-wide access rules.',users:3,scope:'Any Reseller or Sub-reseller',assisted:['Organisation setup','Entitlements','User administration','Ordering','Service management','Support and diagnostics']},
-  {key:'btAccountMgr',label:'Account Manager',persona:'btAccountMgr',desc:'Looks after Reseller relationships and helps with onboarding, users and roles.',users:6,scope:'Assigned Resellers and their Sub-resellers',assisted:['User administration','Ordering','Support and diagnostics']},
-  {key:'btSalesSpec',label:'Sales Specialist',persona:'btSalesSpec',desc:'Handles commercial relationships and completes onboarding forms for Resellers.',users:4,scope:'Assigned Resellers',assisted:['Onboarding forms','Ordering']},
-  {key:'btEstablishment',label:'Establishment Operator',persona:'btEstablishment',desc:'Provisions new organisations: EIM attributes, API accounts and system setup steps.',users:3,scope:'Organisations being set up',assisted:['Organisation setup','API provisioning']},
-  {key:'btSupport',label:'Network Support',desc:'Handles fault escalations and technical support requests from partners.',users:5,scope:'Any Reseller or Sub-reseller',assisted:['Service management','Support and diagnostics']},
-  {key:'btBilling',label:'Billing Administrator',desc:'Oversees wholesale invoicing, billing reports and reconciliation.',users:2,scope:'Resellers only',assisted:['Billing']},
-  {key:'btAnalyst',label:'Reporting Analyst',desc:'Read-only access to platform-wide performance data and dashboards.',users:4,scope:'None. Can\'t act on behalf of partners',assisted:[]},
-  {key:'faultDiagnosticsUser',label:'Fault Diagnostics User',desc:'SVMP access for fault diagnostics. Named individual nominated at establishment, not assignable from the role picker.',users:2,nominatedOnly:true,scope:'The organisation that nominated them',assisted:['Support and diagnostics']},
+  {key:'btAdmin',label:'Platform Administrator',persona:'bt',desc:'Configures the platform, sets up Resellers and defines network-wide access rules.',users:3,scopeType:'any',scope:'Any Reseller or Sub-reseller',assisted:['Organisation setup','Entitlements','User administration','Ordering','Service management','Support and diagnostics']},
+  {key:'btAccountMgr',label:'Account Manager',persona:'btAccountMgr',desc:'Looks after Reseller relationships and helps with onboarding, users and roles.',users:6,scopeType:'assigned',assigned:['northgate'],withSubs:true,scope:'Assigned Resellers and their Sub-resellers',assisted:['User administration','Ordering','Support and diagnostics']},
+  {key:'btSalesSpec',label:'Sales Specialist',persona:'btSalesSpec',desc:'Handles commercial relationships and completes onboarding forms for Resellers.',users:4,scopeType:'assigned',assigned:['northgate'],scope:'Assigned Resellers',assisted:['Onboarding forms','Entitlements','Ordering']},
+  {key:'btEstablishment',label:'Establishment Operator',persona:'btEstablishment',desc:'Provisions new organisations: EIM attributes, API accounts and system setup steps.',users:3,scopeType:'setup',scope:'Organisations being set up',assisted:['Organisation setup','API provisioning']},
+  {key:'btSupport',label:'Network Support',desc:'Handles fault escalations and technical support requests from partners.',users:5,scopeType:'any',scope:'Any Reseller or Sub-reseller',assisted:['Service management','Support and diagnostics']},
+  {key:'btBilling',label:'Billing Administrator',desc:'Oversees wholesale invoicing, billing reports and reconciliation.',users:2,scopeType:'resellers',scope:'Resellers only',assisted:['Billing']},
+  {key:'btAnalyst',label:'Reporting Analyst',desc:'Read-only access to platform-wide performance data and dashboards.',users:4,scopeType:'none',scope:'None. Can\'t act on behalf of partners',assisted:[]},
+  {key:'faultDiagnosticsUser',label:'Fault Diagnostics User',desc:'SVMP access for fault diagnostics. Named individual nominated at establishment, not assignable from the role picker.',users:2,nominatedOnly:true,scopeType:'none',scope:'The organisation that nominated them',assisted:['Support and diagnostics']},
 ];
 const PERSONAS={
   bt:{key:'bt',name:'BT Wholesale Administrator',signedInAs:'BT Wholesale Administrator',org:'BT Wholesale',orgInitials:'BT',crumb:'BT Wholesale · Platform administration',title:'Dashboard',
@@ -656,9 +656,34 @@ function App(){
     const fail=checks.find(c=>!c.pass);
     return {allowed:!fail,reason:fail?fail.why:'All checks passed.',checks,action:a,target,decisionId:'dec_'+(u.id+actionKey+(actingFor||'')).split('').reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7).toString(16).slice(0,8)};
   }
+  const BT_PERSONA_ROLE={bt:'btAdmin',btAccountMgr:'btAccountMgr',btSalesSpec:'btSalesSpec',btEstablishment:'btEstablishment'};
+  const btRole=isBt?BT_ROLES.find(r=>r.key===BT_PERSONA_ROLE[persona]):null;
+  function btInScope(orgId){
+    const o=orgs.find(x=>x.id===orgId);
+    if(!btRole||!o||o.typeKey==='root') return false;
+    const t=btRole.scopeType;
+    if(t==='any') return true;
+    if(t==='resellers') return o.typeKey==='reseller';
+    if(t==='setup') return o.orgStatus==='testing'||o.orgApprovalStatus!=='approved';
+    if(t==='assigned') return btRole.assigned.includes(o.id)||(!!btRole.withSubs&&btRole.assigned.includes(o.parentId));
+    return false;
+  }
+  function btCan(area,orgId){
+    if(!isBt) return {ok:true};
+    const o=orgs.find(x=>x.id===orgId)||{name:'this organisation'};
+    if(!btRole||!btRole.assisted.includes(area)) return {ok:false,why:(btRole?btRole.label:'Your role')+' can\'t do '+area.toLowerCase()+' for partners.'};
+    if(!btInScope(orgId)){const t=btRole.scopeType;return {ok:false,why:t==='assigned'?o.name+' isn\'t one of your assigned '+(btRole.withSubs?'Resellers or their Sub-resellers.':'Resellers.'):t==='resellers'?o.name+' is a Sub-reseller, and '+btRole.label+' covers Resellers only.':t==='setup'?o.name+' is already live, and '+btRole.label+' only covers organisations being set up.':btRole.label+' can\'t act for partners.'};}
+    return {ok:true};
+  }
+  function btDeny(res,area,orgId){
+    const o=orgs.find(x=>x.id===orgId)||{};
+    logAudit({action:'Access denied',detail:area+' for '+o.name+'. '+res.why,category:'Access decisions',outcome:'denied',subjectOrg:o.name});
+    showToast('error',res.why);
+  }
   function canManageUsersOf(orgId){
     if(!canAdmin) return false;
-    if(isBt||orgId===ownOrg) return true;
+    if(isBt) return btCan('User administration',orgId).ok;
+    if(orgId===ownOrg) return true;
     const o=orgs.find(x=>x.id===orgId);
     if(!o||o.parentId!==ownOrg) return false;
     if(subUserPolicy==='allowed') return true;
@@ -709,7 +734,7 @@ function App(){
     const hint=isOrg?(isBt?'Set up a new reseller organisation':'Delegate access to a downstream org'):(isBt?'Add a user & assign them a role':'Add a team member & assign a role');
     const onClick=isOrg
       ?()=>{if(!canAdmin)return deny();const t=childTypes()[0];setOrgWiz({step:1,name:'',email:'',type:t,ent:defEnt(t),brandingMode:'inherited'});}
-      :()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:home,profileType:'regular',role:'salesOrdering'});};
+      :()=>{if(!canAdmin)return deny();if(isBt){const ok=orgs.filter(o=>canManageUsersOf(o.id)&&(!btOrgContext||o.id===btOrgContext||o.parentId===btOrgContext));if(!ok.length){const t=btOrgContext||'northgate';return btDeny(btCan('User administration',t),'User administration',t);}return setUserWiz({step:1,name:'',email:'',phone:'',orgId:ok[0].id,profileType:'regular',role:'salesOrdering'});}setUserWiz({step:1,name:'',email:'',phone:'',orgId:home,profileType:'regular',role:'salesOrdering'});};
     return {label,hint,onClick,
       rowStyle:{display:'flex',alignItems:'center',gap:'12px',width:'100%',borderRadius:'12px',padding:'13px 14px',marginBottom:'12px',textAlign:'left',border:'1px solid #E3E3E3',background:canAdmin?'#fff':'#F7F7F7',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
       ctaStyle:{display:'inline-flex',alignItems:'center',gap:'8px',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',whiteSpace:'nowrap',background:canAdmin?'#5514B4':'#EDEDED',color:canAdmin?'#fff':'#AAAAAA',cursor:canAdmin?'pointer':'not-allowed',fontFamily:'inherit'},
@@ -1029,7 +1054,7 @@ function App(){
                   h('div',{style:{position:'relative',display:'inline-flex',alignItems:'center'}},
                     h('select',{value:btOrgContext||'',onChange:e=>{const v=e.target.value||null;if(v)setAuditExtra(a=>[{id:'x'+Date.now(),who:P.person.name,whoRole:P.name,org:P.org,actorType:'bt',outcome:'success',ts:nowTs(),action:'Started assisted session',detail:'Acting in the context of '+orgById(v).name,category:'Delegated administration',assisted:true,assistedOrg:orgById(v).name},...a]);setBtOrgContext(v);},style:{padding:'5px 28px 5px 10px',border:'1px solid #C8C8C8',borderRadius:'8px',fontSize:'13px',background:'#fff',fontFamily:'inherit',cursor:'pointer'}},
                       h('option',{value:''},'Select reseller…'),
-                      orgs.filter(o=>o.typeKey==='reseller'||o.typeKey==='partnerOrg').map(o=>h('option',{key:o.id,value:o.id},o.name))),
+                      orgs.filter(o=>(o.typeKey==='reseller'||o.typeKey==='partnerOrg')&&btInScope(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name))),
                     h('span',{style:{position:'absolute',right:'7px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:12,c:'#808080'}))),
                   h('span',{style:{fontSize:'12px',color:'#808080'}},'Select an org context before making changes on behalf of a reseller.'))),
 
@@ -1478,7 +1503,7 @@ function App(){
                   h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},'Organisation'),
                   h('div',{style:{position:'relative'}},
                     h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 40px 12px 14px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'16px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
-                      [orgById(home),...childrenOf(home)].filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
+                      (isBt&&!btOrgContext?orgs.filter(o=>o.typeKey!=='root'):[orgById(isBt?btOrgContext:home),...childrenOf(isBt?btOrgContext:home)]).filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
                     h('span',{style:{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:14,c:'#808080'})))),
                 userWiz.step===2&&h('div',null,
                   h('div',{style:{marginBottom:'20px'}},
@@ -1663,7 +1688,7 @@ function App(){
                       style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#fff',color:'#5514B4',border:'1px solid #5514B4',borderRadius:'32px',padding:'11px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px',marginRight:'10px'}},
                       ic('M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7',{s:15,c:'#5514B4'}),'Act on behalf'),
                     canAdmin&&dSel.id!=='btw'&&dSel.id!==home&&h('button',{
-                      onClick:()=>{const ent={};dSel.entitlements.forEach(k=>ent[k]=true);setEntWiz({orgId:dSel.id,mode:'assign',step:1,ent});},
+                      onClick:()=>{const c=btCan('Entitlements',dSel.id);if(!c.ok)return btDeny(c,'Entitlements',dSel.id);const ent={};dSel.entitlements.forEach(k=>ent[k]=true);setEntWiz({orgId:dSel.id,mode:'assign',step:1,ent});},
                       style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',padding:'12px 20px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'20px'}},
                       ic('M12 5v14M5 12h14',{s:15,c:'#fff'}),'Assign entitlements'))
                 :h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'12px',padding:'40px'}},
@@ -1985,7 +2010,7 @@ function App(){
                       }
                       return rows;
                     }),
-                    canAdmin&&od.id!=='btw'&&od.id!==home&&h('button',{onClick:()=>{const ent={};od.entitlements.forEach(k=>ent[k]=true);setEntWiz({orgId:od.id,mode:'edit',step:1,ent});},style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic(['M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7','M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z'],{s:14,c:'#fff'}),'Edit entitlements')))));
+                    canAdmin&&od.id!=='btw'&&od.id!==home&&h('button',{onClick:()=>{const c=btCan('Entitlements',od.id);if(!c.ok)return btDeny(c,'Entitlements',od.id);const ent={};od.entitlements.forEach(k=>ent[k]=true);setEntWiz({orgId:od.id,mode:'edit',step:1,ent});},style:{display:'inline-flex',alignItems:'center',gap:'8px',background:'#5514B4',color:'#fff',border:0,borderRadius:'8px',padding:'10px 16px',fontWeight:700,fontSize:'14px',cursor:'pointer',fontFamily:'inherit',marginTop:'16px',width:'100%',justifyContent:'center'}},ic(['M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7','M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z'],{s:14,c:'#fff'}),'Edit entitlements')))));
           })(),
 
           screen==='users'&&h('div',{style:{maxWidth:'1120px'}},
@@ -2067,7 +2092,7 @@ function App(){
                           ic([{el:'circle',cx:9,cy:7,r:4},'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'],{s:22,c:'#5514B4'})),
                         h('div',{style:{fontWeight:700,fontSize:'14px',color:'#434343'}},'No users yet'),
                         h('div',{style:{fontSize:'13px',color:'#808080',lineHeight:1.5}},'Invite your first team member to get started.'),
-                        h('button',{onClick:()=>{if(!canAdmin)return deny();setUserWiz({step:1,name:'',email:'',phone:'',orgId:home,profileType:'regular',role:'salesOrdering'});},
+                        h('button',{onClick:inviteUser.onClick,
                           style:{marginTop:'6px',padding:'8px 18px',background:'#5514B4',color:'#fff',border:0,borderRadius:'32px',fontWeight:700,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}},'Invite user'))
                     :filtered.length===0
                     ?h('div',{style:{padding:'32px 14px',textAlign:'center'}},
@@ -2129,7 +2154,10 @@ function App(){
                           h('div',{style:{fontSize:'12px',fontWeight:500,color:'#434343',marginBottom:'5px'}},lbl),
                           h('div',{style:{fontWeight:700,fontSize:'14px',color:'#2A2A2A'}},val)))),
                     // Policy notice: Partner can't manage this Partner Organisation's users right now
-                    du&&!canManageDu&&canAdmin&&dOrg&&dOrg.parentId===ownOrg&&h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#434343',lineHeight:1.5}},
+                    du&&isBt&&!canManageDu&&dOrg&&h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#434343',lineHeight:1.5}},
+                      ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:15,c:'#808080'}),
+                      h('div',null,h('strong',null,'Outside your assisted scope. '),btCan('User administration',dOrg.id).why)),
+                    du&&!isBt&&!canManageDu&&canAdmin&&dOrg&&dOrg.parentId===ownOrg&&h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start',background:'#F7F7F7',border:'1px solid #E3E3E3',borderRadius:'12px',padding:'14px 16px',marginBottom:'24px',fontSize:'13px',color:'#434343',lineHeight:1.5}},
                       ic('M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z',{s:15,c:'#808080'}),
                       h('div',null,h('strong',null,dOrg.name+' manages this user. '),subUserPolicy==='notAllowed'?'Partners can\'t manage Partner Organisation users under the current policy.':'To make changes, act on behalf of '+dOrg.name+' from Organisations. '+(consents[dOrg.id]?dOrg.name+' has given consent.':dOrg.name+' hasn\'t given consent yet.'))),
                     // Pending invite notice
@@ -2623,7 +2651,7 @@ function App(){
                 h('label',{style:{display:'block',fontSize:'14px',fontWeight:700,marginBottom:'8px'}},'Organisation'),
                 h('div',{style:{position:'relative'}},
                   h('select',{value:userWiz.orgId,onChange:e=>setUserWiz(w=>({...w,orgId:e.target.value})),style:{width:'100%',padding:'12px 40px 12px 14px',border:'1px solid #C8C8C8',borderRadius:'12px',fontSize:'16px',background:'#fff',cursor:'pointer',fontFamily:'inherit'}},
-                    [orgById(home),...childrenOf(home)].filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
+                    (isBt&&!btOrgContext?orgs.filter(o=>o.typeKey!=='root'):[orgById(isBt?btOrgContext:home),...childrenOf(isBt?btOrgContext:home)]).filter(o=>canManageUsersOf(o.id)).map(o=>h('option',{key:o.id,value:o.id},o.name+' · '+TYPE_LABELS[o.typeKey]))),
                   h('span',{style:{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none',display:'flex'}},ic('M6 9l6 6 6-6',{s:14,c:'#808080'})))),
               userWiz.step===2&&h('div',null,
                 h('div',{style:{marginBottom:'20px'}},
